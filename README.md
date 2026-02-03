@@ -10,4 +10,3 @@
 <img width="1919" height="948" alt="5" src="https://github.com/user-attachments/assets/83bb9a69-0092-4d2c-b3d6-0b0a15b0a27e" />
 <img width="1917" height="945" alt="6" src="https://github.com/user-attachments/assets/c72c5e3e-b64e-4741-89d2-f14b6aebfea6" />
 
-> Desde el navegador Brave puede generar problemas de compatibilidad con las animaciónes, abrá el sitio en otro navegador (Ej: Edge).
