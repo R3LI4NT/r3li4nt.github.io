@@ -1,453 +1,116 @@
-// Script principal para el CV Hacker de R3LI4NT
-
+// Enhanced Hacker CV - R3LI4NT
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // 1. Boot Terminal
+    // 1. Boot Sequence
     const bootTerminal = document.getElementById('boot-terminal');
     const mainContent = document.getElementById('main-content');
-    
-    // Simular proceso de boot
-    setTimeout(() => {
+    let bootComplete = false;
+
+    // Simulate boot process
+    const bootSequence = async () => {
+        await delay(500);
+        typeTerminalText();
+        
+        // Allow skip with Enter
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !bootComplete) {
+                skipBoot();
+            }
+        });
+
+        // Auto continue after 4 seconds
+        setTimeout(() => {
+            if (!bootComplete) completeBoot();
+        }, 4000);
+    };
+
+    const typeTerminalText = () => {
+        const lines = document.querySelectorAll('.terminal-text');
+        lines.forEach((line, index) => {
+            setTimeout(() => {
+                line.style.opacity = '1';
+                line.style.transform = 'translateX(0)';
+            }, index * 500);
+        });
+    };
+
+    const completeBoot = () => {
+        bootComplete = true;
         bootTerminal.style.opacity = '0';
+        bootTerminal.style.transform = 'scale(0.95)';
+        
         setTimeout(() => {
             bootTerminal.classList.add('hidden');
             mainContent.classList.remove('hidden');
-            initializePage();
+            initializeApp();
         }, 500);
-    }, 4000);
-    
-    // También permitir salir con Enter
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !bootTerminal.classList.contains('hidden')) {
-            bootTerminal.style.opacity = '0';
-            setTimeout(() => {
-                bootTerminal.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                initializePage();
-            }, 500);
-        }
-    });
-    
-    function initializePage() {
-        // 2. Inicializar animaciones
+    };
+
+    const skipBoot = () => {
+        if (bootComplete) return;
+        bootComplete = true;
+        completeBoot();
+    };
+
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    // 2. Initialize Application
+    const initializeApp = () => {
+        initNavigation();
+        initMatrixRain();
+        initScrollEffects();
         initAnimations();
-        
-        // 3. Inicializar efectos interactivos
-        initInteractiveEffects();
-        
-        // 4. Inicializar menú móvil
+        initThemeToggle();
+        initBackToTop();
+        initCopyButtons();
+        initCounters();
         initMobileMenu();
-        
-        // 5. Inicializar sección malware
-        initMalwareSection();
-        
-        // 6. Inicializar sección pentesting
-        initPentestingSection();
-        
-        // 7. Inicializar funcionalidad PGP
-        initPGPKeyCopy();
-        
-        // 8. Inicializar toggle de color
-        initColorToggle();
-        
-        // 9. Crear lluvia de código
-        createMatrixRain();
-        
-        // 10. Inicializar scroll suave
-        initSmoothScroll();
-        
-        // 11. Inicializar contadores animados
-        initAnimatedCounters();
-        
-        // 12. Inicializar efectos de escritura
-        initTypingEffects();
-        
-        // 13. Inicializar animación de barras de habilidad
+        initGlitchEffects();
         initSkillBars();
+    };
+
+    // 3. Navigation Effects
+    const initNavigation = () => {
+        const nav = document.querySelector('.floating-nav');
+        const navLinks = document.querySelectorAll('.nav-link');
         
-        // 14. Inicializar efectos especiales
-        initSpecialEffects();
-    }
-    
-    function initAnimations() {
-        // Añadir clase de animación a elementos cuando son visibles
+        // Scroll effect for nav
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Active link highlighting
+        const sections = document.querySelectorAll('.section');
         const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            root: null,
+            rootMargin: '-50% 0px -50% 0px',
+            threshold: 0
         };
-        
-        const observer = new IntersectionObserver((entries) => {
+
+        const sectionObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('animated');
-                    
-                    // Efecto específico para tarjetas de malware
-                    if (entry.target.classList.contains('malware-type')) {
-                        setTimeout(() => {
-                            entry.target.style.transform = 'translateY(0)';
-                            entry.target.style.opacity = '1';
-                        }, 100);
-                    }
+                    const id = entry.target.id;
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
                 }
             });
         }, observerOptions);
-        
-        // Observar elementos para animación
-        document.querySelectorAll('.skill-category, .malware-type, .pentesting-area, .contact-item').forEach(el => {
-            observer.observe(el);
-        });
-    }
-    
-    function initInteractiveEffects() {
-        // Efecto de brillo en elementos interactivos
-        const interactiveElements = document.querySelectorAll('.nav-link, .tool-item, .pentest-tool');
-        
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', function() {
-                this.style.boxShadow = '0 0 15px var(--primary-color)';
-            });
-            
-            el.addEventListener('mouseleave', function() {
-                this.style.boxShadow = '';
-            });
-        });
-        
-        // Efecto de parpadeo en terminal
-        const terminalCursor = document.querySelector('.terminal-cursor');
-        if (terminalCursor) {
-            setInterval(() => {
-                terminalCursor.style.opacity = terminalCursor.style.opacity === '0' ? '1' : '0';
-            }, 500);
-        }
-        
-        // Efecto de escritura en la terminal del hero
-        const typedLines = document.querySelectorAll('.terminal-line.typed');
-        typedLines.forEach((line, index) => {
-            const text = line.getAttribute('data-text');
-            line.textContent = '';
-            
-            setTimeout(() => {
-                typeText(line, text, 0, 50);
-            }, 1000 * index);
-        });
-        
-        function typeText(element, text, index, speed) {
-            if (index < text.length) {
-                element.textContent += text.charAt(index);
-                setTimeout(() => {
-                    typeText(element, text, index + 1, speed);
-                }, speed);
-            }
-        }
-    }
-    
-    function initMobileMenu() {
-        const menuToggle = document.getElementById('menuToggle');
-        const navMenu = document.querySelector('.nav-menu');
-        
-        if (menuToggle) {
-            menuToggle.addEventListener('click', function() {
-                navMenu.classList.toggle('active');
-                
-                // Animación de hamburguesa a X
-                const bars = document.querySelectorAll('.menu-bar');
-                if (navMenu.classList.contains('active')) {
-                    bars[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
-                    bars[1].style.opacity = '0';
-                    bars[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
-                } else {
-                    bars[0].style.transform = 'none';
-                    bars[1].style.opacity = '1';
-                    bars[2].style.transform = 'none';
-                }
-            });
-            
-            // Cerrar menú al hacer clic en un enlace
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    navMenu.classList.remove('active');
-                    bars[0].style.transform = 'none';
-                    bars[1].style.opacity = '1';
-                    bars[2].style.transform = 'none';
-                });
-            });
-        }
-    }
-    
-    function initMalwareSection() {
-        // Efecto especial para las tarjetas de malware
-        const malwareCards = document.querySelectorAll('.malware-type');
-        
-        malwareCards.forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'all 0.5s ease-out';
-            
-            card.addEventListener('mouseenter', function() {
-                const icon = this.querySelector('.malware-icon i');
-                if (icon) {
-                    icon.style.animation = 'pulse 0.5s';
-                    setTimeout(() => {
-                        icon.style.animation = '';
-                    }, 500);
-                }
-                
-                // Resaltar características
-                const features = this.querySelectorAll('.malware-features li');
-                features.forEach((feature, index) => {
-                    setTimeout(() => {
-                        feature.style.color = '#ff003c';
-                        feature.style.transform = 'translateX(5px)';
-                    }, index * 100);
-                });
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                const features = this.querySelectorAll('.malware-features li');
-                features.forEach((feature, index) => {
-                    setTimeout(() => {
-                        feature.style.color = '';
-                        feature.style.transform = '';
-                    }, index * 50);
-                });
-            });
-            
-            // Efecto de parpadeo rojo aleatorio
-            setInterval(() => {
-                if (Math.random() > 0.9 && !card.matches(':hover')) {
-                    card.style.boxShadow = '0 0 20px rgba(255, 0, 60, 0.6)';
-                    setTimeout(() => {
-                        if (!card.matches(':hover')) {
-                            card.style.boxShadow = '';
-                        }
-                    }, 300);
-                }
-            }, 3000);
-        });
-    }
-    
-    function initPentestingSection() {
-        // Animación de herramientas de pentesting
-        const pentestTools = document.querySelectorAll('.pentest-tool');
-        
-        pentestTools.forEach((tool, index) => {
-            // Retraso escalonado para animación
-            tool.style.opacity = '0';
-            tool.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                tool.style.transition = 'all 0.5s ease-out';
-                tool.style.opacity = '1';
-                tool.style.transform = 'translateY(0)';
-            }, 100 * index);
-        });
-        
-        // Efecto hover en áreas de pentesting
-        const pentestAreas = document.querySelectorAll('.pentesting-area');
-        
-        pentestAreas.forEach(area => {
-            area.addEventListener('mouseenter', function() {
-                const tags = this.querySelectorAll('.skill-tag');
-                tags.forEach((tag, i) => {
-                    setTimeout(() => {
-                        tag.style.transform = 'scale(1.05)';
-                        tag.style.boxShadow = '0 0 8px rgba(255, 0, 60, 0.4)';
-                    }, i * 50);
-                });
-            });
-            
-            area.addEventListener('mouseleave', function() {
-                const tags = this.querySelectorAll('.skill-tag');
-                tags.forEach(tag => {
-                    tag.style.transform = '';
-                    tag.style.boxShadow = '';
-                });
-            });
-        });
-    }
-    
-    function initPGPKeyCopy() {
-        // Funcionalidad para copiar clave PGP
-        const copyBtn = document.getElementById('copyPgpKey');
-        const keyContent = document.querySelector('.key-content');
-        
-        if (copyBtn && keyContent) {
-            copyBtn.addEventListener('click', function() {
-                const textToCopy = keyContent.textContent;
-                
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    // Feedback visual
-                    const originalHTML = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check"></i>';
-                    this.style.backgroundColor = '#00ff41';
-                    this.style.color = '#000';
-                    this.style.borderColor = '#00ff41';
-                    
-                    // Mensaje temporal
-                    const originalTitle = this.getAttribute('title');
-                    this.setAttribute('title', '¡Clave copiada!');
-                    
-                    setTimeout(() => {
-                        this.innerHTML = originalHTML;
-                        this.style.backgroundColor = '';
-                        this.style.color = '';
-                        this.style.borderColor = '';
-                        this.setAttribute('title', originalTitle || 'Copiar clave PGP');
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Error al copiar:', err);
-                    // Fallback para navegadores antiguos
-                    const textArea = document.createElement('textarea');
-                    textArea.value = textToCopy;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        alert('Clave PGP copiada al portapapeles');
-                    } catch (e) {
-                        alert('No se pudo copiar la clave. Cópiala manualmente.');
-                    }
-                    document.body.removeChild(textArea);
-                });
-            });
-        }
-    }
-    
-    function initColorToggle() {
-        // Toggle entre esquemas de color
-        const colorToggle = document.getElementById('colorToggle');
-        let isRedTheme = true;
-        
-        if (colorToggle) {
-            colorToggle.addEventListener('click', function() {
-                isRedTheme = !isRedTheme;
-                
-                if (isRedTheme) {
-                    // Tema rojo (default)
-                    document.documentElement.style.setProperty('--primary-color', '#ff003c');
-                    document.documentElement.style.setProperty('--primary-dark', '#cc0030');
-                    document.documentElement.style.setProperty('--glow-color', 'rgba(255, 0, 60, 0.7)');
-                    this.innerHTML = '<i class="fas fa-palette"></i>';
-                    this.style.backgroundColor = 'rgba(255, 0, 60, 0.9)';
-                    
-                    // Actualizar bordes de malware types
-                    document.querySelectorAll('.malware-type').forEach(el => {
-                        el.style.borderColor = '#ff003c';
-                    });
-                    
-                    document.querySelectorAll('.skill-tag').forEach(el => {
-                        el.style.backgroundColor = 'rgba(255, 0, 60, 0.2)';
-                        el.style.borderColor = 'rgba(255, 0, 60, 0.3)';
-                    });
-                } else {
-                    // Tema verde (alternativo)
-                    document.documentElement.style.setProperty('--primary-color', '#00ff41');
-                    document.documentElement.style.setProperty('--primary-dark', '#00cc33');
-                    document.documentElement.style.setProperty('--glow-color', 'rgba(0, 255, 65, 0.7)');
-                    this.innerHTML = '<i class="fas fa-skull"></i>';
-                    this.style.backgroundColor = 'rgba(0, 255, 65, 0.9)';
-                    
-                    // Actualizar bordes de malware types
-                    document.querySelectorAll('.malware-type').forEach(el => {
-                        el.style.borderColor = '#00ff41';
-                    });
-                    
-                    document.querySelectorAll('.skill-tag').forEach(el => {
-                        el.style.backgroundColor = 'rgba(0, 255, 65, 0.2)';
-                        el.style.borderColor = 'rgba(0, 255, 65, 0.3)';
-                    });
-                }
-                
-                // Efecto de transición
-                document.body.style.transition = 'all 0.5s ease';
-                setTimeout(() => {
-                    document.body.style.transition = '';
-                }, 500);
-            });
-        }
-    }
-    
-    function createMatrixRain() {
-        const matrixContainer = document.getElementById('matrix-rain');
-        
-        // Caracteres estilo Matrix
-        const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        
-        // Configuración
-        const fontSize = 14;
-        const columns = Math.floor(window.innerWidth / fontSize);
-        const drops = new Array(columns).fill(1);
-        
-        // Crear canvas para la lluvia
-        const canvas = document.createElement('canvas');
-        canvas.id = 'matrix-canvas';
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        matrixContainer.appendChild(canvas);
-        
-        const ctx = canvas.getContext('2d');
-        
-        // Dibujar la lluvia
-        function drawMatrix() {
-            // Fondo semitransparente para efecto de rastro
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Estilo del texto
-            ctx.fillStyle = '#0f0';
-            ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
-            
-            // Dibujar caracteres
-            for (let i = 0; i < drops.length; i++) {
-                // Carácter aleatorio
-                const text = chars[Math.floor(Math.random() * chars.length)];
-                
-                // Posición y
-                const y = drops[i] * fontSize;
-                
-                // Intensidad variable
-                const opacity = Math.random() * 0.5 + 0.5;
-                ctx.globalAlpha = opacity;
-                
-                // Dibujar carácter
-                ctx.fillText(text, i * fontSize, y);
-                
-                // Restaurar opacidad
-                ctx.globalAlpha = 1;
-                
-                // Reiniciar gota cuando llega al fondo
-                if (y > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                
-                // Mover gota hacia abajo
-                drops[i]++;
-            }
-        }
-        
-        // Animar
-        function animateMatrix() {
-            drawMatrix();
-            requestAnimationFrame(animateMatrix);
-        }
-        
-        // Iniciar animación
-        animateMatrix();
-        
-        // Redimensionar canvas cuando cambia el tamaño de la ventana
-        window.addEventListener('resize', function() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-    }
-    
-    function initSmoothScroll() {
-        // Scroll suave para enlaces internos
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+
+        sections.forEach(section => sectionObserver.observe(section));
+
+        // Smooth scroll
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
                 e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
+                const targetId = link.getAttribute('href');
                 if (targetId === '#') return;
                 
                 const targetElement = document.querySelector(targetId);
@@ -459,169 +122,409 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-    }
-    
-    function initAnimatedCounters() {
+    };
+
+    // 4. Matrix Rain Background
+    const initMatrixRain = () => {
+        const canvas = document.createElement('canvas');
+        const container = document.getElementById('matrix-background');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.zIndex = '-1';
+        container.appendChild(canvas);
+        
+        const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        
+        let animationId;
+        
+        const draw = () => {
+            // Semi-transparent black background for trail effect
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Green text
+            ctx.fillStyle = '#0f0';
+            ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
+            
+            drops.forEach((y, i) => {
+                // Random character
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                
+                // Draw character
+                const x = i * fontSize;
+                ctx.fillText(text, x, y * fontSize);
+                
+                // Send drop back to top randomly
+                if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                // Increment y coordinate
+                drops[i]++;
+            });
+        };
+        
+        const animate = () => {
+            draw();
+            animationId = requestAnimationFrame(animate);
+        };
+        
+        animate();
+        
+        // Handle resize
+        const handleResize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup on page hide
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                cancelAnimationFrame(animationId);
+            } else {
+                animate();
+            }
+        });
+    };
+
+    // 5. Scroll Effects
+    const initScrollEffects = () => {
+        // Fade sections on scroll
+        const fadeSections = document.querySelectorAll('.fade-section');
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        });
+        
+        fadeSections.forEach(section => fadeObserver.observe(section));
+    };
+
+    // 6. Animations
+    const initAnimations = () => {
+        // Glitch effect interval
+        setInterval(() => {
+            const glitchElements = document.querySelectorAll('.glitch');
+            glitchElements.forEach(el => {
+                if (Math.random() > 0.7) {
+                    el.style.animation = 'none';
+                    setTimeout(() => {
+                        el.style.animation = 'glitch 0.3s';
+                    }, 10);
+                }
+            });
+        }, 3000);
+        
+        // Terminal cursor blink
+        const cursor = document.querySelector('.cursor');
+        if (cursor) {
+            setInterval(() => {
+                cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+            }, 500);
+        }
+        
+        // Subtle floating animations
+        const floatingElements = document.querySelectorAll('.about-card, .skill-category, .project-card');
+        floatingElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                el.style.transition = 'transform 0.3s ease-out';
+            });
+        });
+    };
+
+    // 7. Theme Toggle
+    const initThemeToggle = () => {
+        const toggleBtn = document.getElementById('themeToggle');
+        let currentTheme = 'red';
+        
+        const themes = {
+            red: {
+                primary: '#ff003c',
+                secondary: '#00ff41',
+                accent: '#00d9ff'
+            },
+            blue: {
+                primary: '#0088ff',
+                secondary: '#00ffdd',
+                accent: '#ff00aa'
+            },
+            purple: {
+                primary: '#9d00ff',
+                secondary: '#00ff9d',
+                accent: '#ffd700'
+            },
+            green: {
+                primary: '#00ff41',
+                secondary: '#ff003c',
+                accent: '#0088ff'
+            }
+        };
+        
+        toggleBtn.addEventListener('click', () => {
+            const themeKeys = Object.keys(themes);
+            const currentIndex = themeKeys.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themeKeys.length;
+            currentTheme = themeKeys[nextIndex];
+            const theme = themes[currentTheme];
+            
+            // Update CSS variables
+            document.documentElement.style.setProperty('--primary', theme.primary);
+            document.documentElement.style.setProperty('--secondary', theme.secondary);
+            document.documentElement.style.setProperty('--accent', theme.accent);
+            
+            // Update button icon
+            const icons = ['fa-palette', 'fa-moon', 'fa-sun', 'fa-bolt'];
+            toggleBtn.innerHTML = `<i class="fas ${icons[nextIndex]}"></i>`;
+            
+            // Animation feedback
+            toggleBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                toggleBtn.style.transform = 'scale(1)';
+            }, 150);
+        });
+    };
+
+    // 8. Back to Top Button
+    const initBackToTop = () => {
+        const backBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                backBtn.classList.add('visible');
+            } else {
+                backBtn.classList.remove('visible');
+            }
+        });
+        
+        backBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    };
+
+    // 9. Copy Buttons
+    const initCopyButtons = () => {
+        const copyBtn = document.getElementById('copyToxId');
+        if (!copyBtn) return;
+        
+        copyBtn.addEventListener('click', async () => {
+            const keyElement = document.querySelector('.pgp-key');
+            const text = keyElement.textContent.trim();
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                
+                // Visual feedback
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.style.background = '#00ff41';
+                copyBtn.style.color = '#000';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.background = '';
+                    copyBtn.style.color = '';
+                }, 2000);
+                
+                // Notification
+                showNotification('TOX ID copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                showNotification('Failed to copy. Please copy manually.', true);
+            }
+        });
+    };
+
+    // 10. Animated Counters
+    const initCounters = () => {
         const counters = document.querySelectorAll('.stat-number');
         
-        // Observar cuando los contadores son visibles
-        const counterObserver = new IntersectionObserver((entries) => {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     animateCounter(entry.target);
-                    counterObserver.unobserve(entry.target);
+                    observer.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.5 });
         
-        counters.forEach(counter => {
-            counterObserver.observe(counter);
-        });
+        counters.forEach(counter => observer.observe(counter));
         
-        function animateCounter(counter) {
+        const animateCounter = (counter) => {
             const target = parseInt(counter.getAttribute('data-target'));
-            const duration = 2000; // 2 segundos
-            const step = target / (duration / 16); // 60fps
+            const duration = 2000;
+            const startTime = performance.now();
             
-            let current = 0;
-            
-            const timer = setInterval(() => {
-                current += step;
+            const updateCounter = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const value = Math.floor(easeOut * target);
                 
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
+                counter.textContent = value;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
                 }
-                
-                counter.textContent = Math.floor(current);
-            }, 16);
-        }
-    }
-    
-    function initTypingEffects() {
-        // Efecto de escritura para el título
-        const titleCursor = document.querySelector('.title-cursor');
-        if (titleCursor) {
-            setInterval(() => {
-                titleCursor.style.opacity = titleCursor.style.opacity === '0' ? '1' : '0';
-            }, 500);
-        }
+            };
+            
+            requestAnimationFrame(updateCounter);
+        };
+    };
+
+    // 11. Mobile Menu
+    const initMobileMenu = () => {
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.querySelector('.nav-menu');
+        const menuLines = document.querySelectorAll('.menu-line');
         
+        if (!menuToggle) return;
         
-        const subtitleBlink = document.querySelector('.subtitle-blink');
-        if (subtitleBlink) {
-            setInterval(() => {
-                subtitleBlink.style.opacity = subtitleBlink.style.opacity === '0' ? '1' : '0';
-            }, 500);
-        }
-        
-        
-        const aboutTerminalLines = document.querySelectorAll('.about-terminal-line');
-        aboutTerminalLines.forEach((line, index) => {
-            if (index > 0) {
-                const text = line.textContent;
-                line.textContent = '';
-                
-                setTimeout(() => {
-                    typeText(line, text, 0, 30);
-                }, 500 * index);
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+            
+            // Animate menu lines
+            if (navMenu.classList.contains('active')) {
+                menuLines[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+                menuLines[1].style.opacity = '0';
+                menuLines[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+                document.body.style.overflow = 'hidden';
+            } else {
+                menuLines[0].style.transform = 'none';
+                menuLines[1].style.opacity = '1';
+                menuLines[2].style.transform = 'none';
+                document.body.style.overflow = '';
             }
         });
-    }
-    
-    function initSkillBars() {
-        const skillBars = document.querySelectorAll('.skill-progress');
         
-        // Observar cuando las barras son visibles
-        const skillObserver = new IntersectionObserver((entries) => {
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+                menuLines[0].style.transform = 'none';
+                menuLines[1].style.opacity = '1';
+                menuLines[2].style.transform = 'none';
+                document.body.style.overflow = '';
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+                menuLines[0].style.transform = 'none';
+                menuLines[1].style.opacity = '1';
+                menuLines[2].style.transform = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+    };
+
+    // 12. Glitch Effects
+    const initGlitchEffects = () => {
+        // Random glitch effect on elements
+        setInterval(() => {
+            const elements = document.querySelectorAll('.glass');
+            if (elements.length > 0 && Math.random() > 0.8) {
+                const randomElement = elements[Math.floor(Math.random() * elements.length)];
+                const originalBorder = randomElement.style.border;
+                
+                randomElement.style.border = '1px solid #ff003c';
+                randomElement.style.boxShadow = '0 0 20px rgba(255, 0, 60, 0.5)';
+                
+                setTimeout(() => {
+                    randomElement.style.border = originalBorder;
+                    randomElement.style.boxShadow = '';
+                }, 100);
+            }
+        }, 5000);
+    };
+
+    // 13. Skill Bars Animation
+    const initSkillBars = () => {
+        const skillBars = document.querySelectorAll('.skill-level');
+        
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    const width = entry.target.getAttribute('data-width');
-                    entry.target.style.width = `${width}%`;
-                    skillObserver.unobserve(entry.target);
+                    const level = entry.target.getAttribute('data-level');
+                    entry.target.style.width = `${level}%`;
+                    observer.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.5 });
         
-        skillBars.forEach(bar => {
-            skillObserver.observe(bar);
-        });
-    }
-    
-    function initSpecialEffects() {
+        skillBars.forEach(bar => observer.observe(bar));
+    };
+
+    // 14. Utility Functions
+    const showNotification = (message, isError = false) => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${isError ? 'error' : 'success'}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${isError ? '#ff003c' : '#00ff41'};
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+        `;
         
-        setInterval(() => {
-            if (Math.random() > 0.7) {
-                const logo = document.querySelector('.nav-logo');
-                if (logo) {
-                    logo.style.textShadow = '2px 0 0 red, -2px 0 0 cyan';
-                    logo.style.transform = 'translateX(2px)';
-                    
-                    setTimeout(() => {
-                        logo.style.textShadow = '';
-                        logo.style.transform = '';
-                    }, 100);
-                }
-            }
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-in forwards';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
         }, 3000);
+    };
+
+    // Add notification styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
         
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
         
-        setInterval(() => {
-            if (Math.random() > 0.8) {
-                const scanline = document.createElement('div');
-                scanline.style.position = 'fixed';
-                scanline.style.top = '0';
-                scanline.style.left = Math.random() * 100 + '%';
-                scanline.style.width = '1px';
-                scanline.style.height = '100%';
-                scanline.style.background = 'linear-gradient(to bottom, transparent, var(--primary-color), transparent)';
-                scanline.style.zIndex = '9999';
-                scanline.style.animation = 'scanline 0.5s linear';
-                scanline.style.pointerEvents = 'none';
-                
-                document.body.appendChild(scanline);
-                
-                setTimeout(() => {
-                    if (scanline.parentNode) {
-                        document.body.removeChild(scanline);
-                    }
-                }, 500);
-            }
-        }, 4000);
-        
-        setInterval(() => {
-            if (Math.random() > 0.9) {
-                const terminalElements = document.querySelectorAll('.terminal-line, .about-terminal-line');
-                if (terminalElements.length > 0) {
-                    const randomElement = terminalElements[Math.floor(Math.random() * terminalElements.length)];
-                    const originalColor = randomElement.style.color;
-                    randomElement.style.color = '#ff003c';
-                    
-                    setTimeout(() => {
-                        randomElement.style.color = originalColor;
-                    }, 200);
-                }
-            }
-        }, 2000);
-    }
-    
-    const currentYear = new Date().getFullYear();
-    document.querySelectorAll('.copyright p').forEach(el => {
-        el.textContent = el.textContent.replace('2023', currentYear);
-    });
-    
-    window.addEventListener('load', function() {
-        document.body.style.opacity = '1';
-        
-        // Efecto de sonido opcional (comentado por defecto)
-        /*
-        const clickSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQ=');
-        document.querySelectorAll('button, .nav-link').forEach(el => {
-            el.addEventListener('click', () => {
-                clickSound.currentTime = 0;
-                clickSound.play();
-            });
-        });
-        */
-    });
+        .nav-link.active {
+            color: var(--primary) !important;
+            background: rgba(var(--primary-rgb), 0.1) !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Start boot sequence
+    bootSequence();
 });
