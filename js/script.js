@@ -1,23 +1,22 @@
-// Enhanced Hacker CV - R3LI4NT
 document.addEventListener('DOMContentLoaded', function() {
     // 1. Boot Sequence
     const bootTerminal = document.getElementById('boot-terminal');
     const mainContent = document.getElementById('main-content');
     let bootComplete = false;
 
-    // Simulate boot process
+    
     const bootSequence = async () => {
         await delay(500);
         typeTerminalText();
         
-        // Allow skip with Enter
+        
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !bootComplete) {
                 skipBoot();
             }
         });
 
-        // Auto continue after 4 seconds
+        
         setTimeout(() => {
             if (!bootComplete) completeBoot();
         }, 4000);
@@ -53,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    // 2. Initialize Application
+    
     const initializeApp = () => {
         initNavigation();
         initMatrixRain();
@@ -68,12 +67,12 @@ document.addEventListener('DOMContentLoaded', function() {
         initSkillBars();
     };
 
-    // 3. Navigation Effects
+    
     const initNavigation = () => {
         const nav = document.querySelector('.floating-nav');
         const navLinks = document.querySelectorAll('.nav-link');
         
-        // Scroll effect for nav
+        
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 nav.classList.add('scrolled');
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Active link highlighting
+        
         const sections = document.querySelectorAll('.section');
         const observerOptions = {
             root: null,
@@ -106,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         sections.forEach(section => sectionObserver.observe(section));
 
-        // Smooth scroll
+        
         navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -124,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 4. Matrix Rain Background
+    
     const initMatrixRain = () => {
         const canvas = document.createElement('canvas');
         const container = document.getElementById('matrix-background');
@@ -146,28 +145,28 @@ document.addEventListener('DOMContentLoaded', function() {
         let animationId;
         
         const draw = () => {
-            // Semi-transparent black background for trail effect
+            
             ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Green text
+            
             ctx.fillStyle = '#0f0';
             ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
             
             drops.forEach((y, i) => {
-                // Random character
+                
                 const text = chars[Math.floor(Math.random() * chars.length)];
                 
-                // Draw character
+                
                 const x = i * fontSize;
                 ctx.fillText(text, x, y * fontSize);
                 
-                // Send drop back to top randomly
+                
                 if (y * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[i] = 0;
                 }
                 
-                // Increment y coordinate
+                
                 drops[i]++;
             });
         };
@@ -179,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         animate();
         
-        // Handle resize
+        
         const handleResize = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -187,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         window.addEventListener('resize', handleResize);
         
-        // Cleanup on page hide
+        
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 cancelAnimationFrame(animationId);
@@ -197,9 +196,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 5. Scroll Effects
+    
     const initScrollEffects = () => {
-        // Fade sections on scroll
+        
         const fadeSections = document.querySelectorAll('.fade-section');
         const fadeObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -215,9 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fadeSections.forEach(section => fadeObserver.observe(section));
     };
 
-    // 6. Animations
+    
     const initAnimations = () => {
-        // Glitch effect interval
+        
         setInterval(() => {
             const glitchElements = document.querySelectorAll('.glitch');
             glitchElements.forEach(el => {
@@ -230,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }, 3000);
         
-        // Terminal cursor blink
+        
         const cursor = document.querySelector('.cursor');
         if (cursor) {
             setInterval(() => {
@@ -238,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }
         
-        // Subtle floating animations
+        
         const floatingElements = document.querySelectorAll('.about-card, .skill-category, .project-card');
         floatingElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
@@ -247,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 7. Theme Toggle
+    
     const initThemeToggle = () => {
         const toggleBtn = document.getElementById('themeToggle');
         let currentTheme = 'red';
@@ -282,16 +281,16 @@ document.addEventListener('DOMContentLoaded', function() {
             currentTheme = themeKeys[nextIndex];
             const theme = themes[currentTheme];
             
-            // Update CSS variables
+            
             document.documentElement.style.setProperty('--primary', theme.primary);
             document.documentElement.style.setProperty('--secondary', theme.secondary);
             document.documentElement.style.setProperty('--accent', theme.accent);
             
-            // Update button icon
+            
             const icons = ['fa-palette', 'fa-moon', 'fa-sun', 'fa-bolt'];
             toggleBtn.innerHTML = `<i class="fas ${icons[nextIndex]}"></i>`;
             
-            // Animation feedback
+            
             toggleBtn.style.transform = 'scale(0.9)';
             setTimeout(() => {
                 toggleBtn.style.transform = 'scale(1)';
@@ -299,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 8. Back to Top Button
+    
     const initBackToTop = () => {
         const backBtn = document.getElementById('backToTop');
         
@@ -319,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 9. Copy Buttons
+    
     const initCopyButtons = () => {
         const copyBtn = document.getElementById('copyToxId');
         if (!copyBtn) return;
@@ -331,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 await navigator.clipboard.writeText(text);
                 
-                // Visual feedback
+                
                 const originalHTML = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="fas fa-check"></i>';
                 copyBtn.style.background = '#00ff41';
@@ -343,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     copyBtn.style.color = '';
                 }, 2000);
                 
-                // Notification
+                
                 showNotification('TOX ID copied to clipboard!');
             } catch (err) {
                 console.error('Failed to copy:', err);
@@ -352,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 10. Animated Counters
+    
     const initCounters = () => {
         const counters = document.querySelectorAll('.stat-number');
         
@@ -389,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     };
 
-    // 11. Mobile Menu
+   
     const initMobileMenu = () => {
         const menuToggle = document.getElementById('menuToggle');
         const navMenu = document.querySelector('.nav-menu');
@@ -401,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
             navMenu.classList.toggle('active');
             menuToggle.classList.toggle('active');
             
-            // Animate menu lines
+            
             if (navMenu.classList.contains('active')) {
                 menuLines[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
                 menuLines[1].style.opacity = '0';
@@ -415,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Close menu when clicking on a link
+        
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 navMenu.classList.remove('active');
@@ -427,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Close menu when clicking outside
+        
         document.addEventListener('click', (e) => {
             if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
                 navMenu.classList.remove('active');
@@ -440,9 +439,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 12. Glitch Effects
+    
     const initGlitchEffects = () => {
-        // Random glitch effect on elements
+        
         setInterval(() => {
             const elements = document.querySelectorAll('.glass');
             if (elements.length > 0 && Math.random() > 0.8) {
@@ -460,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     };
 
-    // 13. Skill Bars Animation
+    
     const initSkillBars = () => {
         const skillBars = document.querySelectorAll('.skill-level');
         
@@ -477,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
         skillBars.forEach(bar => observer.observe(bar));
     };
 
-    // 14. Utility Functions
+    
     const showNotification = (message, isError = false) => {
         const notification = document.createElement('div');
         notification.className = `notification ${isError ? 'error' : 'success'}`;
@@ -505,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     };
 
-    // Add notification styles
+    
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideIn {
@@ -525,6 +524,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 
-    // Start boot sequence
+    
     bootSequence();
 });
