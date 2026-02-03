@@ -2,16 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R3LI4NT - CV Personal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>R3LI4NT - Security Researcher</title>
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Boot Terminal -->
     <div id="boot-terminal">
         <div class="terminal-header">
             <div class="terminal-buttons">
@@ -22,542 +23,619 @@
             <div class="terminal-title">system://boot/cv_r3li4nt.exe</div>
         </div>
         <div class="terminal-content">
-            <p class="terminal-text">> Inicializando sistema CV_R3LI4NT v2.0...</p>
-            <p class="terminal-text">> Cargando módulos de malware development...</p>
-            <p class="terminal-text">> Verificando identidad...</p>
-            <p class="terminal-text">> [██████████] 100%</p>
-            <p class="terminal-text">> Sistema listo. Presiona ENTER para continuar...</p>
+            <p class="terminal-text">> Initializing R3LI4NT_OS v3.0...</p>
+            <p class="terminal-text">> Loading security modules...</p>
+            <p class="terminal-text">> Establishing encrypted connection...</p>
+            <p class="terminal-text">> [████████████████████] 100%</p>
+            <p class="terminal-text">> System ready. Press ENTER to continue...</p>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div id="main-content" class="hidden">
-        <nav class="hacker-nav">
+        <!-- Floating Navigation -->
+        <nav class="floating-nav">
             <div class="nav-container">
                 <div class="nav-logo">
                     <span class="logo-text">R3LI4NT</span>
                     <span class="logo-blink">_</span>
                 </div>
                 <div class="nav-menu">
-                    <a href="#about" class="nav-link">[ SOBRE MÍ ]</a>
-                    <a href="#skills" class="nav-link">[ HABILIDADES ]</a>
-                    <a href="#projects" class="nav-link">[ PROYECTOS ]</a>
-                    <a href="#pentesting" class="nav-link">[ PENTESTING ]</a>
-                    <a href="#contact" class="nav-link">[ CONTACTO ]</a>
+                    <a href="#about" class="nav-link">
+                        <span class="link-number">01</span>
+                        <span class="link-text">ABOUT</span>
+                    </a>
+                    <a href="#skills" class="nav-link">
+                        <span class="link-number">02</span>
+                        <span class="link-text">SKILLS</span>
+                    </a>
+                    <a href="#projects" class="nav-link">
+                        <span class="link-number">03</span>
+                        <span class="link-text">PROJECTS</span>
+                    </a>
+                    <a href="#experience" class="nav-link">
+                        <span class="link-number">04</span>
+                        <span class="link-text">EXPERIENCE</span>
+                    </a>
+                    <a href="#contact" class="nav-link">
+                        <span class="link-number">05</span>
+                        <span class="link-text">CONTACT</span>
+                    </a>
                 </div>
                 <button class="menu-toggle" id="menuToggle">
-                    <span class="menu-bar"></span>
-                    <span class="menu-bar"></span>
-                    <span class="menu-bar"></span>
+                    <span class="menu-line"></span>
+                    <span class="menu-line"></span>
+                    <span class="menu-line"></span>
                 </button>
             </div>
         </nav>
 
-        <header class="hero-section">
-            <div class="matrix-bg"></div>
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="hero-background"></div>
             <div class="hero-content">
-                <div class="hero-text">
-                    <h1 class="hero-title">
-                        <span class="title-cursor">> _</span>
+                <div class="hero-glitch">
+                    <h1 class="hero-title glitch" data-text="R3LI4NT">
+                        <span class="title-line">></span>
                         <span class="title-name">R3LI4NT</span>
                     </h1>
                     <p class="hero-subtitle">
-                        <span class="subtitle-text">MALWARE DEVELOPER & PENTESTER</span>
-                        <span class="subtitle-blink">|</span>
+                        <span class="subtitle-text">SECURITY RESEARCHER & MALWARE DEVELOPER</span>
+                        <span class="subtitle-cursor">|</span>
                     </p>
-                    <div class="hero-desc">
-                        <p class="desc-line">>> Desarrollador de Malware</p>
-                        <p class="desc-line">>> Pentesting Integral (Web, AD, AWS, Mobile)</p>
-                        <p class="desc-line">>> Análisis de Vulnerabilidades & Reversing</p>
+                </div>
+                
+                <div class="hero-terminal-wrapper">
+                    <div class="terminal-glass">
+                        <div class="terminal-header">
+                            <div class="terminal-dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <span class="terminal-title">root@kali:~</span>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">whoami</span>
+                            </div>
+                            <div class="terminal-output">
+                                <span class="output-text">r3li4nt - malware_developer | pentester</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">find ./skills/ -type f</span>
+                            </div>
+                            <div class="terminal-output">
+                                <span class="output-text">rust.py.c#.asm.reverse_engineering.pentesting</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">cat ./status.txt</span>
+                            </div>
+                            <div class="terminal-output">
+                                <span class="output-text highlight">[ ACTIVE ] [ AVAILABLE FOR WORK ]</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt blinking">$</span>
+                                <span class="cursor"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="hero-terminal">
-                    <div class="hero-terminal-header">
-                        <span class="terminal-prompt">root@r3li4nt:~$</span>
-                    </div>
-                    <div class="hero-terminal-content">
-                        <p class="terminal-line">> whoami</p>
-                        <p class="terminal-line typed" data-text="R3LI4NT - Malware Developer & Pentester"></p>
-                        <p class="terminal-line">> cat repos/public/</p>
-                        <p class="terminal-line typed" data-text="Ransomware | Trojan | Backdoors | Keylogger"></p>
-                        <p class="terminal-line">> locate ./languages/</p>
-                        <p class="terminal-line typed" data-text="Rust | Python | C# "></p>
-                        <p class="terminal-line">> <span class="terminal-cursor">_</span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="scroll-indicator">
-                <span>DESPLAZAR</span>
-                <div class="scroll-line"></div>
-            </div>
-        </header>
 
-        <section id="about" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="title-number">01</span>
-                    <span class="title-text">SOBRE MÍ</span>
-                </h2>
-                <div class="title-line"></div>
-            </div>
-            <div class="about-content">
-                <div class="about-text">
-                    <p class="about-desc">
-                        > <span class="highlight">Desarrollador de malware especializado</span> con enfoque en investigación avanzada de amenazas y desarrollo de herramientas ofensivas para pruebas de seguridad.
-                    </p>
-                    <p class="about-desc">
-                        > Experto en <span class="highlight">pentesting integral</span> cubriendo todas las superficies de ataque: web, APIs, Active Directory, AWS, móviles y redes WiFi.
-                    </p>
-                    <p class="about-desc">
-                        > Mi metodología combina <span class="highlight">desarrollo ofensivo avanzado</span> con técnicas de análisis forense y reversión para identificar y explotar vulnerabilidades críticas.
-                    </p>
-                    <div class="about-terminal">
-                        <p class="about-terminal-line">> r3li4nt --specializations</p>
-                        <p class="about-terminal-line">- Malware Development (Ransomware, Trojans, Backdoors, Keyloggers)</p>
-                        <p class="about-terminal-line">- Comprehensive Penetration Testing</p>
-                        <p class="about-terminal-line">- Cloud Security Assessment (AWS)</p>
-                        <p class="about-terminal-line">- Vulnerability Assessment & Exploitation</p>
-                        <p class="about-terminal-line">- Static Code Analysis & Reverse Engineering</p>
+                <div class="scroll-indicator">
+                    <div class="mouse">
+                        <div class="wheel"></div>
                     </div>
-                </div>
-                <div class="about-code">
-                    <div class="code-header">
-                        <span class="code-title">malware_framework.py</span>
-                    </div>
-                    <pre class="code-content">
-class AdvancedMalwareFactory:
-    def __init__(self):
-        self.languages = ["Rust", "Python", "C#"]
-        self.malware_types = ["Ransomware", "Trojans", "Backdoors", "Keyloggers"]
-        self.techniques = ["Process Injection", "Persistence", "Evasion", "Lateral Movement"]
-    
-    def create_ransomware(self, target, encryption_key):
-        return {
-            "type": "Ransomware",
-            "features": ["File Encryption", "Ransom Note", "C2 Communication"],
-            "evasion": ["Antivirus Bypass", "Sandbox Detection", "Debugger Evasion"]
-        }
-    
-    def create_trojan(self, payload_type):
-        return {
-            "type": "Trojan",
-            "capabilities": ["Remote Access", "Data Exfiltration", "Command Execution"],
-            "stealth": ["Rootkit Integration", "Process Hollowing", "DLL Injection"]
-        }
-    
-    def create_backdoor(self, protocol="HTTPS"):
-        return {
-            "type": "Backdoor",
-            "persistence": ["Registry", "Services", "Scheduled Tasks"],
-            "communication": ["Encrypted C2", "Domain Fronting", "TOR Integration"]
-        }
-
-# Instancia del framework
-malware_lab = AdvancedMalwareFactory()
-ransomware_sample = malware_lab.create_ransomware(
-    target="enterprise_network",
-    encryption_key="0xDEADBEEF1337"
-)</pre>
+                    <span class="scroll-text">SCROLL</span>
                 </div>
             </div>
         </section>
 
-        <section id="skills" class="section dark-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="title-number">02</span>
-                    <span class="title-text">HABILIDADES TÉCNICAS</span>
-                </h2>
-                <div class="title-line"></div>
-            </div>
-            <div class="skills-container">
-                <div class="skill-category">
-                    <h3 class="category-title">PENTESTING SKILLS</h3>
-                    <div class="skill-list">
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fas fa-globe"></i></span>
-                            <span class="skill-name">Pentesting Web & API</span>
+        <!-- About Section -->
+        <section class="section fade-section" id="about">
+            <div class="section-background"></div>
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-number">01</span>
+                    <h2 class="section-title">ABOUT ME</h2>
+                    <div class="title-line"></div>
+                </div>
+                
+                <div class="about-grid">
+                    <div class="about-card glass">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-user-secret"></i>
+                            </div>
+                            <h3 class="card-title">PROFILE</h3>
                         </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fas fa-network-wired"></i></span>
-                            <span class="skill-name">Active Directory Security</span>
+                        <div class="card-content">
+                            <p class="card-text">
+                                Specialized malware developer focused on advanced threat research and offensive tool development for security testing.
+                            </p>
+                            <div class="card-list">
+                                <div class="list-item">
+                                    <i class="fas fa-chevron-right"></i>
+                                    <span>Malware Development & Analysis</span>
+                                </div>
+                                <div class="list-item">
+                                    <i class="fas fa-chevron-right"></i>
+                                    <span>Penetration Testing</span>
+                                </div>
+                                <div class="list-item">
+                                    <i class="fas fa-chevron-right"></i>
+                                    <span>Reverse Engineering</span>
+                                </div>
+                                <div class="list-item">
+                                    <i class="fas fa-chevron-right"></i>
+                                    <span>Vulnerability Research</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fab fa-aws"></i></span>
-                            <span class="skill-name">AWS Pentesting</span>
+                    </div>
+
+                    <div class="about-card glass">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <h3 class="card-title">METHODOLOGY</h3>
                         </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fas fa-mobile-alt"></i></span>
-                            <span class="skill-name">Mobile App Pentesting</span>
+                        <div class="card-content">
+                            <p class="card-text">
+                                Combining advanced offensive development with forensic analysis and reverse engineering techniques.
+                            </p>
+                            <div class="methodology-tags">
+                                <span class="tag">Red Teaming</span>
+                                <span class="tag">Threat Hunting</span>
+                                <span class="tag">Malware Analysis</span>
+                                <span class="tag">Exploit Dev</span>
+                                <span class="tag">Forensics</span>
+                                <span class="tag">OSINT</span>
+                            </div>
                         </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fas fa-wifi"></i></span>
-                            <span class="skill-name">WiFi Security Testing</span>
+                    </div>
+
+                    <div class="about-card glass">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3 class="card-title">ETHICS</h3>
                         </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fas fa-shield-alt"></i></span>
-                            <span class="skill-name">Internal/External Pentest</span>
-                        </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fas fa-code"></i></span>
-                            <span class="skill-name">Code Analysis</span>
+                        <div class="card-content">
+                            <p class="card-text">
+                                All research and development is conducted in controlled environments for educational and defensive purposes only.
+                            </p>
+                            <div class="ethics-list">
+                                <div class="ethics-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Authorized testing only</span>
+                                </div>
+                                <div class="ethics-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Responsible disclosure</span>
+                                </div>
+                                <div class="ethics-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Legal compliance</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="skill-category">
-                    <h3 class="category-title">PROGRAMMING LANGUAGES</h3>
-                    <div class="skill-list">
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fab fa-rust"></i></span>
-                            <span class="skill-name">Rust (Malware Focus)</span>
-                            <span class="skill-tag intermediate">Intermediate</span>
-                        </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fab fa-python"></i></span>
-                            <span class="skill-name">Python (Security Tools)</span>
-                            <span class="skill-tag expert">Expert</span>
-                        </div>
-                        <div class="skill-item-no-bar">
-                            <span class="skill-icon"><i class="fab fa-microsoft"></i></span>
-                            <span class="skill-name">C# (Windows Malware)</span>
-                            <span class="skill-tag advanced">Advanced</span>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
         </section>
 
-        <section id="projects" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="title-number">03</span>
-                    <span class="title-text">PROYECTOS PÚBLICOS</span>
-                </h2>
-                <div class="title-line"></div>
+        <!-- Skills Section -->
+        <section class="section fade-section" id="skills">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-number">02</span>
+                    <h2 class="section-title">TECHNICAL SKILLS</h2>
+                    <div class="title-line"></div>
+                </div>
+
+                <div class="skills-grid">
+                    <div class="skill-category glass">
+                        <div class="category-header">
+                            <i class="fas fa-bug category-icon"></i>
+                            <h3 class="category-title">MALWARE DEV</h3>
+                        </div>
+                        <div class="skill-list">
+                            <div class="skill-item">
+                                <span class="skill-name">Ransomware Development</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="95"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Trojan Development</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="90"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Backdoor Engineering</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="92"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Rootkit Development</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="85"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-category glass">
+                        <div class="category-header">
+                            <i class="fas fa-shield-halved category-icon"></i>
+                            <h3 class="category-title">PENTESTING</h3>
+                        </div>
+                        <div class="skill-list">
+                            <div class="skill-item">
+                                <span class="skill-name">Web Application</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="94"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Active Directory</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="91"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Cloud Security</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="88"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Mobile Security</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="86"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-category glass">
+                        <div class="category-header">
+                            <i class="fas fa-code category-icon"></i>
+                            <h3 class="category-title">PROGRAMMING</h3>
+                        </div>
+                        <div class="skill-list">
+                            <div class="skill-item">
+                                <span class="skill-name">Rust</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="90"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Python</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="96"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">C#</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="92"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Assembly</span>
+                                <div class="skill-bar">
+                                    <div class="skill-level" data-level="75"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tools-grid">
+                    <div class="tools-category">
+                        <h4 class="tools-title">TOOLS & FRAMEWORKS</h4>
+                        <div class="tools-list">
+                            <span class="tool-tag">IDA Pro</span>
+                            <span class="tool-tag">Ghidra</span>
+                            <span class="tool-tag">Burp Suite</span>
+                            <span class="tool-tag">Metasploit</span>
+                            <span class="tool-tag">Impacket</span>
+                            <span class="tool-tag">BloodHound</span>
+                            <span class="tool-tag">Cobalt Strike</span>
+                            <span class="tool-tag">Wireshark</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="projects-container">
+        </section>
+
+        <!-- Projects Section -->
+        <section class="section fade-section" id="projects">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-number">03</span>
+                    <h2 class="section-title">PUBLIC PROJECTS</h2>
+                    <div class="title-line"></div>
+                </div>
+
                 <div class="projects-grid">
-                    <div class="project-card">
+                    <!-- Project 1 -->
+                    <div class="project-card glass">
+                        <div class="project-badge">
+                            <span class="badge-text">C#</span>
+                        </div>
                         <div class="project-header">
                             <div class="project-icon">
                                 <i class="fas fa-lock"></i>
                             </div>
-                            <h3 class="project-title">Invasor</h3>
-                            <span class="project-lang">C#</span>
+                            <h3 class="project-title">INVASOR</h3>
                         </div>
-                        <p class="project-desc">Ransomware avanzado con cifrado AES-256 + ECC. Incluye mecanismos de persistencia, movimiento lateral, EDRKiller, stealers, etc</p>
-                        <div class="project-features">
-                            <span class="feature-tag">Persistence</span>
-                            <span class="feature-tag">Loader</span>
-                            <span class="feature-tag">Lateral Movement</span>
-                            <span class="feature-tag">Stealer</span>
-                            <span class="feature-tag">EDRKiller</span>
-                            <span class="feature-tag">Stealer</span>
-                            <span class="feature-tag">Private</span>
+                        <div class="project-content">
+                            <p class="project-description">
+                                Advanced ransomware with AES-256 + ECC encryption. Includes persistence mechanisms, lateral movement, EDRKiller, and stealers.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Persistence</span>
+                                <span class="project-tag">Loader</span>
+                                <span class="project-tag">Lateral Movement</span>
+                                <span class="project-tag">EDRKiller</span>
+                            </div>
                         </div>
-                        <a href="https://github.com/R3LI4NT/Invasor" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> Ver en GitHub
-                        </a>
+                        <div class="project-footer">
+                            <a href="https://github.com/R3LI4NT/Invasor" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                                <span>View Source</span>
+                            </a>
+                        </div>
                     </div>
 
-                    <div class="project-card">
+                    <!-- Project 2 -->
+                    <div class="project-card glass">
+                        <div class="project-badge">
+                            <span class="badge-text">C#</span>
+                        </div>
                         <div class="project-header">
                             <div class="project-icon">
                                 <i class="fas fa-door-open"></i>
                             </div>
-                            <h3 class="project-title">XilentDoor</h3>
-                            <span class="project-lang">C#</span>
+                            <h3 class="project-title">XILENTDOOR</h3>
                         </div>
-                        <p class="project-desc">Backdoor persistente para sistemas Windows</p>
-                        <div class="project-features">
-                            <span class="feature-tag">Windows</span>
-                            <span class="feature-tag">Persistence</span>
-                            <span class="feature-tag">Evasion AV</span>
+                        <div class="project-content">
+                            <p class="project-description">
+                                Persistent backdoor for Windows systems with advanced evasion techniques and encrypted C2 communication.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Windows</span>
+                                <span class="project-tag">Persistence</span>
+                                <span class="project-tag">Evasion</span>
+                                <span class="project-tag">C2</span>
+                            </div>
                         </div>
-                        <a href="https://github.com/R3LI4NT/XilentDoor" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> Ver en GitHub
-                        </a>
+                        <div class="project-footer">
+                            <a href="https://github.com/R3LI4NT/XilentDoor" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                                <span>View Source</span>
+                            </a>
+                        </div>
                     </div>
 
-                    <div class="project-card">
+                    <!-- Project 3 -->
+                    <div class="project-card glass">
+                        <div class="project-badge">
+                            <span class="badge-text">Python</span>
+                        </div>
                         <div class="project-header">
                             <div class="project-icon">
                                 <i class="fas fa-horse-head"></i>
                             </div>
-                            <h3 class="project-title">XilentRAT</h3>
-                            <span class="project-lang">Python</span>
+                            <h3 class="project-title">XILENTRAT</h3>
                         </div>
-                        <p class="project-desc">Troyano de Acceso Remoto para sistemas Windows usando Discord como C2 </p>
-                        <div class="project-features">
-                            <span class="feature-tag">Persistence</span>
-                            <span class="feature-tag">Keylogger</span>
-                            <span class="feature-tag">Screen Capture</span>
-                            <span class="feature-tag">Discord C2</span>
-                        </div>
-                        <a href="https://github.com/R3LI4NT/XilentRAT" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> Ver en GitHub
-                        </a>
-                    </div>
-
-                    <div class="project-card">
-                        <div class="project-header">
-                            <div class="project-icon">
-                                <i class="fas fa-door-open"></i>
+                        <div class="project-content">
+                            <p class="project-description">
+                                Remote Access Trojan for Windows using Discord as C2 with keylogger and screen capture capabilities.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">RAT</span>
+                                <span class="project-tag">Discord C2</span>
+                                <span class="project-tag">Keylogger</span>
+                                <span class="project-tag">Python</span>
                             </div>
-                            <h3 class="project-title">RavenDoor</h3>
-                            <span class="project-lang">Rust</span>
                         </div>
-                        <p class="project-desc">Backdoor persistente para sistemas Windows con comunicación cifrada</p>
-                        <div class="project-features">
-                            <span class="feature-tag">Persistence</span>
-                            <span class="feature-tag">Windows</span>
-                            <span class="feature-tag">C2 Encrypt</span>
+                        <div class="project-footer">
+                            <a href="https://github.com/R3LI4NT/XilentRAT" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                                <span>View Source</span>
+                            </a>
                         </div>
-                        <a href="https://github.com/R3LI4NT/RavenDoor" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> Ver en GitHub
-                        </a>
                     </div>
-
-                    <div class="project-card">
-                        <div class="project-header">
-                            <div class="project-icon">
-                                <i class="fas fa-keyboard"></i>
-                            </div>
-                            <h3 class="project-title">XilentLogger</h3>
-                            <span class="project-lang">Python</span>
-                        </div>
-                        <p class="project-desc">Keylogger remoto para sistemas Windows</p>
-                        <div class="project-features">
-                            <span class="feature-tag">Windows</span>
-                            <span class="feature-tag">ScreenShoots</span>
-                            <span class="feature-tag">SMTP C2</span>
-                        </div>
-                        <a href="https://github.com/R3LI4NT/XilentLogger" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> Ver en GitHub
-                        </a>
-                    </div>
-
-                    <div class="project-card">
-                        <div class="project-header">
-                            <div class="project-icon">
-                                <i class="fas fa-lock"></i>
-                            </div>
-                            <h3 class="project-title">Purge - Ransomware</h3>
-                            <span class="project-lang">Python</span>
-                        </div>
-                        <p class="project-desc">Ransomware para sistemas Windows con encriptación AES+RSA, stealer, eliminación de backups, etc</p>
-                        <div class="project-features">
-                            <span class="feature-tag">Windows</span>
-                            <span class="feature-tag">Stealer</span>
-                            <span class="feature-tag">Private</span>
-                        </div>
-                        <a href="https://github.com/R3LI4NT/PURGE-Ransomware" target="_blank" class="project-link">
-                            <i class="fab fa-github"></i> Ver en GitHub
-                        </a>
-                    </div>
-
                 </div>
-                
+
+                <div class="github-stats glass">
+                    <div class="stats-item">
+                        <i class="fab fa-github"></i>
+                        <span class="stats-text">All projects available on GitHub</span>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section id="pentesting" class="section dark-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="title-number">04</span>
-                    <span class="title-text">PENTESTING & AUDITORÍA</span>
-                </h2>
-                <div class="title-line"></div>
-            </div>
-            <div class="pentesting-container">
-                <div class="pentesting-areas">
-                    <div class="pentesting-area">
-                        <h3 class="area-title">PENTESTING WEB & API</h3>
-                        <div class="area-skills">
-                            <span class="skill-tag">SQL Injection</span>
-                            <span class="skill-tag">XSS (All Types)</span>
-                            <span class="skill-tag">CSRF & SSRF</span>
-                            <span class="skill-tag">API Security</span>
-                            <span class="skill-tag">JWT Attacks</span>
-                            <span class="skill-tag">Business Logic</span>
-                        </div>
-                        <p class="area-desc">Auditoría completa de aplicaciones web modernas (SPA, APIs REST/GraphQL) incluyendo análisis de lógica de negocio y vulnerabilidades complejas.</p>
-                    </div>
-                    
-                    <div class="pentesting-area">
-                        <h3 class="area-title">ACTIVE DIRECTORY & CLOUD</h3>
-                        <div class="area-skills">
-                            <span class="skill-tag">Kerberoasting</span>
-                            <span class="skill-tag">AS-REP Roasting</span>
-                            <span class="skill-tag">Golden Ticket</span>
-                            <span class="skill-tag">DCSync Attacks</span>
-                            <span class="skill-tag">AWS Pentesting</span>
-                            <span class="skill-tag">Cloud Security</span>
-                        </div>
-                        <p class="area-desc">Pentesting de entornos híbridos: desde dominios AD tradicionales hasta infraestructuras cloud con AWS, incluyendo seguridad de contenedores y serverless.</p>
-                    </div>
-                    
-                    <div class="pentesting-area">
-                        <h3 class="area-title">ANÁLISIS & REVERSING</h3>
-                        <div class="area-skills">
-                            <span class="skill-tag">Static Analysis</span>
-                            <span class="skill-tag">Dynamic Analysis</span>
-                            <span class="skill-tag">Malware Reversing</span>
-                            <span class="skill-tag">Firmware Analysis</span>
-                            <span class="skill-tag">Mobile App Reversing</span>
-                            <span class="skill-tag">Binary Exploitation</span>
-                        </div>
-                        <p class="area-desc">Análisis de código estático y dinámico, reverse engineering de malware y aplicaciones, análisis de firmware y exploits.</p>
-                    </div>
-                    
-                    <div class="pentesting-area">
-                        <h3 class="area-title">AUDITORÍA COMPLETA</h3>
-                        <div class="area-skills">
-                            <span class="skill-tag">Internal Pentest</span>
-                            <span class="skill-tag">External Pentest</span>
-                            <span class="skill-tag">WiFi Security</span>
-                            <span class="skill-tag">Mobile Pentest</span>
-                            <span class="skill-tag">Segmentation Testing</span>
-                            <span class="skill-tag">Phishing Simulations</span>
-                        </div>
-                        <p class="area-desc">Auditorías de seguridad integrales cubriendo todos los vectores de ataque: internos, externos, redes WiFi, aplicaciones móviles y concienciación.</p>
-                    </div>
+        <!-- Experience Section -->
+        <section class="section fade-section" id="experience">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-number">04</span>
+                    <h2 class="section-title">RESEARCH AREAS</h2>
+                    <div class="title-line"></div>
                 </div>
-                
-                <div class="pentesting-tools">
-                    <h3 class="tools-title">EXPERIENCIA CON HERRAMIENTAS:</h3>
-                    <div class="tools-grid">
-                        <div class="pentest-tool">
-                            <span class="tool-name">Burp Suite</span>
-                            <span class="tool-category">Web Pentesting</span>
+
+                <div class="timeline">
+                    <div class="timeline-item glass">
+                        <div class="timeline-header">
+                            <div class="timeline-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="timeline-title">
+                                <h3>VULNERABILITY RESEARCH</h3>
+                                <span class="timeline-date">Ongoing</span>
+                            </div>
                         </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Metasploit</span>
-                            <span class="tool-category">Exploitation</span>
+                        <div class="timeline-content">
+                            <p>Discovery and analysis of 0-day vulnerabilities in various systems and applications.</p>
+                            <div class="timeline-tags">
+                                <span class="tag">Exploit Development</span>
+                                <span class="tag">Fuzzing</span>
+                                <span class="tag">Binary Analysis</span>
+                            </div>
                         </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Impacket</span>
-                            <span class="tool-category">AD Attacks</span>
+                    </div>
+
+                    <div class="timeline-item glass">
+                        <div class="timeline-header">
+                            <div class="timeline-icon">
+                                <i class="fas fa-virus"></i>
+                            </div>
+                            <div class="timeline-title">
+                                <h3>MALWARE DEVELOPMENT</h3>
+                                <span class="timeline-date">2023-Present</span>
+                            </div>
                         </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">BloodHound</span>
-                            <span class="tool-category">AD Enumeration</span>
+                        <div class="timeline-content">
+                            <p>Developing custom malware for research and security testing purposes.</p>
+                            <div class="timeline-tags">
+                                <span class="tag">Ransomware</span>
+                                <span class="tag">Trojans</span>
+                                <span class="tag">Rootkits</span>
+                                <span class="tag">Loaders</span>
+                            </div>
                         </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Mimiktaz</span>
-                            <span class="tool-category">Post-Explotation</span>
+                    </div>
+
+                    <div class="timeline-item glass">
+                        <div class="timeline-header">
+                            <div class="timeline-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="timeline-title">
+                                <h3>PENETRATION TESTING</h3>
+                                <span class="timeline-date">2022-Present</span>
+                            </div>
                         </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">ScoutSuite</span>
-                            <span class="tool-category">AWS Security</span>
-                        </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Nmap</span>
-                            <span class="tool-category">Network Scanning</span>
-                        </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Aircrack-ng</span>
-                            <span class="tool-category">WiFi Testing</span>
-                        </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">JADX</span>
-                            <span class="tool-category">Mobile Reversing</span>
-                        </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Acunetix</span>
-                            <span class="tool-category">Web Scanner</span>
-                        </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Nessus</span>
-                            <span class="tool-category">Scanner</span>
-                        </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Ghidra</span>
-                            <span class="tool-category">Reversing</span>
-                        </div>
-                        <div class="pentest-tool">
-                            <span class="tool-name">Wireshark</span>
-                            <span class="tool-category">Sniffing</span>
+                        <div class="timeline-content">
+                            <p>Comprehensive security assessments across various attack surfaces.</p>
+                            <div class="timeline-tags">
+                                <span class="tag">Web Apps</span>
+                                <span class="tag">Active Directory</span>
+                                <span class="tag">Cloud Security</span>
+                                <span class="tag">Mobile Apps</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="contact" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="title-number">05</span>
-                    <span class="title-text">CONTACTO SEGURO</span>
-                </h2>
-                <div class="title-line"></div>
-            </div>
-            <div class="contact-container">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h4 class="contact-label">EMAIL</h4>
-                            <p class="contact-value">R3LI4NT.CONTACT@KEEMAIL.ME</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fab fa-github"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h4 class="contact-label">GITHUB</h4>
-                            <p class="contact-value">github.com/R3LI4NT</p>
-                        </div>
-                    </div>
+        <!-- Contact Section -->
+        <section class="section fade-section" id="contact">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-number">05</span>
+                    <h2 class="section-title">SECURE CONTACT</h2>
+                    <div class="title-line"></div>
                 </div>
-                <div class="contact-form">
-                    <div class="form-header">
-                        <h3 class="form-title">COMUNICACIÓN CIFRADA</h3>
-                        <p class="form-subtitle">Usa mi TOXID para comunicaciones seguras</p>
-                    </div>
-                    <div class="pgp-key-box">
-                        <div class="key-header">
-                            <span class="key-title">TOX CHAT ID</span>
-                            <button class="copy-key" id="copyPgpKey">
-                                <i class="fas fa-copy"></i>
-                            </button>
+
+                <div class="contact-grid">
+                    <div class="contact-card glass">
+                        <div class="contact-header">
+                            <i class="fas fa-envelope contact-icon"></i>
+                            <h3 class="contact-title">EMAIL</h3>
                         </div>
-                        <pre class="key-content">
------------------------------------PUBLIC ID-----------------------------------
+                        <div class="contact-content">
+                            <p class="contact-text">R3LI4NT.CONTACT@KEEMAIL.ME</p>
+                            <a href="mailto:R3LI4NT.CONTACT@KEEMAIL.ME" class="contact-button">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send Message</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-card glass">
+                        <div class="contact-header">
+                            <i class="fab fa-github contact-icon"></i>
+                            <h3 class="contact-title">GITHUB</h3>
+                        </div>
+                        <div class="contact-content">
+                            <p class="contact-text">github.com/R3LI4NT</p>
+                            <a href="https://github.com/R3LI4NT" class="contact-button" target="_blank">
+                                <i class="fab fa-github"></i>
+                                <span>View Profile</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-card glass">
+                        <div class="contact-header">
+                            <i class="fas fa-shield-halved contact-icon"></i>
+                            <h3 class="contact-title">ENCRYPTED</h3>
+                        </div>
+                        <div class="contact-content">
+                            <div class="pgp-box">
+                                <div class="pgp-header">
+                                    <span>TOX CHAT ID</span>
+                                    <button class="copy-button" id="copyToxId">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <pre class="pgp-key">
 08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426
------------------------------------PUBLIC ID------------------------------------</pre>
+                                </pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Footer -->
-        <footer class="hacker-footer">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <span class="logo-text">R3LI4NT</span>
-                    <span class="logo-blink">_</span>
-                </div>
-                <p class="footer-text">> System encrypted. All connections secured. No logs kept.</p>
-                <div class="footer-links">
-                    <a href="#" class="footer-link">[ ETHICAL USE POLICY ]</a>
-                    <a href="#" class="footer-link">[ LEGAL DISCLAIMER ]</a>
-                    <a href="#" class="footer-link">[ PGP VERIFICATION ]</a>
-                </div>
-                <div class="copyright">
-                    <p>> © 2026 R3LI4NT SECURITY RESEARCH. For authorized testing only.</p>
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <span class="logo-text">R3LI4NT</span>
+                        <span class="logo-blink">_</span>
+                    </div>
+                    <div class="footer-links">
+                        <a href="#" class="footer-link">ETHICS</a>
+                        <a href="#" class="footer-link">DISCLAIMER</a>
+                        <a href="#" class="footer-link">PGP KEY</a>
+                    </div>
+                    <div class="footer-copyright">
+                        <p>© 2024 R3LI4NT SECURITY RESEARCH. FOR AUTHORIZED TESTING ONLY.</p>
+                        <p class="footer-note">All activities conducted in controlled environments for research purposes.</p>
+                    </div>
                 </div>
             </div>
         </footer>
 
-        <div id="matrix-rain"></div>
-        
-        <button id="colorToggle" class="color-toggle">
+        <!-- Matrix Rain Background -->
+        <div id="matrix-background"></div>
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="themeToggle">
             <i class="fas fa-palette"></i>
+        </button>
+
+        <!-- Back to Top -->
+        <button class="back-to-top" id="backToTop">
+            <i class="fas fa-arrow-up"></i>
         </button>
     </div>
 
