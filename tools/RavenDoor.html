@@ -74,7 +74,7 @@
         </div>
         <div class="feature-neon">
           <i class="fas fa-terminal feature-icon"></i>
-          <div class="feature-title">C2 Python + Telegram Exfiltración</div>
+          <div class="feature-title">C2 Python + Telegram Key</div>
           <div class="feature-desc">Servidor C2 interactivo con gestión multi-cliente. La clave AES se genera y se guarda en %AppData%\Microsoft\Windows\ravendoor_key.txt, enviada automáticamente por Telegram para control remoto.</div>
           <div class="code-snip">$ python3 raven_client.py --key [MASTER_KEY] <br>▶ Clientes conectados: 3 | Shell interactiva cifrada</div>
         </div>
@@ -94,7 +94,7 @@
     <section id="v2" class="version-section">
       <div class="version-header">
         <div class="version-badge">v2.0</div>
-        <div class="version-sub">—— Inyección DLL · Syscalls · Anti-sandbox · Sleep Ofuscación · VPS Server</div>
+        <div class="version-sub">—— Inyección DLL · Syscalls · Anti-sandbox · Sleep Ofuscación · VPS Server · C2 Web</div>
       </div>
       <div class="feature-grid">
         <div class="feature-neon">
@@ -145,6 +145,36 @@
         <div class="screenshot-card">
           <img src="https://github.com/user-attachments/assets/1472afa7-7772-4132-bc99-f7bcecbd8bc1" alt="inyeccion" class="clickable-img">
           <div class="caption">Múltiples inyecciones</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="c2-web" class="version-section">
+      <div class="version-header">
+        <div class="version-badge">C2 WEB</div>
+        <div class="version-sub">—— Panel profesional multi-usuario por roles</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-neon">
+          <i class="fas fa-globe feature-icon"></i>
+          <div class="feature-title">C2 Web Panel <span class="tag">Multi-Usuario</span></div>
+          <div class="feature-desc">Además del tradicional C2 CLI, se ha desarrollado un panel web profesional que permite controlar los equipos infectados de forma más flexible mediante un sistema multi-usuario por roles (Administrador y Operador).</div>
+          <div class="feature-desc" style="margin-top: 0.5rem;">El Administrador tiene control total sobre el servidor C2 y puede crear y gestionar operadores, cada uno con su propia clave AES única, lo que garantiza que los operadores solo puedan ver y controlar los clientes que utilizan su clave específica, logrando un completo aislamiento entre diferentes operadores dentro de la misma infraestructura.</div>
+          <div class="code-snip">[+] Roles: Admin (control total) / Operador (clave única)<br>[+] Aislamiento completo entre operadores<br>[+] Gestión de claves AES por usuario</div>
+        </div>
+      </div>
+      <div class="screenshot-showcase">
+        <div class="screenshot-card">
+          <img src="https://github.com/user-attachments/assets/625d8b4e-590e-4fbd-a0e1-ccdda7d862bd" alt="C2 Web Login" class="clickable-img">
+          <div class="caption">Panel de autenticación · Login</div>
+        </div>
+        <div class="screenshot-card">
+          <img src="https://github.com/user-attachments/assets/0b0fe857-a2ea-4dd1-87f7-267cc79d3243" alt="C2 Web Dashboard" class="clickable-img">
+          <div class="caption">Dashboard principal · Control de clientes</div>
+        </div>
+        <div class="screenshot-card">
+          <img src="https://github.com/user-attachments/assets/1ab2e334-fca4-4822-a0b6-6a60943e5b49" alt="C2 Web Gestión" class="clickable-img">
+          <div class="caption">Gestión de operadores · Asignación de claves</div>
         </div>
       </div>
     </section>
