@@ -5,2183 +5,1370 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>RulesAudit :: Firewall Security Tool</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/R3LI4NT/RulesAudit/refs/heads/main/img/icon-3.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --green:    #00ff88;
+            --cyan:     #00d4ff;
+            --green-dim: rgba(0,255,136,0.12);
+            --cyan-dim:  rgba(0,212,255,0.12);
+            --bg:       #04060a;
+            --bg2:      #080c12;
+            --surface:  rgba(10,15,22,0.85);
+            --border:   rgba(255,255,255,0.07);
+            --border-g: rgba(0,255,136,0.25);
+            --border-c: rgba(0,212,255,0.25);
+            --text:     #c8d6e5;
+            --text-dim: #546e8a;
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
         }
 
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0c0f;
-            color: #fff;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-15px) rotate(2deg); }
-            75% { transform: translateY(15px) rotate(-2deg); }
+        body::before {
+            content:'';
+            position:fixed;
+            inset:0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.35;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        @keyframes pulse-glow {
-            0%, 100% { filter: drop-shadow(0 0 20px currentColor); }
-            50% { filter: drop-shadow(0 0 50px currentColor) brightness(1.2); }
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -1;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .bg-glow-left {
+            position: fixed;
+            top: -200px;
+            left: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .bg-glow-right {
+            position: fixed;
+            bottom: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
         }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        @keyframes scale {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        @keyframes matrixRain {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 0% 100%; }
-        }
-
-        @keyframes pulseWidth {
-            0%, 100% { width: 60%; }
-            50% { width: 80%; }
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        @keyframes borderPulse {
-            0%, 100% { border-color: rgba(0, 255, 0, 0.3); }
-            50% { border-color: rgba(0, 255, 255, 0.6); }
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.6); }
-        }
-
-        .timeline-item {
-            opacity: 0;
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        .timeline-item.visible {
-            opacity: 1;
-            transform: translateX(0) !important;
-        }
-        
-        .timeline-item:nth-child(odd) {
-            transform: translateX(-100px);
-        }
-        
-        .timeline-item:nth-child(even) {
-            transform: translateX(100px);
-        }
-
-        /* ===== HEADER REDISEÑADO ===== */
-        .header {
+        nav {
             position: fixed;
             top: 0;
-            left: 0;
             width: 100%;
-            padding: 15px 50px;
+            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(15px);
-            background: rgba(10, 12, 15, 0.8);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            animation: slideUp 0.8s ease;
+            padding: 0 60px;
+            height: 68px;
+            background: rgba(4,6,10,0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s, height 0.3s;
         }
 
-        .logo-container {
+        nav.scrolled {
+            background: rgba(4,6,10,0.96);
+            height: 60px;
+        }
+
+        .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
-            position: relative;
-        }
-
-        .logo-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            padding: 2px;
-            animation: rotate 10s linear infinite;
-            transition: all 0.3s ease;
-        }
-
-        .logo-img:hover {
-            transform: scale(1.1) rotate(180deg);
-        }
-
-        .logo-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        .logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8em;
+            gap: 10px;
+            font-family: var(--font-head);
             font-weight: 800;
-            background: linear-gradient(135deg, #00ff00, #00ffff, #00ff00);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 5s ease infinite;
-            position: relative;
-        }
-
-        .logo-text::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #00ff00, #00ffff, transparent);
-            transform: scaleX(0);
-            transform-origin: center;
-            transition: transform 0.3s ease;
-        }
-
-        .logo-container:hover .logo-text::after {
-            transform: scaleX(1);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        .nav-item {
-            position: relative;
-            perspective: 1000px;
-        }
-
-        .nav-item a {
+            font-size: 1.3rem;
             color: #fff;
+            letter-spacing: -0.5px;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1em;
-            padding: 12px 20px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            z-index: 1;
         }
 
-        .nav-item a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #00ff00, #00ffff);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: -1;
+        .logo img { width: 28px; filter: drop-shadow(0 0 6px var(--green)); }
+        .logo em { color: var(--green); font-style: normal; }
+
+        .nav-center {
+            display: flex;
+            gap: 2px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px;
         }
 
-        .nav-item a:hover::before {
-            opacity: 1;
-        }
-
-        .nav-item a:hover {
-            color: #000;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
-            border-color: transparent;
-        }
-
-        .nav-item a::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-            opacity: 0;
-            transform: scale(0.5);
-            transition: all 0.4s ease;
-            pointer-events: none;
-        }
-
-        .nav-item a:hover::after {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .nav-indicator {
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%) rotateX(45deg);
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(135deg, #00ff00, #00ffff);
-            border-radius: 50%;
-            filter: blur(10px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: -1;
-        }
-
-        .nav-item:nth-child(1).active .nav-indicator,
-        .nav-item:nth-child(2).active .nav-indicator {
-            opacity: 0.7;
-            animation: pulse-glow 2s ease infinite;
-        }
-
-        .nav-item:nth-child(3).active .nav-indicator {
-            display: none;
-        }
-
-        .nav-item.active a {
-            background: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
-            border-color: rgba(0, 255, 255, 0.3);
-        }
-
-        .nav-item:nth-child(3).active a {
-            background: rgba(0, 255, 255, 0.15);
-            color: #00ffff;
-            border-color: #00ffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .btn-download {
-            padding: 12px 35px;
-            background: linear-gradient(135deg, #00ff00, #00ffff);
-            border: none;
-            border-radius: 40px;
-            color: #000;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .nav-center a {
+            color: var(--text-dim);
             text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 5px;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-center a:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.07);
+        }
+
+        .nav-right {
             display: flex;
             align-items: center;
             gap: 12px;
-            position: relative;
-            overflow: hidden;
-            animation: glowPulse 3s ease infinite;
-            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .btn-download::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+        .nav-right a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 8px 18px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            transition: all 0.25s;
         }
 
-        .btn-download:hover::before {
-            width: 300px;
-            height: 300px;
+        .nav-right a:hover {
+            color: var(--green);
+            border-color: var(--border-g);
+            background: var(--green-dim);
         }
 
-        .btn-download:hover {
-            transform: translateY(-3px) scale(1.1);
-            box-shadow: 0 20px 50px rgba(0, 255, 255, 0.6);
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            outline: none;
         }
 
-        .btn-download i {
-            transition: transform 0.3s ease;
-            font-size: 1.2em;
+        .hamburger:hover {
+            border-color: var(--green);
+            background: var(--green-dim);
         }
 
-        .btn-download:hover i {
-            transform: rotate(360deg) scale(1.2);
+        .hamburger span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
         }
 
-        .btn-download span {
-            position: relative;
-            z-index: 2;
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+            background: var(--green);
         }
 
-        .btn-download::after {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(135deg, #00ff00, #00ffff);
-            border-radius: 42px;
-            z-index: -1;
+        .hamburger.active span:nth-child(2) {
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transform: scaleX(0);
         }
 
-        .btn-download:hover::after {
-            opacity: 0.5;
-            filter: blur(5px);
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+            background: var(--green);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 68px;
+            left: 0;
+            width: 100%;
+            background: rgba(4,6,10,0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 999;
+            transform: translateY(-110%);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(.23,1,.32,1), opacity 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .mobile-menu.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        nav.scrolled ~ .mobile-menu {
+            top: 60px;
+        }
+
+        .mobile-menu a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--green);
+            background: var(--green-dim);
+            padding-left: 32px;
+        }
+
+        .mobile-menu a i {
+            width: 24px;
+            font-size: 1.1rem;
         }
 
         .hero {
-            display: flex;
+            padding-top: 68px;
             min-height: 100vh;
-            position: relative;
-            perspective: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1px 1fr;
         }
 
-        .hero-left, .hero-right {
-            flex: 1;
+        .hero-divider {
+            background: linear-gradient(180deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+            width: 1px;
+        }
+
+        .hero-panel {
+            padding: 100px 60px 80px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 120px 50px;
+            justify-content: flex-start;
             position: relative;
             overflow: hidden;
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
         }
 
-        .hero-left {
-            background: linear-gradient(135deg, #0a2f0a, #1a4a1a, #0a2f0a);
-            background-size: 400% 400%;
-            animation: gradientShift 20s ease infinite;
-            border-right: 1px solid rgba(0, 255, 0, 0.2);
-            transform-origin: right center;
+        .hero-panel::before {
+            content:'';
+            position:absolute;
+            inset:0;
+            pointer-events:none;
         }
 
-        .hero-right {
-            background: linear-gradient(135deg, #0a2f2f, #1a4a4a, #0a2f2f);
-            background-size: 400% 400%;
-            animation: gradientShift 20s ease infinite reverse;
-            transform-origin: left center;
+        .hero-panel.left::before {
+            background: radial-gradient(ellipse at 0% 60%, rgba(0,255,136,0.06) 0%, transparent 60%);
         }
 
-        .hero-left:hover, .hero-right:hover {
-            transform: scale(1.02) translateZ(50px);
-            z-index: 10;
-            box-shadow: 0 0 100px rgba(0, 255, 255, 0.2);
+        .hero-panel.right::before {
+            background: radial-gradient(ellipse at 100% 40%, rgba(0,212,255,0.06) 0%, transparent 60%);
         }
 
-        .hero-left::before, .hero-right::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
-            pointer-events: none;
+        .hero-panel.left::after {
+            content:'';
+            position:absolute;
+            top:0; left:0;
+            width:180px; height:180px;
+            background: radial-gradient(circle at 0% 0%, rgba(0,255,136,0.08), transparent 70%);
         }
 
-        .hero-left::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 30px,
-                rgba(0, 255, 0, 0.03) 30px,
-                rgba(0, 255, 0, 0.03) 60px
-            );
-            animation: matrixRain 30s linear infinite;
-            pointer-events: none;
+        .hero-panel.right::after {
+            content:'';
+            position:absolute;
+            bottom:0; right:0;
+            width:180px; height:180px;
+            background: radial-gradient(circle at 100% 100%, rgba(0,212,255,0.08), transparent 70%);
         }
 
-        .hero-right::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 30px,
-                rgba(0, 255, 255, 0.03) 30px,
-                rgba(0, 255, 255, 0.03) 60px
-            );
-            animation: matrixRain 30s linear infinite reverse;
-            pointer-events: none;
-        }
-
-        .tool-icon {
-            font-size: 8em;
-            margin-bottom: 30px;
-            animation: float 6s ease infinite, pulse-glow 3s ease infinite;
-            position: relative;
-        }
-
-        .hero-left .tool-icon {
-            color: #00ff00;
-        }
-
-        .hero-right .tool-icon {
-            color: #00ffff;
-        }
-
-        .tool-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 4em;
-            font-weight: 800;
-            margin-bottom: 20px;
-            text-align: center;
-            animation: slideUp 1s ease;
-            position: relative;
-        }
-
-        .hero-left .tool-title {
-            background: linear-gradient(135deg, #00ff00, #80ff80, #00ff00);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 5s ease infinite;
-        }
-
-        .hero-right .tool-title {
-            background: linear-gradient(135deg, #00ffff, #80ffff, #00ffff);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 5s ease infinite;
-        }
-
-        .version-badge {
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 8px 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            animation: pulse-glow 2s ease infinite;
-        }
-
-        .hero-left .version-badge {
-            color: #00ff00;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-        }
-
-        .hero-right .version-badge {
-            color: #00ffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .tool-description {
-            font-size: 1.2em;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: center;
-            max-width: 500px;
-            margin-bottom: 40px;
-            line-height: 1.8;
-            animation: slideUp 1s ease 0.2s both;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .changelog-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 30px 0;
-            animation: slideUp 1s ease 0.4s both;
-        }
-
-        .changelog-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .hero-left .changelog-title {
-            color: #00ff00;
-        }
-
-        .hero-right .changelog-title {
-            color: #00ffff;
-        }
-
-        .changelog-list {
-            list-style: none;
-        }
-
-        .changelog-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            animation: slideInLeft 0.5s ease;
-            animation-fill-mode: both;
-        }
-
-        .hero-left .changelog-item:hover {
-            transform: translateX(10px);
-            border-color: #00ff00;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
-        }
-
-        .hero-right .changelog-item:hover {
-            transform: translateX(10px);
-            border-color: #00ffff;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-        }
-
-        .changelog-item:nth-child(1) { animation-delay: 0.1s; }
-        .changelog-item:nth-child(2) { animation-delay: 0.2s; }
-        .changelog-item:nth-child(3) { animation-delay: 0.3s; }
-        .changelog-item:nth-child(4) { animation-delay: 0.4s; }
-        .changelog-item:nth-child(5) { animation-delay: 0.5s; }
-
-        .changelog-icon {
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 1.2em;
-        }
-
-        .hero-left .changelog-icon {
-            background: rgba(0, 255, 0, 0.1);
-            color: #00ff00;
-        }
-
-        .hero-right .changelog-icon {
-            background: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
-        }
-
-        .changelog-content {
-            flex: 1;
-        }
-
-        .changelog-version {
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .hero-left .changelog-version {
-            color: #00ff00;
-        }
-
-        .hero-right .changelog-version {
-            color: #00ffff;
-        }
-
-        .changelog-desc {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95em;
-            line-height: 1.5;
-        }
-
-        .changelog-tag {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.7em;
-            font-weight: 600;
-            margin-left: 10px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-tool {
-            padding: 15px 45px;
-            font-size: 1.3em;
-            font-weight: 700;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
+        .tool-chip {
             display: inline-flex;
             align-items: center;
-            gap: 15px;
-            position: relative;
-            overflow: hidden;
-            animation: pulse-glow 3s ease infinite;
-            margin-top: 20px;
+            gap: 7px;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 4px;
+            margin-bottom: 32px;
+            width: fit-content;
         }
 
-        .hero-left .btn-tool {
-            background: linear-gradient(135deg, #00ff00, #80ff80);
-            color: #000;
-            box-shadow: 0 0 40px rgba(0, 255, 0, 0.4);
+        .tool-chip.green {
+            color: var(--green);
+            border: 1px solid var(--border-g);
+            background: var(--green-dim);
         }
 
-        .hero-right .btn-tool {
-            background: linear-gradient(135deg, #00ffff, #80ffff);
-            color: #000;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+        .tool-chip.cyan {
+            color: var(--cyan);
+            border: 1px solid var(--border-c);
+            background: var(--cyan-dim);
         }
 
-        .btn-tool::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
+        .tool-chip .dot {
+            width: 5px; height: 5px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            animation: blink 2s infinite;
         }
 
-        .btn-tool:hover::before {
-            width: 400px;
-            height: 400px;
+        .tool-chip.green .dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .tool-chip.cyan .dot  { background: var(--cyan);  box-shadow: 0 0 6px var(--cyan);  }
+
+        @keyframes blink {
+            0%,100% { opacity:1; }
+            50%      { opacity:0.3; }
         }
 
-        .btn-tool:hover {
-            transform: translateY(-5px) scale(1.1);
-            box-shadow: 0 0 80px currentColor;
+        .tool-name {
+            font-family: var(--font-head);
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -1.5px;
+            line-height: 1.05;
+            margin-bottom: 16px;
         }
 
-        .btn-tool i {
-            transition: transform 0.3s ease;
-        }
+        .tool-name .accent-g { color: var(--green); }
+        .tool-name .accent-c { color: var(--cyan);  }
 
-        .btn-tool:hover i {
-            transform: rotate(360deg) scale(1.2);
-        }
-
-        .mockups {
-            padding: 100px 50px;
-            background: #0a0c0f;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mockups::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #00ff00, #00ffff, transparent);
-        }
-
-        .section-title {
-            text-align: center;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3em;
-            margin-bottom: 60px;
-            animation: slideUp 1s ease;
-        }
-
-        .section-title span {
-            background: linear-gradient(135deg, #00ff00, #00ffff, #00ff00);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 5s ease infinite;
-        }
-
-        .mockup-container {
-            display: flex;
-            justify-content: center;
-            gap: 50px;
-            flex-wrap: wrap;
-            perspective: 2000px;
-        }
-
-        .mockup-card {
-            flex: 1;
-            min-width: 350px;
-            max-width: 550px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 30px;
-            padding: 40px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-            animation: slideUp 1s ease;
-        }
-
-        .mockup-card:hover {
-            transform: rotateY(10deg) translateY(-20px) translateZ(50px);
-            border-color: currentColor;
-        }
-
-        .mockup-card.left {
-            border-color: rgba(0, 255, 0, 0.3);
-            box-shadow: 0 0 50px rgba(0, 255, 0, 0.2);
-        }
-
-        .mockup-card.right {
-            border-color: rgba(0, 255, 255, 0.3);
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
-        }
-
-        .mockup-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .mockup-header i {
-            font-size: 3em;
-            animation: rotate 10s linear infinite;
-        }
-
-        .mockup-card.left .mockup-header i {
-            color: #00ff00;
-        }
-
-        .mockup-card.right .mockup-header i {
-            color: #00ffff;
-        }
-
-        .mockup-header h3 {
-            font-size: 2em;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .mockup-card.left .mockup-header h3 {
-            color: #00ff00;
-        }
-
-        .mockup-card.right .mockup-header h3 {
-            color: #00ffff;
-        }
-
-        .mockup-dashboard {
-            width: 100%;
-            height: 280px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            overflow: hidden;
-            position: relative;
-            transition: all 0.5s ease;
-            padding: 20px;
-        }
-
-        .mockup-card.left .mockup-dashboard {
-            background: linear-gradient(135deg, #0a2f0a, #1a4a1a);
-            border: 1px solid #00ff00;
-        }
-
-        .mockup-card.right .mockup-dashboard {
-            background: linear-gradient(135deg, #0a2f2f, #1a4a4a);
-            border: 1px solid #00ffff;
-        }
-
-        .dashboard-preview {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .preview-header {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .preview-header span {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .mockup-card.left .preview-header span:nth-child(1) { background: #00ff00; }
-        .mockup-card.left .preview-header span:nth-child(2) { background: #00ff00; opacity: 0.7; }
-        .mockup-card.left .preview-header span:nth-child(3) { background: #00ff00; opacity: 0.4; }
-
-        .mockup-card.right .preview-header span:nth-child(1) { background: #00ffff; }
-        .mockup-card.right .preview-header span:nth-child(2) { background: #00ffff; opacity: 0.7; }
-        .mockup-card.right .preview-header span:nth-child(3) { background: #00ffff; opacity: 0.4; }
-
-        .preview-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .preview-bar {
-            height: 20px;
-            border-radius: 5px;
-            animation: pulseWidth 2s infinite;
-        }
-
-        .mockup-card.left .preview-bar {
-            background: linear-gradient(90deg, #00ff00, #80ff80);
-        }
-
-        .mockup-card.right .preview-bar {
-            background: linear-gradient(90deg, #00ffff, #80ffff);
-        }
-
-        .preview-bar:nth-child(2) { animation-delay: 0.2s; width: 70%; }
-        .preview-bar:nth-child(3) { animation-delay: 0.4s; width: 50%; }
-        .preview-bar:nth-child(4) { animation-delay: 0.6s; width: 90%; }
-
-        .preview-cards {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .preview-card {
-            flex: 1;
-            height: 60px;
-            border-radius: 5px;
-        }
-
-        .mockup-card.left .preview-card {
-            background: rgba(0, 255, 0, 0.2);
-        }
-
-        .mockup-card.right .preview-card {
-            background: rgba(0, 255, 255, 0.2);
-        }
-
-        .preview-nodes {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .preview-node {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-        }
-
-        .mockup-card.right .preview-node {
-            background: #00ffff;
-        }
-
-        .preview-lines {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-        }
-
-        .preview-line {
-            flex: 1;
-            height: 4px;
-        }
-
-        .mockup-card.right .preview-line {
-            background: #00ffff;
-        }
-
-        .preview-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-        }
-
-        .preview-grid-item {
-            height: 40px;
-            border-radius: 3px;
-        }
-
-        .mockup-card.right .preview-grid-item {
-            background: rgba(0, 255, 255, 0.2);
-        }
-
-        .version-stats {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .stat-badge {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: 700;
-        }
-
-        .mockup-card.left .stat-number {
-            color: #00ff00;
-        }
-
-        .mockup-card.right .stat-number {
-            color: #00ffff;
-        }
-
-        .stat-label {
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.5);
+        .tool-desc {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+            max-width: 460px;
+            margin-bottom: 40px;
         }
 
         .features {
-            padding: 100px 50px;
-            background: #0f1215;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .features-timeline {
-            position: relative;
-            max-width: 1200px;
-            margin: 60px auto 0;
-        }
-
-        .features-timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(180deg, #00ff00, #00ffff, #00ff00);
-            animation: pulse-glow 3s ease infinite;
-        }
-
-        .timeline-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 60px;
-            position: relative;
-        }
-
-        .timeline-item:nth-child(even) {
-            flex-direction: row-reverse;
-        }
-
-        .timeline-content {
-            width: 45%;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .timeline-content:hover {
-            transform: translateY(-10px) scale(1.05);
-        }
-
-        .timeline-item:nth-child(odd) .timeline-content {
-            border-left: 4px solid #00ff00;
-        }
-
-        .timeline-item:nth-child(even) .timeline-content {
-            border-right: 4px solid #00ffff;
-        }
-
-        .timeline-dot {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #00ff00;
-            box-shadow: 0 0 30px #00ff00;
-            animation: pulse-glow 2s ease infinite;
-            z-index: 2;
-        }
-
-        .timeline-item:nth-child(even) .timeline-dot {
-            background: #00ffff;
-            box-shadow: 0 0 30px #00ffff;
-        }
-
-        .timeline-date {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .timeline-item:nth-child(odd) .timeline-date {
-            background: rgba(0, 255, 0, 0.1);
-            color: #00ff00;
-        }
-
-        .timeline-item:nth-child(even) .timeline-date {
-            background: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
-        }
-
-        .timeline-title {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-        }
-
-        .timeline-item:nth-child(odd) .timeline-title {
-            color: #00ff00;
-        }
-
-        .timeline-item:nth-child(even) .timeline-title {
-            color: #00ffff;
-        }
-
-        .timeline-list {
             list-style: none;
+            margin-bottom: 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .timeline-list li {
-            margin: 10px 0;
+        .features li {
+            display: grid;
+            grid-template-columns: 36px 1fr;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.25s ease;
+            cursor: default;
+        }
+
+        .hero-panel.left .features li:hover {
+            border-color: var(--border-g);
+            background: var(--green-dim);
+            transform: translateX(6px);
+        }
+
+        .hero-panel.right .features li:hover {
+            border-color: var(--border-c);
+            background: var(--cyan-dim);
+            transform: translateX(6px);
+        }
+
+        .feat-icon {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .hero-panel.left  .feat-icon { background: var(--green-dim); color: var(--green); }
+        .hero-panel.right .feat-icon { background: var(--cyan-dim);  color: var(--cyan);  }
+
+        .feat-body { display: flex; flex-direction: column; gap: 1px; }
+
+        .feat-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #dde8f0;
             display: flex;
             align-items: center;
+            gap: 8px;
+        }
+
+        .feat-sub {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+
+        .badge-new {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            padding: 2px 7px;
+            border-radius: 3px;
+            background: var(--green-dim);
+            color: var(--green);
+            border: 1px solid var(--border-g);
+            text-transform: uppercase;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
             gap: 10px;
-            color: rgba(255, 255, 255, 0.8);
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+            padding: 13px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(.23,1,.32,1);
+            cursor: pointer;
+            width: fit-content;
         }
 
-        .timeline-list i {
-            font-size: 1.2em;
+        .btn-green {
+            background: var(--green);
+            color: #04060a;
         }
 
-        .timeline-item:nth-child(odd) .timeline-list i {
-            color: #00ff00;
+        .btn-green:hover {
+            background: #33ffaa;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0,255,136,0.3);
         }
 
-        .timeline-item:nth-child(even) .timeline-list i {
-            color: #00ffff;
+        .btn-cyan {
+            background: var(--cyan);
+            color: #04060a;
         }
 
-        .footer {
-            background: #0a0c0f;
-            padding: 60px 50px 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
+        .btn-cyan:hover {
+            background: #33e0ff;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0,212,255,0.3);
         }
 
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 50px;
-            max-width: 1200px;
-            margin: 0 auto 50px;
+        .section-head {
+            text-align: center;
+            margin-bottom: 60px;
         }
 
-        .footer-logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2em;
-            background: linear-gradient(135deg, #00ff00, #00ffff);
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: var(--font-head);
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -1px;
+        }
+
+        .section-title span {
+            background: linear-gradient(135deg, var(--green), var(--cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .footer-links {
+        .mockups-section {
+            padding: 100px 60px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        .mockup-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .mockup-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+        }
+
+        .mockup-card.green-card { border-top: 2px solid var(--green); }
+        .mockup-card.cyan-card  { border-top: 2px solid var(--cyan);  }
+
+        .mockup-card-header {
+            padding: 22px 28px;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            gap: 60px;
+            align-items: center;
+            gap: 14px;
         }
 
-        .footer-column h4 {
+        .mockup-icon {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+
+        .green-card .mockup-icon { background: var(--green-dim); color: var(--green); }
+        .cyan-card  .mockup-icon { background: var(--cyan-dim);  color: var(--cyan);  }
+
+        .mockup-card-header h3 {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1.1rem;
             color: #fff;
-            margin-bottom: 20px;
-            font-size: 1.2em;
         }
 
-        .footer-column a {
-            display: block;
-            color: rgba(255, 255, 255, 0.5);
-            text-decoration: none;
-            margin: 10px 0;
-            transition: all 0.3s ease;
+        .mockup-card-header p {
+            font-size: 0.78rem;
+            color: var(--text-dim);
         }
 
-        .footer-column a:hover {
-            color: #00ffff;
-            transform: translateX(5px);
+        .mockup-screen {
+            margin: 24px 28px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 160px;
         }
 
-        .footer-social {
+        .screen-dots {
             display: flex;
-            gap: 20px;
+            gap: 7px;
+            margin-bottom: 18px;
         }
 
-        .footer-social a {
-            color: #fff;
-            font-size: 1.8em;
-            transition: all 0.3s ease;
+        .screen-dots span {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+        }
+
+        .green-card .screen-dots span:nth-child(1) { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .green-card .screen-dots span:nth-child(2) { background: rgba(0,255,136,0.5); }
+        .green-card .screen-dots span:nth-child(3) { background: rgba(0,255,136,0.2); }
+
+        .cyan-card .screen-dots span:nth-child(1) { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+        .cyan-card .screen-dots span:nth-child(2) { background: rgba(0,212,255,0.5); }
+        .cyan-card .screen-dots span:nth-child(3) { background: rgba(0,212,255,0.2); }
+
+        .screen-bar {
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .green-card .screen-bar { background: linear-gradient(90deg, var(--green), rgba(0,255,136,0.2)); }
+        .cyan-card  .screen-bar { background: linear-gradient(90deg, var(--cyan),  rgba(0,212,255,0.2)); }
+
+        .screen-mini-cards {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .screen-mini-card {
+            flex: 1;
+            height: 44px;
+            border-radius: 6px;
+        }
+
+        .green-card .screen-mini-card { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.15); }
+        .cyan-card  .screen-mini-card { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.15); }
+
+        .screen-nodes {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .screen-node {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 12px rgba(0,212,255,0.3);
+        }
+
+        .screen-node:nth-child(2) { opacity: 0.65; width: 20px; height: 20px; }
+        .screen-node:nth-child(3) { opacity: 0.35; width: 14px; height: 14px; }
+
+        .screen-node-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0,212,255,0.4), transparent);
+        }
+
+        .screen-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .screen-grid-cell {
+            height: 32px;
+            border-radius: 5px;
+            background: rgba(0,212,255,0.08);
+            border: 1px solid rgba(0,212,255,0.12);
+        }
+
+        .mockup-stats {
+            display: flex;
+            gap: 12px;
+            padding: 20px 28px;
+            border-top: 1px solid var(--border);
+        }
+
+        .mstat {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+        }
+
+        .mstat-val {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .green-card .mstat-val { color: var(--green); }
+        .cyan-card  .mstat-val { color: var(--cyan);  }
+
+        .mstat-lbl {
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            margin-top: 3px;
+            letter-spacing: 0.05em;
+        }
+
+        .timeline-section {
+            padding: 100px 60px;
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.3) 20%, rgba(0,0,0,0.3) 80%, transparent);
+        }
+
+        .timeline-wrap {
+            max-width: 860px;
+            margin: 0 auto;
             position: relative;
         }
 
-        .footer-social a::before {
-            content: '';
+        .timeline-line {
             position: absolute;
-            top: 50%;
             left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(0, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.3s ease, height 0.3s ease;
-            z-index: -1;
+            transform: translateX(-50%);
+            top: 0; bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, var(--green) 10%, var(--cyan) 90%, transparent);
         }
 
-        .footer-social a:hover::before {
-            width: 50px;
-            height: 50px;
+        .tl-item {
+            display: grid;
+            grid-template-columns: 1fr 40px 1fr;
+            gap: 0;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(24px);
+            transition: all 0.6s ease;
         }
 
-        .footer-social a:hover {
-            color: #00ff00;
-            transform: translateY(-5px) rotate(360deg);
+        .tl-item.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.3);
+        .tl-item:nth-child(odd)  .tl-card { grid-column: 1; text-align: right; align-items: flex-end; }
+        .tl-item:nth-child(odd)  .tl-empty { grid-column: 3; }
+        .tl-item:nth-child(even) .tl-card  { grid-column: 3; text-align: left;  align-items: flex-start; }
+        .tl-item:nth-child(even) .tl-empty { grid-column: 1; }
+
+        .tl-center {
+            grid-column: 2;
             display: flex;
+            align-items: flex-start;
             justify-content: center;
-            gap: 20px;
+            padding-top: 20px;
+        }
+
+        .tl-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tl-dot::after {
+            content:'';
+            position:absolute;
+            inset:-5px;
+            border-radius:50%;
+            border: 1px solid;
+            opacity: 0.4;
+            animation: ripple 2s infinite;
+        }
+
+        @keyframes ripple {
+            0%   { transform: scale(0.8); opacity: 0.4; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .tl-item:nth-child(odd) .tl-dot {
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+        .tl-item:nth-child(odd) .tl-dot::after { border-color: var(--green); }
+
+        .tl-item:nth-child(even) .tl-dot {
+            background: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan);
+        }
+        .tl-item:nth-child(even) .tl-dot::after { border-color: var(--cyan); }
+
+        .tl-card {
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .tl-card:hover { transform: translateY(-4px); }
+
+        .tl-item:nth-child(odd)  .tl-card { border-right: 2px solid var(--green); margin-right: 20px; }
+        .tl-item:nth-child(even) .tl-card { border-left:  2px solid var(--cyan);  margin-left:  20px; }
+
+        .tl-date {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            width: fit-content;
+        }
+
+        .tl-item:nth-child(odd)  .tl-date { background: var(--green-dim); color: var(--green); }
+        .tl-item:nth-child(even) .tl-date { background: var(--cyan-dim);  color: var(--cyan);  }
+
+        .tl-item:nth-child(odd) .tl-card { align-self: start; }
+
+        .tl-title {
+            font-family: var(--font-head);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 14px;
+        }
+
+        .tl-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+        .tl-list li {
+            font-size: 0.83rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tl-item:nth-child(odd) .tl-list li { flex-direction: row-reverse; }
+
+        .tl-list li i {
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .tl-item:nth-child(odd)  .tl-list li i { color: var(--green); }
+        .tl-item:nth-child(even) .tl-list li i { color: var(--cyan);  }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 60px 60px 36px;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .footer-logo {
+            font-family: var(--font-head);
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .footer-logo em { color: var(--green); font-style: normal; }
+
+        .footer-nav {
+            display: flex;
+            gap: 32px;
             flex-wrap: wrap;
         }
 
-        .footer-bottom span {
+        .footer-nav a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer-nav a:hover { color: var(--green); }
+
+        .footer-social {
             display: flex;
+            gap: 12px;
+        }
+
+        .footer-social a {
+            width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.25s;
+        }
+
+        .footer-social a:hover {
+            color: var(--green);
+            border-color: var(--border-g);
+            background: var(--green-dim);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 5px;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
         }
 
-        .footer-bottom i {
-            color: #ff6b6b;
-            animation: pulse-glow 2s ease infinite;
+        .footer-bottom a {
+            color: var(--green);
+            text-decoration: none;
+            font-weight: 600;
         }
 
-        @media (max-width: 1200px) {
-            .hero-left .tool-title, .hero-right .tool-title {
-                font-size: 3em;
-            }
+        .footer-versions {
+            display: flex;
+            gap: 16px;
         }
 
-        @media (max-width: 992px) {
-            .header {
-                padding: 20px;
-            }
+        .ver-tag {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
 
-            .nav-links {
-                display: none;
-            }
+        .ver-tag.g { background: var(--green-dim); color: var(--green); border: 1px solid var(--border-g); }
+        .ver-tag.c { background: var(--cyan-dim);  color: var(--cyan);  border: 1px solid var(--border-c); }
 
-            .hero {
-                flex-direction: column;
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; }
+            .hero-divider { display: none; }
+            .hero-panel {
+                padding: 60px 40px;
+                border-bottom: 1px solid var(--border);
             }
+            .mockup-grid { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; }
+        }
 
-            .hero-left, .hero-right {
-                padding: 80px 30px;
-            }
-
-            .features-timeline::before {
-                left: 30px;
-            }
-
-            .timeline-item, .timeline-item:nth-child(even) {
-                flex-direction: column;
-                margin-left: 60px;
-            }
-
-            .timeline-content {
-                width: 100%;
-            }
-
-            .timeline-dot {
-                left: 30px;
-            }
-
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                gap: 30px;
-            }
+        @media (max-width: 860px) {
+            nav { padding: 0 24px; }
+            .nav-center { display: none; }
+            .nav-right { display: none; }
+            .hamburger { display: flex; }
         }
 
         @media (max-width: 768px) {
-            .tool-title {
-                font-size: 2.5em;
-            }
+            .hero-panel { padding: 50px 24px; }
+            .mockups-section,
+            .timeline-section { padding: 70px 24px; }
+            footer { padding: 50px 24px 30px; }
 
-            .mockups, .features {
-                padding: 60px 30px;
+            .tl-item {
+                grid-template-columns: 24px 1fr;
+                gap: 16px;
             }
-        }
-
-        @media (max-width: 576px) {
-            .header {
-                padding: 12px 20px;
+            .tl-item:nth-child(odd) .tl-card,
+            .tl-item:nth-child(even) .tl-card {
+                grid-column: 2;
+                grid-row: 1;
+                text-align: left;
+                align-items: flex-start;
+                margin: 0;
+                border-left: 2px solid var(--green);
+                border-right: none;
             }
-
-            .logo-img {
-                width: 45px;
-                height: 45px;
-            }
-
-            .logo-text {
-                font-size: 1.4em;
-            }
-
-            .btn-download {
-                padding: 8px 20px;
-                font-size: 0.9em;
-                gap: 8px;
-            }
-
-            .btn-download i {
-                font-size: 1em;
-            }
-
-            .hero-left, .hero-right {
-                padding: 60px 20px;
-            }
-
-            .tool-icon {
-                font-size: 5em;
-                margin-bottom: 20px;
-            }
-
-            .tool-title {
-                font-size: 2.2em;
-            }
-
-            .tool-description {
-                font-size: 1em;
-                max-width: 100%;
-                margin-bottom: 25px;
-            }
-
-            .changelog-container {
-                max-width: 100%;
-                margin: 20px 0;
-            }
-
-            .changelog-title {
-                font-size: 1.2em;
-            }
-
-            .changelog-item {
-                padding: 12px;
-                gap: 12px;
-            }
-
-            .changelog-icon {
-                width: 25px;
-                height: 25px;
-                font-size: 1em;
-            }
-
-            .changelog-version {
-                font-size: 0.9em;
-            }
-
-            .changelog-desc {
-                font-size: 0.85em;
-            }
-
-            .btn-tool {
-                padding: 12px 30px;
-                font-size: 1.1em;
-                gap: 10px;
-            }
-
-            .mockups {
-                padding: 40px 20px;
-            }
-
-            .section-title {
-                font-size: 2em;
-                margin-bottom: 30px;
-            }
-
-            .mockup-card {
-                min-width: 280px;
-                max-width: 100%;
-                padding: 25px;
-            }
-
-            .mockup-header {
-                gap: 15px;
-                margin-bottom: 20px;
-            }
-
-            .mockup-header i {
-                font-size: 2.2em;
-            }
-
-            .mockup-header h3 {
-                font-size: 1.5em;
-            }
-
-            .mockup-dashboard {
-                height: 220px;
-                padding: 15px;
-                margin-bottom: 20px;
-            }
-
-            .preview-header span {
-                width: 10px;
-                height: 10px;
-            }
-
-            .preview-bar {
-                height: 16px;
-            }
-
-            .preview-card {
-                height: 45px;
-            }
-
-            .preview-node {
-                width: 22px;
-                height: 22px;
-            }
-
-            .preview-grid-item {
-                height: 30px;
-            }
-
-            .version-stats {
-                gap: 10px;
-                margin-top: 15px;
-            }
-
-            .stat-number {
-                font-size: 1.2em;
-            }
-
-            .stat-label {
-                font-size: 0.7em;
-            }
-
-            .features {
-                padding: 40px 20px;
-            }
-
-            .timeline-item {
-                margin-bottom: 30px;
-                margin-left: 40px;
-            }
-
-            .timeline-content {
-                padding: 20px;
-            }
-
-            .timeline-dot {
-                width: 16px;
-                height: 16px;
-                left: 25px;
-            }
-
-            .timeline-date {
-                font-size: 0.8em;
-                padding: 4px 12px;
-            }
-
-            .timeline-title {
-                font-size: 1.2em;
-                margin-bottom: 12px;
-            }
-
-            .timeline-list li {
-                font-size: 0.9em;
-                margin: 8px 0;
-            }
-
-            .timeline-list i {
-                font-size: 1em;
-            }
-
-            .footer {
-                padding: 40px 20px 20px;
-            }
-
-            .footer-logo {
-                font-size: 1.8em;
-            }
-
-            .footer-links {
-                gap: 30px;
-            }
-
-            .footer-column h4 {
-                font-size: 1.1em;
-                margin-bottom: 15px;
-            }
-
-            .footer-social a {
-                font-size: 1.5em;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                gap: 10px;
-                padding-top: 20px;
-            }
+            .tl-item:nth-child(even) .tl-card { border-left-color: var(--cyan); }
+            .tl-center { grid-column: 1; grid-row: 1; }
+            .tl-empty  { display: none; }
+            .tl-item:nth-child(odd) .tl-list li { flex-direction: row; }
+            .timeline-line { left: 12px; }
         }
 
         @media (max-width: 480px) {
-            .header {
-                padding: 10px 15px;
-            }
-
-            .logo-img {
-                width: 35px;
-                height: 35px;
-            }
-
-            .logo-text {
-                font-size: 1.2em;
-            }
-
-            .btn-download {
-                padding: 6px 15px;
-                font-size: 0.85em;
-            }
-
-            .hero-left, .hero-right {
-                padding: 50px 15px;
-            }
-
-            .tool-icon {
-                font-size: 4.5em;
-            }
-
-            .tool-title {
-                font-size: 1.8em;
-            }
-
-            .tool-description {
-                font-size: 0.95em;
-                line-height: 1.6;
-            }
-
-            .changelog-item {
-                padding: 10px;
-            }
-
-            .changelog-version {
-                font-size: 0.85em;
-            }
-
-            .changelog-desc {
-                font-size: 0.8em;
-            }
-
-            .btn-tool {
-                padding: 10px 25px;
-                font-size: 1em;
-            }
-
-            .section-title {
-                font-size: 1.8em;
-            }
-
-            .mockup-card {
-                padding: 20px;
-            }
-
-            .mockup-header h3 {
-                font-size: 1.3em;
-            }
-
-            .mockup-dashboard {
-                height: 200px;
-                padding: 12px;
-            }
-
-            .preview-bar {
-                height: 14px;
-            }
-
-            .version-stats {
-                flex-wrap: wrap;
-            }
-
-            .stat-badge {
-                min-width: 80px;
-            }
-
-            .features-timeline::before {
-                left: 20px;
-            }
-
-            .timeline-item {
-                margin-left: 30px;
-            }
-
-            .timeline-dot {
-                left: 20px;
-            }
-
-            .footer-links {
-                gap: 25px;
-            }
-
-            .footer-bottom span {
-                font-size: 0.85em;
-            }
-        }
-
-        @media (max-width: 375px) {
-            .logo-text {
-                font-size: 1.1em;
-            }
-
-            .btn-download {
-                padding: 5px 12px;
-                font-size: 0.8em;
-            }
-
-            .tool-icon {
-                font-size: 4em;
-            }
-
-            .tool-title {
-                font-size: 1.6em;
-            }
-
-            .tool-description {
-                font-size: 0.9em;
-            }
-
-            .changelog-icon {
-                width: 22px;
-                height: 22px;
-                font-size: 0.9em;
-            }
-
-            .mockup-header i {
-                font-size: 2em;
-            }
-
-            .mockup-header h3 {
-                font-size: 1.2em;
-            }
-
-            .mockup-dashboard {
-                height: 180px;
-            }
-
-            .preview-node {
-                width: 18px;
-                height: 18px;
-            }
-
-            .preview-grid-item {
-                height: 25px;
-            }
-
-            .footer-logo {
-                font-size: 1.6em;
-            }
-
-            .footer-column h4 {
-                font-size: 1em;
-            }
-
-            .footer-column a {
-                font-size: 0.9em;
-            }
-        }
-
-        @media (max-width: 320px) {
-            .logo-text {
-                font-size: 1em;
-            }
-
-            .btn-download {
-                padding: 4px 10px;
-                font-size: 0.75em;
-            }
-
-            .tool-icon {
-                font-size: 3.5em;
-            }
-
-            .tool-title {
-                font-size: 1.4em;
-            }
-
-            .tool-description {
-                font-size: 0.85em;
-            }
-
-            .changelog-item {
-                padding: 8px;
-            }
-
-            .btn-tool {
-                padding: 8px 20px;
-                font-size: 0.9em;
-            }
-
-            .mockup-header h3 {
-                font-size: 1.1em;
-            }
-
-            .footer-links {
-                gap: 20px;
-            }
-        }
-
-        @media (min-width: 350px) and (max-width: 400px) and (min-height: 800px) and (max-height: 900px) {
-            .hero-left, .hero-right {
-                padding: 60px 15px;
-            }
-
-            .tool-title {
-                font-size: 2em;
-            }
-
-            .tool-description {
-                font-size: 1em;
-                max-width: 320px;
-            }
-
-            .changelog-container {
-                max-width: 320px;
-            }
-
-            .changelog-item {
-                padding: 12px;
-            }
-
-            .mockup-card {
-                min-width: 300px;
-            }
-
-            .mockup-dashboard {
-                height: 200px;
-            }
-
-            .features-timeline::before {
-                left: 25px;
-            }
-
-            .timeline-item {
-                margin-left: 35px;
-            }
-
-            .timeline-dot {
-                left: 25px;
-            }
-        }
-
-        @media (min-width: 384px) and (max-width: 412px) and (min-height: 850px) and (max-height: 920px) {
-            .hero-left, .hero-right {
-                padding: 65px 18px;
-            }
-
-            .tool-title {
-                font-size: 2.1em;
-            }
-
-            .tool-description {
-                font-size: 1.05em;
-            }
-
-            .changelog-container {
-                max-width: 340px;
-            }
-
-            .mockup-card {
-                min-width: 320px;
-            }
-        }
-
-        @media (min-width: 360px) and (max-width: 390px) and (min-height: 720px) and (max-height: 780px) {
-            .hero-left, .hero-right {
-                padding: 55px 15px;
-            }
-
-            .tool-title {
-                font-size: 1.9em;
-            }
-
-            .tool-description {
-                font-size: 0.95em;
-            }
-
-            .mockup-card {
-                min-width: 290px;
-                padding: 20px;
-            }
-
-            .mockup-dashboard {
-                height: 190px;
-            }
+            .footer-top { flex-direction: column; text-align: center; }
+            .footer-nav, .footer-social { justify-content: center; }
+            .footer-bottom { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="logo-container">
-            <div class="logo-img">
-                <img src="https://raw.githubusercontent.com/R3LI4NT/RulesAudit/refs/heads/main/img/icon-3.png" alt="RulesAudit Logo">
-            </div>
-            <span class="logo-text">RulesAudit</span>
-        </div>
-        <nav class="nav-links">
-            <div class="nav-item">
-                <a href="#rulesaudit">RulesAudit</a>
-                <div class="nav-indicator"></div>
-            </div>
-            <div class="nav-item">
-                <a href="#segmentation">Segmentation</a>
-                <div class="nav-indicator"></div>
-            </div>
-            <div class="nav-item">
-                <a href="#features">Changelog</a>
-                <div class="nav-indicator"></div>
-            </div>
-        </nav>
-        <a href="#rulesaudit" class="btn-download">
-            <i class="fas fa-download"></i>
-            <span>Descargar</span>
+
+<div class="bg-grid"></div>
+<div class="bg-glow-left"></div>
+<div class="bg-glow-right"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+    <a href="#" class="logo">
+        <img src="https://raw.githubusercontent.com/R3LI4NT/RulesAudit/refs/heads/main/img/icon-3.png" alt="Logo">
+        Rules<em>Audit</em>
+    </a>
+    <div class="nav-center" id="navCenter">
+        <a href="#rulesaudit">RulesAudit</a>
+        <a href="#segmentation">Segmentation</a>
+        <a href="#changelog">Changelog</a>
+    </div>
+    <div class="nav-right">
+        <a href="https://github.com/R3LI4NT" target="_blank" class="nav-github">
+            <i class="fab fa-github"></i> GitHub
         </a>
-    </header>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+</nav>
 
-    <section class="hero">
-        <div class="hero-left" id="rulesaudit">
-            <div class="tool-icon">
-                <i class="fa-solid fa-fire"></i>
-            </div>
-            <div class="tool-title">
-                RulesAudit
-            </div>
-            <p class="tool-description">
-                Analizador de reglas de firewall profesional. Detecta vulnerabilidades, 
-                genera reportes detallados y optimiza tu seguridad perimetral.
-            </p>
-            
-            <!-- CHANGELOG RULESAUDIT -->
-            <div class="changelog-container">
-                <div class="changelog-title">
-                    <i class="fas fa-history"></i> Características
-                </div>
-                <ul class="changelog-list">
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fa-brands fa-searchengin"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Análisis en tiempo real</div>
-                            <div class="changelog-desc">Motor de análisis que procesa reglas en milisegundos</div>
-                        </div>
-                    </li>
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fas fa-chart-pie"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Dashboard interactivo</div>
-                            <div class="changelog-desc">Visualización de vulnerabilidades por severidad</div>
-                        </div>
-                    </li>
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fas fa-file-export"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Exportación </div>
-                            <div class="changelog-desc">Reportes en HTML interactivo y Excel</div>
-                        </div>
-                    </li>
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fas fa-robot"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Modos de uso</div>
-                            <div class="changelog-desc">Además de CLI, ahora cuenta con una aplicación WEB <span class="changelog-tag">NUEVO</span></div>
-                        </div>
-                    </li>
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fa-solid fa-gear"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Motor de Vulnerabilidades</div>
-                            <div class="changelog-desc">Cuenta con un motor de vulnerabilidades full personalizable</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            
-            <a href="https://github.com/R3LI4NT/RulesAudit/releases/download/SRC/RulesAudit.zip" class="btn-tool">
-                <i class="fas fa-download"></i> Descargar RulesAudit
-            </a>
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#rulesaudit"><i class="fas fa-fire"></i> RulesAudit</a>
+    <a href="#segmentation"><i class="fas fa-project-diagram"></i> Segmentation Analyzer</a>
+    <a href="#changelog"><i class="fas fa-history"></i> Changelog</a>
+    <a href="https://github.com/R3LI4NT" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+
+    <div class="hero-panel left" id="rulesaudit">
+        <div class="tool-chip green">
+            <span class="dot"></span> Firewall Security Tool
         </div>
 
-        <!-- SEGMENTATION ANALYZER -->
-        <div class="hero-right" id="segmentation">
-            <div class="tool-icon">
-                <i class="fas fa-project-diagram"></i>
-            </div>
-            <div class="tool-title">
-                Segmentation Analyzer
-            </div>
-            <p class="tool-description">
-                Herramienta especializada en pruebas de segmentación de red. 
-                Verifica aislamiento y analiza comunicaciones entre redes.
-            </p>
-            
-            <!-- CHANGELOG SEGMENTATION -->
-            <div class="changelog-container">
-                <div class="changelog-title">
-                    <i class="fas fa-history"></i> Características
-                </div>
-                <ul class="changelog-list">
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fa-solid fa-network-wired"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Pruebas de Segmentación</div>
-                            <div class="changelog-desc">Identifica comunicaciones no autorizadas entre segmentos</div>
-                        </div>
-                    </li>
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fas fa-file-export"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Exportación </div>
-                            <div class="changelog-desc">Reportes en HTML interactivo</div>
-                        </div>
-                    </li>
-                    <li class="changelog-item">
-                        <div class="changelog-icon"><i class="fas fa-clock"></i></div>
-                        <div class="changelog-content">
-                            <div class="changelog-version">[+] Aplicación GUI + Script</div>
-                            <div class="changelog-desc">Cuenta con una aplicación GUI para Windows y script automatizado para Testing con nmap</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            
-            <a href="https://github.com/R3LI4NT/RulesAudit/releases/download/EXE/SegmAnalyzer.exe" class="btn-tool">
-                <i class="fas fa-download"></i> Descargar Segmentation Analyzer
-            </a>
-        </div>
-    </section>
+        <h1 class="tool-name">Rules<span class="accent-g">Audit</span></h1>
 
-    <section class="mockups">
-        <h2 class="section-title">
-            <span>Interfaces Profesionales</span>
-        </h2>
-        <div class="mockup-container">
-            <div class="mockup-card left">
-                <div class="mockup-header">
-                    <i class="fa-solid fa-fire"></i>
+        <p class="tool-desc">
+            Analizador profesional de reglas de firewall. Detecta vulnerabilidades, genera reportes detallados y optimiza tu seguridad perimetral en tiempo real.
+        </p>
+
+        <ul class="features">
+            <li>
+                <div class="feat-icon"><i class="fas fa-bolt"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">Análisis en tiempo real</span>
+                    <span class="feat-sub">Motor que procesa reglas en milisegundos</span>
+                </div>
+            </li>
+            <li>
+                <div class="feat-icon"><i class="fas fa-chart-pie"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">Dashboard interactivo</span>
+                    <span class="feat-sub">Visualización de vulnerabilidades por severidad</span>
+                </div>
+            </li>
+            <li>
+                <div class="feat-icon"><i class="fas fa-file-export"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">Exportación múltiple</span>
+                    <span class="feat-sub">Reportes en HTML interactivo y Excel</span>
+                </div>
+            </li>
+            <li>
+                <div class="feat-icon"><i class="fas fa-terminal"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">Modos de uso <span class="badge-new">NUEVO</span></span>
+                    <span class="feat-sub">CLI + Aplicación WEB con Flask</span>
+                </div>
+            </li>
+            <li>
+                <div class="feat-icon"><i class="fas fa-gear"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">Motor de Vulnerabilidades</span>
+                    <span class="feat-sub">100% personalizable</span>
+                </div>
+            </li>
+        </ul>
+
+        <a href="https://github.com/R3LI4NT/RulesAudit/releases/download/SRC/RulesAudit.zip" class="btn btn-green">
+            <i class="fas fa-download"></i> Descargar RulesAudit
+        </a>
+    </div>
+
+    <div class="hero-divider"></div>
+
+    <div class="hero-panel right" id="segmentation">
+        <div class="tool-chip cyan">
+            <span class="dot"></span> Network Segmentation Tool
+        </div>
+
+        <h1 class="tool-name">Segmentation<br><span class="accent-c">Analyzer</span></h1>
+
+        <p class="tool-desc">
+            Herramienta especializada en pruebas de segmentación de red. Verifica aislamiento y analiza comunicaciones no autorizadas entre segmentos.
+        </p>
+
+        <ul class="features">
+            <li>
+                <div class="feat-icon"><i class="fas fa-network-wired"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">Pruebas de Segmentación</span>
+                    <span class="feat-sub">Identifica comunicaciones no autorizadas entre segmentos</span>
+                </div>
+            </li>
+            <li>
+                <div class="feat-icon"><i class="fas fa-file-export"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">Exportación</span>
+                    <span class="feat-sub">Reportes en HTML interactivo</span>
+                </div>
+            </li>
+            <li>
+                <div class="feat-icon"><i class="fas fa-desktop"></i></div>
+                <div class="feat-body">
+                    <span class="feat-title">GUI + Script automatizado</span>
+                    <span class="feat-sub">Interfaz Windows + nmap integrado</span>
+                </div>
+            </li>
+        </ul>
+
+        <a href="https://github.com/R3LI4NT/RulesAudit/releases/download/EXE/SegmAnalyzer.exe" class="btn btn-cyan">
+            <i class="fas fa-download"></i> Descargar Segmentation Analyzer
+        </a>
+    </div>
+
+</div>
+
+<!-- MOCKUPS -->
+<section class="mockups-section">
+    <div class="section-head">
+        <p class="section-label">// interfaces</p>
+        <h2 class="section-title"><span>Interfaces Profesionales</span></h2>
+    </div>
+
+    <div class="mockup-grid">
+        <div class="mockup-card green-card">
+            <div class="mockup-card-header">
+                <div class="mockup-icon"><i class="fas fa-fire"></i></div>
+                <div>
                     <h3>RulesAudit Dashboard</h3>
-                </div>
-                <div class="mockup-dashboard">
-                    <div class="dashboard-preview">
-                        <div class="preview-header">
-                            <span></span><span></span><span></span>
-                        </div>
-                        <div class="preview-content">
-                            <div class="preview-bar" style="width: 80%;"></div>
-                            <div class="preview-bar" style="width: 70%;"></div>
-                            <div class="preview-bar" style="width: 50%;"></div>
-                            <div class="preview-bar" style="width: 90%;"></div>
-                            <div class="preview-cards">
-                                <div class="preview-card"></div>
-                                <div class="preview-card"></div>
-                                <div class="preview-card"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <p style="color: #a0ffa0; margin-bottom: 20px;">Dashboard interactivo con estadísticas en tiempo real</p>
-                <div class="version-stats">
-                    <div class="stat-badge">
-                        <div class="stat-number">2.0</div>
-                        <div class="stat-label">Versión</div>
-                    </div>
-                    <div class="stat-badge">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Personalizable</div>
-                    </div>
-                    <div class="stat-badge">
-                        <div class="stat-number"><i class="fa-brands fa-html5" ></i> - <i class="fa-solid fa-file-excel"></i></div>
-                        <div class="stat-label">Reportes</div>
-                    </div>
+                    <p>Dashboard interactivo con estadísticas en tiempo real</p>
                 </div>
             </div>
+            <div class="mockup-screen">
+                <div class="screen-dots"><span></span><span></span><span></span></div>
+                <div class="screen-bar" style="width:82%"></div>
+                <div class="screen-bar" style="width:68%; opacity:.65"></div>
+                <div class="screen-bar" style="width:91%; opacity:.8"></div>
+                <div class="screen-bar" style="width:54%; opacity:.5"></div>
+                <div class="screen-mini-cards">
+                    <div class="screen-mini-card"></div>
+                    <div class="screen-mini-card"></div>
+                    <div class="screen-mini-card"></div>
+                </div>
+            </div>
+            <div class="mockup-stats">
+                <div class="mstat">
+                    <div class="mstat-val">v2.0</div>
+                    <div class="mstat-lbl">Versión</div>
+                </div>
+                <div class="mstat">
+                    <div class="mstat-val">100%</div>
+                    <div class="mstat-lbl">Personalizable</div>
+                </div>
+                <div class="mstat">
+                    <div class="mstat-val"><i class="fa-brands fa-html5"></i> + <i class="fa-solid fa-file-excel"></i></div>
+                    <div class="mstat-lbl">Reportes</div>
+                </div>
+            </div>
+        </div>
 
-            <div class="mockup-card right">
-                <div class="mockup-header">
-                    <i class="fas fa-project-diagram"></i>
+        <div class="mockup-card cyan-card">
+            <div class="mockup-card-header">
+                <div class="mockup-icon"><i class="fas fa-project-diagram"></i></div>
+                <div>
                     <h3>Segmentation Analyzer</h3>
+                    <p>Visualización de segmentos y comunicaciones</p>
                 </div>
-                <div class="mockup-dashboard">
-                    <div class="dashboard-preview">
-                        <div class="preview-header">
-                            <span></span><span></span><span></span>
-                        </div>
-                        <div class="preview-content">
-                            <div class="preview-nodes">
-                                <div class="preview-node"></div>
-                                <div class="preview-node" style="opacity:0.7;"></div>
-                                <div class="preview-node" style="opacity:0.4;"></div>
-                            </div>
-                            <div class="preview-lines">
-                                <div class="preview-line"></div>
-                                <div class="preview-line" style="opacity:0.7;"></div>
-                                <div class="preview-line" style="opacity:0.4;"></div>
-                            </div>
-                            <div class="preview-grid">
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                                <div class="preview-grid-item"></div>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <div class="mockup-screen">
+                <div class="screen-dots"><span></span><span></span><span></span></div>
+                <div class="screen-nodes">
+                    <div class="screen-node"></div>
+                    <div class="screen-node-line"></div>
+                    <div class="screen-node"></div>
+                    <div class="screen-node-line" style="background:linear-gradient(90deg,transparent,rgba(0,212,255,0.4))"></div>
+                    <div class="screen-node"></div>
                 </div>
-                <p style="color: #a0ffff; margin-bottom: 20px;">Visualización de segmentos y comunicaciones</p>
-                <div class="version-stats">
-                    <div class="stat-badge">
-                        <div class="stat-number">1.0</div>
-                        <div class="stat-label">Versión</div>
-                    </div>
-                    <div class="stat-badge">
-                        <div class="stat-number"><i class="fa-brands fa-windows"></i></div>
-                        <div class="stat-label">Compatible</div>
-                    </div>
-                    <div class="stat-badge">
-                        <div class="stat-number"><i class="fa-brands fa-html5"></i></div>
-                        <div class="stat-label">Reporte</div>
-                    </div>
+                <div class="screen-grid">
+                    <div class="screen-grid-cell"></div>
+                    <div class="screen-grid-cell"></div>
+                    <div class="screen-grid-cell"></div>
+                    <div class="screen-grid-cell"></div>
+                    <div class="screen-grid-cell"></div>
+                    <div class="screen-grid-cell"></div>
+                </div>
+            </div>
+            <div class="mockup-stats">
+                <div class="mstat">
+                    <div class="mstat-val">v1.0</div>
+                    <div class="mstat-lbl">Versión</div>
+                </div>
+                <div class="mstat">
+                    <div class="mstat-val"><i class="fa-brands fa-windows"></i></div>
+                    <div class="mstat-lbl">Compatible</div>
+                </div>
+                <div class="mstat">
+                    <div class="mstat-val"><i class="fa-brands fa-html5"></i></div>
+                    <div class="mstat-lbl">Reporte</div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- FEATURES TIMELINE SECTION -->
-    <section class="features" id="features">
-        <h2 class="section-title">
-            <span>Registro de Cambios</span>
-        </h2>
-        
-        <div class="features-timeline">
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="timeline-date">RulesAudit v1.0 :: Marzo 2026</div>
-                    <h3 class="timeline-title">🚀 Lanzamiento inicial</h3>
-                    <ul class="timeline-list">
-                        <li><i class="fas fa-check"></i> Análisis básico de reglas de firewall con CLI</li>
-                        <li><i class="fas fa-check"></i> Reportes en Excel</li>
-                        <li><i class="fas fa-check"></i> Motor básico de vulnerabilidades</li>
-                    </ul>
-                </div>
+<!-- TIMELINE -->
+<section class="timeline-section" id="changelog">
+    <div class="section-head">
+        <p class="section-label">// changelog</p>
+        <h2 class="section-title"><span>Registro de Cambios</span></h2>
+    </div>
+
+    <div class="timeline-wrap">
+        <div class="timeline-line"></div>
+
+        <div class="tl-item">
+            <div class="tl-card">
+                <div class="tl-date">RulesAudit v1.0 · Marzo 2026</div>
+                <div class="tl-title">🚀 Lanzamiento inicial</div>
+                <ul class="tl-list">
+                    <li><i class="fas fa-check-circle"></i> Análisis básico de reglas de firewall con CLI</li>
+                    <li><i class="fas fa-check-circle"></i> Reportes en Excel</li>
+                    <li><i class="fas fa-check-circle"></i> Motor básico de vulnerabilidades</li>
+                </ul>
             </div>
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="timeline-date">Segmentation Analyzer v1.0 :: Marzo 2026</div>
-                    <h3 class="timeline-title">🚀 Lanzamiento inicial</h3>
-                    <ul class="timeline-list">
-                        <li><i class="fas fa-check"></i> Aplicación GUI</li>
-                        <li><i class="fas fa-check"></i> Análisis de conexiones entre segmentos</li>
-                        <li><i class="fas fa-check"></i> Reportes en HTML interactivo</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="timeline-date">RulesAudit v2.0 :: Marzo 2026</div>
-                    <h3 class="timeline-title">⚡ Análisis en tiempo real</h3>
-                    <ul class="timeline-list">
-                        <li><i class="fas fa-check"></i> Motor de análisis mejorado</li>
-                        <li><i class="fas fa-check"></i> Reportes en HTML interactivo</li>
-                        <li><i class="fas fa-check"></i> Aplicación web con Flask</li>
-                    </ul>
-                </div>
-            </div>
-
+            <div class="tl-center"><div class="tl-dot"></div></div>
+            <div class="tl-empty"></div>
         </div>
-    </section>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                RulesAudit
+        <div class="tl-item">
+            <div class="tl-empty"></div>
+            <div class="tl-center"><div class="tl-dot"></div></div>
+            <div class="tl-card">
+                <div class="tl-date">Segmentation v1.0 · Marzo 2026</div>
+                <div class="tl-title">🚀 Lanzamiento inicial</div>
+                <ul class="tl-list">
+                    <li><i class="fas fa-check-circle"></i> Aplicación GUI</li>
+                    <li><i class="fas fa-check-circle"></i> Análisis de conexiones entre segmentos</li>
+                    <li><i class="fas fa-check-circle"></i> Reportes en HTML interactivo</li>
+                </ul>
             </div>
-            <div class="footer-links">
-                <div class="footer-column">
-                    <h4>Herramientas</h4>
-                    <a href="#rulesaudit">RulesAudit</a>
-                    <a href="#segmentation">Segmentation Analyzer</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Recursos</h4>
-                    <a href="https://github.com/R3LI4NT/RulesAudit" target="_blank">Documentación</a>
-                </div>
+        </div>
+
+        <div class="tl-item">
+            <div class="tl-card">
+                <div class="tl-date">RulesAudit v2.0 · Marzo 2026</div>
+                <div class="tl-title">⚡ Análisis en tiempo real</div>
+                <ul class="tl-list">
+                    <li><i class="fas fa-check-circle"></i> Motor de análisis mejorado</li>
+                    <li><i class="fas fa-check-circle"></i> Reportes en HTML interactivo</li>
+                    <li><i class="fas fa-check-circle"></i> Aplicación web con Flask</li>
+                </ul>
             </div>
+            <div class="tl-center"><div class="tl-dot"></div></div>
+            <div class="tl-empty"></div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-top">
+            <div class="footer-logo">Rules<em>Audit</em></div>
+            <nav class="footer-nav">
+                <a href="#rulesaudit">RulesAudit</a>
+                <a href="#segmentation">Segmentation Analyzer</a>
+                <a href="https://github.com/R3LI4NT/RulesAudit" target="_blank">Documentación</a>
+                <a href="#changelog">Changelog</a>
+            </nav>
             <div class="footer-social">
-                <a href="https://github.com/R3LI4NT" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://github.com/R3LI4NT" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 Todos los derechos reservados</span>
-            <span>::</span>
-            <span>Desarrollado por <a href="https://github.com/R3LI4NT" style="text-decoration: none; color: red; font-weight: bold;">R3LI4NT</a></span>
-            <span>::</span>
-            <span><span style="color: #00ff00;">RulesAudit v2.0</span> <i class="fa-solid fa-arrows-left-right" style="animation: none;color: #fff;"></i> <span style="color: #00ffff;">Segmentation v1.0</span></span>
+            <span>© 2026 Todos los derechos reservados · Desarrollado por <a href="https://github.com/R3LI4NT" target="_blank">R3LI4NT</a></span>
+            <div class="footer-versions">
+                <span class="ver-tag g">RulesAudit v2.0</span>
+                <span class="ver-tag c">Segmentation v1.0</span>
+            </div>
         </div>
-    </footer>
+    </div>
+</footer>
 
-    <!-- SCRIPTS -->
-    <script>
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('section[id]');
-            const navItems = document.querySelectorAll('.nav-item');
-            
-            let current = '';
-            
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop - 100;
-                const sectionHeight = section.clientHeight;
-                
-                if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
-                    current = section.getAttribute('id');
-                }
-            });
-            
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                const link = item.querySelector('a');
-                if (link.getAttribute('href') === `#${current}`) {
-                    item.classList.add('active');
-                }
-            });
+<script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        const scrolled = window.scrollY > 40;
+        navbar.classList.toggle('scrolled', scrolled);
+        mobileMenu.style.top = scrolled ? '60px' : '68px';
+    });
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = mobileMenu.classList.toggle('open');
+        hamburger.classList.toggle('active', isOpen);
+        hamburger.setAttribute('aria-expanded', isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+            hamburger.classList.remove('active');
+            document.body.style.overflow = '';
         });
+    });
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        function checkTimelineVisibility() {
-            const timelineItems = document.querySelectorAll('.timeline-item');
-            
-            timelineItems.forEach(item => {
-                const rect = item.getBoundingClientRect();
-                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-                
-                if (rect.top <= windowHeight * 0.85 && rect.bottom >= 0) {
-                    item.classList.add('visible');
-                }
-            });
+    document.addEventListener('click', (e) => {
+        if (mobileMenu.classList.contains('open') && 
+            !mobileMenu.contains(e.target) && 
+            !hamburger.contains(e.target)) {
+            mobileMenu.classList.remove('open');
+            hamburger.classList.remove('active');
+            document.body.style.overflow = '';
         }
+    });
 
-        window.addEventListener('load', checkTimelineVisibility);
-        window.addEventListener('scroll', checkTimelineVisibility);
-    </script>
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.tl-item').forEach(el => io.observe(el));
+
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            const t = document.querySelector(a.getAttribute('href'));
+            if (t) { 
+                e.preventDefault(); 
+                t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (mobileMenu.classList.contains('open')) {
+                    mobileMenu.classList.remove('open');
+                    hamburger.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+    });
+
+    const bars = document.querySelectorAll('.screen-bar');
+    bars.forEach((bar, i) => {
+        const base = parseInt(bar.style.width);
+        let dir = 1;
+        setInterval(() => {
+            const w = parseFloat(bar.style.width);
+            if (w >= base + 10) dir = -1;
+            if (w <= base - 10) dir = 1;
+            bar.style.width = (w + dir * 0.3) + '%';
+        }, 50 + i * 30);
+    });
+</script>
+
 </body>
 </html>
