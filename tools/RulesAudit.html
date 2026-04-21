@@ -87,7 +87,7 @@
             width: 100%;
             z-index: 1000;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 0 60px;
             height: 68px;
@@ -116,158 +116,6 @@
 
         .logo img { width: 28px; filter: drop-shadow(0 0 6px var(--green)); }
         .logo em { color: var(--green); font-style: normal; }
-
-        .nav-center {
-            display: flex;
-            gap: 2px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 4px;
-        }
-
-        .nav-center a {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.82rem;
-            font-weight: 500;
-            padding: 6px 16px;
-            border-radius: 5px;
-            transition: all 0.2s;
-            letter-spacing: 0.02em;
-        }
-
-        .nav-center a:hover {
-            color: #fff;
-            background: rgba(255,255,255,0.07);
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-right a {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            padding: 8px 18px;
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            transition: all 0.25s;
-        }
-
-        .nav-right a:hover {
-            color: var(--green);
-            border-color: var(--border-g);
-            background: var(--green-dim);
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            width: 42px;
-            height: 42px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-            outline: none;
-        }
-
-        .hamburger:hover {
-            border-color: var(--green);
-            background: var(--green-dim);
-        }
-
-        .hamburger span {
-            display: block;
-            width: 20px;
-            height: 2px;
-            background: var(--text);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-            background: var(--green);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0);
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-            background: var(--green);
-        }
-
-        .mobile-menu {
-            position: fixed;
-            top: 68px;
-            left: 0;
-            width: 100%;
-            background: rgba(4,6,10,0.98);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            z-index: 999;
-            transform: translateY(-110%);
-            opacity: 0;
-            transition: transform 0.35s cubic-bezier(.23,1,.32,1), opacity 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            pointer-events: none;
-        }
-
-        .mobile-menu.open {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        nav.scrolled ~ .mobile-menu {
-            top: 60px;
-        }
-
-        .mobile-menu a {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .mobile-menu a:last-child {
-            border-bottom: none;
-        }
-
-        .mobile-menu a:hover {
-            color: var(--green);
-            background: var(--green-dim);
-            padding-left: 32px;
-        }
-
-        .mobile-menu a i {
-            width: 24px;
-            font-size: 1.1rem;
-        }
 
         .hero {
             padding-top: 68px;
@@ -953,13 +801,6 @@
             .mockup-grid { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; }
         }
 
-        @media (max-width: 860px) {
-            nav { padding: 0 24px; }
-            .nav-center { display: none; }
-            .nav-right { display: none; }
-            .hamburger { display: flex; }
-        }
-
         @media (max-width: 768px) {
             .hero-panel { padding: 50px 24px; }
             .mockups-section,
@@ -1000,36 +841,13 @@
 <div class="bg-glow-left"></div>
 <div class="bg-glow-right"></div>
 
-<!-- NAV -->
+<!-- NAV - Solo el logo -->
 <nav id="navbar">
     <a href="#" class="logo">
         <img src="https://raw.githubusercontent.com/R3LI4NT/RulesAudit/refs/heads/main/img/icon-3.png" alt="Logo">
         Rules<em>Audit</em>
     </a>
-    <div class="nav-center" id="navCenter">
-        <a href="#rulesaudit">RulesAudit</a>
-        <a href="#segmentation">Segmentation</a>
-        <a href="#changelog">Changelog</a>
-    </div>
-    <div class="nav-right">
-        <a href="https://github.com/R3LI4NT" target="_blank" class="nav-github">
-            <i class="fab fa-github"></i> GitHub
-        </a>
-    </div>
-    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
 </nav>
-
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobileMenu">
-    <a href="#rulesaudit"><i class="fas fa-fire"></i> RulesAudit</a>
-    <a href="#segmentation"><i class="fas fa-project-diagram"></i> Segmentation Analyzer</a>
-    <a href="#changelog"><i class="fas fa-history"></i> Changelog</a>
-    <a href="https://github.com/R3LI4NT" target="_blank"><i class="fab fa-github"></i> GitHub</a>
-</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -1279,12 +1097,6 @@
     <div class="footer-inner">
         <div class="footer-top">
             <div class="footer-logo">Rules<em>Audit</em></div>
-            <nav class="footer-nav">
-                <a href="#rulesaudit">RulesAudit</a>
-                <a href="#segmentation">Segmentation Analyzer</a>
-                <a href="https://github.com/R3LI4NT/RulesAudit" target="_blank">Documentación</a>
-                <a href="#changelog">Changelog</a>
-            </nav>
             <div class="footer-social">
                 <a href="https://github.com/R3LI4NT" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
             </div>
@@ -1302,38 +1114,7 @@
 <script>
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
-        const scrolled = window.scrollY > 40;
-        navbar.classList.toggle('scrolled', scrolled);
-        mobileMenu.style.top = scrolled ? '60px' : '68px';
-    });
-
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobileMenu');
-
-    hamburger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = mobileMenu.classList.toggle('open');
-        hamburger.classList.toggle('active', isOpen);
-        hamburger.setAttribute('aria-expanded', isOpen);
-        document.body.style.overflow = isOpen ? 'hidden' : '';
-    });
-
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            hamburger.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    });
-
-    document.addEventListener('click', (e) => {
-        if (mobileMenu.classList.contains('open') && 
-            !mobileMenu.contains(e.target) && 
-            !hamburger.contains(e.target)) {
-            mobileMenu.classList.remove('open');
-            hamburger.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        navbar.classList.toggle('scrolled', window.scrollY > 40);
     });
 
     const io = new IntersectionObserver((entries) => {
@@ -1348,11 +1129,6 @@
             if (t) { 
                 e.preventDefault(); 
                 t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                if (mobileMenu.classList.contains('open')) {
-                    mobileMenu.classList.remove('open');
-                    hamburger.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
             }
         });
     });
