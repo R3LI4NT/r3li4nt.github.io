@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onionymous :: Tor Network Client</title>
+<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/R3LI4NT/Onionymous/refs/heads/main/assets/logo.ico?token=GHSAT0AAAAAADWDC2V537EZ5LT55BWP5FFK2QJ2CEQ">
+<meta name="description" content="A modern, privacy-first desktop client for the Tor network. SOCKS5 proxy and TUN/VPN modes. Built in Rust for Windows.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --violet-50:   #f5f3ff;
+  --violet-100:  #ede9fe;
+  --violet-200:  #ddd6fe;
+  --violet-300:  #c4b5fd;
+  --violet-400:  #a78bfa;
+  --violet-500:  #8a5cff;
+  --violet-600:  #7c3aed;
+  --violet-700:  #6d28d9;
+  --violet-800:  #5b21b6;
+  --violet-900:  #4c1d95;
+
+  --bg-0:        #0a0612;
+  --bg-1:        #120a26;
+  --bg-2:        #1a0f3a;
+  --bg-3:        #251548;
+  --bg-card:     rgba(30, 22, 58, 0.55);
+  --bg-card-hi:  rgba(45, 30, 90, 0.7);
+
+  --text:        #f3f0ff;
+  --text-dim:    #b0aad2;
+  --text-mute:   #827aaa;
+
+  --accent:      #8a5cff;
+  --accent-soft: rgba(138, 92, 255, 0.15);
+  --accent-glow: rgba(138, 92, 255, 0.45);
+  --amber:       #ffd64d;
+  --ok:          #22c55e;
+  --warn:        #f59e0b;
+  --danger:      #f0606e;
+
+  --border:      rgba(255, 255, 255, 0.08);
+  --border-hi:   rgba(138, 92, 255, 0.4);
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-0);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 800px 600px at 20% 0%, rgba(138, 92, 255, 0.25), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 80% 100%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(ellipse 500px 400px at 50% 50%, rgba(91, 33, 182, 0.12), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.04) 1px, transparent 0);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(10, 6, 18, 0.7);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 800; font-size: 18px;
+  background: linear-gradient(135deg, var(--violet-300), var(--violet-500));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+}
+.nav-logo i { color: var(--violet-400); -webkit-text-fill-color: var(--violet-400); }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--violet-300); }
+.lang-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-soft);
+  border: 1px solid var(--border-hi);
+  color: var(--violet-300);
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.lang-toggle:hover { background: var(--accent); color: white; }
+
+.hero { padding: 80px 0 60px; text-align: center; }
+.hero-logo {
+  width: 130px; height: 130px;
+  margin: 0 auto 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle, var(--violet-500), var(--violet-800));
+  border-radius: 50%;
+  box-shadow:
+    0 0 60px rgba(138, 92, 255, 0.5),
+    inset 0 0 40px rgba(255, 255, 255, 0.1);
+  animation: pulse 3s ease-in-out infinite;
+  position: relative;
+}
+.hero-logo::before {
+  content: '';
+  position: absolute; inset: -12px;
+  border: 2px solid var(--accent-glow);
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: ring 2s linear infinite;
+}
+
+.hero-logo img {
+  width: 200px;
+  height: auto;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(138, 92, 255, 0.5), inset 0 0 40px rgba(255, 255, 255, 0.1); }
+  50% { transform: scale(1.04); box-shadow: 0 0 80px rgba(138, 92, 255, 0.7), inset 0 0 50px rgba(255, 255, 255, 0.15); }
+}
+@keyframes ring {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.hero-logo i {
+  font-size: 60px;
+  color: white;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+.hero h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fff 0%, var(--violet-300) 50%, var(--violet-500) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-tagline {
+  font-size: clamp(16px, 1.6vw, 20px);
+  color: var(--text-dim);
+  max-width: 680px;
+  margin: 0 auto 36px;
+  font-weight: 500;
+}
+.hero-badges {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 36px;
+}
+.hero-badges img { height: 28px; }
+.hero-cta {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;
+  margin-bottom: 48px;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px;
+  border-radius: var(--r-md);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--violet-500), var(--violet-700));
+  color: white;
+  border-color: var(--violet-400);
+  box-shadow: 0 10px 30px -10px rgba(138, 92, 255, 0.7);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px -10px rgba(138, 92, 255, 0.9);
+}
+.btn-secondary {
+  background: var(--accent-soft);
+  color: var(--violet-200);
+  border-color: var(--border-hi);
+}
+.btn-secondary:hover {
+  background: rgba(138, 92, 255, 0.25);
+  border-color: var(--violet-400);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+.btn-ghost:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+  border-color: var(--border-hi);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin: 40px 0 60px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-hi);
+  background: var(--bg-card-hi);
+}
+.stat-card i {
+  font-size: 24px;
+  color: var(--violet-400);
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+section { padding: 60px 0; position: relative; }
+.section-head { text-align: center; margin-bottom: 56px; }
+.section-tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--violet-400);
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: var(--accent-soft);
+  border: 1px solid var(--border-hi);
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+.section-head h2 {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.section-head p {
+  color: var(--text-dim);
+  font-size: 17px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Screenshot */
+.screenshot-wrap {
+  position: relative;
+  margin: 40px auto 0;
+  max-width: 1000px;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-hi);
+  box-shadow: 0 30px 80px -20px rgba(138, 92, 255, 0.4);
+}
+.screenshot-wrap::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 0%, transparent 70%, rgba(10, 6, 18, 0.4) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.screenshot-wrap img { width: 100%; display: block; }
+
+.versions {
+  display: flex;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 6px;
+  width: fit-content;
+  margin: 0 auto 40px;
+}
+.version-tab {
+  padding: 10px 24px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.version-tab.active {
+  background: linear-gradient(135deg, var(--violet-500), var(--violet-700));
+  color: white;
+  box-shadow: 0 4px 12px -4px rgba(138, 92, 255, 0.6);
+}
+.version-tab:not(.active):hover { color: var(--violet-300); background: var(--accent-soft); }
+
+.version-panel { display: none; }
+.version-panel.active { display: block; }
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+.feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--violet-500), var(--violet-700));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  background: var(--bg-card-hi);
+  border-color: var(--border-hi);
+  box-shadow: 0 20px 50px -15px rgba(138, 92, 255, 0.3);
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-icon {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-md);
+  color: var(--violet-300);
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+.feature-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.feature-card p {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.feature-card ul {
+  list-style: none;
+  margin-top: 12px;
+}
+.feature-card ul li {
+  font-size: 13px;
+  color: var(--text-dim);
+  padding-left: 18px;
+  position: relative;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.feature-card ul li::before {
+  content: '\f00c';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  left: 0;
+  color: var(--violet-400);
+  font-size: 11px;
+  top: 4px;
+}
+
+.new-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--amber), #ff9c1a);
+  color: #1a0a00;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 100px;
+  margin-left: 8px;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+}
+
+.download-section {
+  background:
+    radial-gradient(circle at center, rgba(138, 92, 255, 0.15), transparent 70%),
+    var(--bg-card);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.download-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 40px;
+}
+.download-card {
+  background: var(--bg-card-hi);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-lg);
+  padding: 32px;
+  transition: all 0.3s;
+}
+.download-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--violet-400);
+  box-shadow: 0 20px 50px -15px rgba(138, 92, 255, 0.4);
+}
+.download-card-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.download-card-head i {
+  font-size: 28px;
+  color: var(--violet-400);
+  width: 50px; height: 50px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft);
+  border-radius: var(--r-md);
+}
+.download-card-head h3 { font-size: 22px; font-weight: 700; }
+.download-card-head .ver-tag {
+  font-size: 11px;
+  background: var(--accent);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+.download-card p { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; }
+.download-meta {
+  display: flex; gap: 18px; flex-wrap: wrap;
+  font-size: 12px; color: var(--text-mute);
+  margin-bottom: 20px;
+  padding: 12px 0;
+  border-top: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+}
+.download-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.download-meta i { color: var(--violet-400); }
+
+.compat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.compat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 24px 20px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.compat-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
+.compat-card i { font-size: 32px; color: var(--violet-400); margin-bottom: 12px; }
+.compat-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.compat-card p { font-size: 12px; color: var(--text-mute); }
+
+.code-block {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 16px 0;
+  overflow-x: auto;
+  position: relative;
+}
+.code-block::before {
+  content: 'powershell';
+  position: absolute;
+  top: 8px; right: 14px;
+  font-size: 10px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.code-block code { color: var(--violet-200); }
+.code-block .comment { color: var(--text-mute); }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  background: rgba(10, 6, 18, 0.6);
+  padding: 50px 0 30px;
+  margin-top: 60px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+.footer-brand h4 {
+  background: linear-gradient(135deg, var(--violet-300), var(--violet-500));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 20px; margin-bottom: 8px;
+}
+.footer-brand p { color: var(--text-dim); font-size: 13px; max-width: 360px; }
+.footer-col h5 { font-size: 13px; color: var(--text); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+.footer-col ul { list-style: none; }
+.footer-col a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13px;
+  display: block;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--violet-300); }
+.footer-bottom {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-mute);
+}
+.footer-bottom a { color: var(--violet-300); text-decoration: none; }
+.footer-bottom a:hover { color: var(--violet-200); text-decoration: underline; }
+
+[data-lang-panel] { display: none; }
+[data-lang-panel].active { display: block; }
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-inner { gap: 12px; }
+  .download-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .hero { padding: 50px 0 40px; }
+  .hero-logo { width: 100px; height: 100px; }
+  .hero-logo i { font-size: 46px; }
+  .versions { width: 100%; flex-direction: column; }
+  .version-tab { width: 100%; text-align: center; }
+}
+
+.disclaimer {
+  background: rgba(240, 96, 110, 0.08);
+  border: 1px solid rgba(240, 96, 110, 0.3);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 30px 0;
+}
+.disclaimer i { color: var(--danger); font-size: 20px; margin-top: 2px; }
+.disclaimer p { color: var(--text-dim); font-size: 13px; line-height: 1.6; }
+.disclaimer strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      Onionymous
+    </a>
+    <div class="nav-links">
+      <a href="#features"><span data-en>Features</span><span data-es>Características</span></a>
+      <a href="#whats-new"><span data-en>What's new</span><span data-es>Novedades</span></a>
+      <a href="#download"><span data-en>Download</span><span data-es>Descargar</span></a>
+      <a href="#build"><span data-en>Build</span><span data-es>Compilar</span></a>
+      <a href="https://github.com/R3LI4NT/Onionymous" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
+    </div>
+    <button class="lang-toggle" id="langToggle">
+      <i class="fa-solid fa-globe"></i>
+      <span id="langLabel">ES</span>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-logo">
+      <img src="https://private-user-images.githubusercontent.com/75953873/580440996-6cab7c7d-9f99-4381-8671-832d3772747a.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzkwMjc3OTUsIm5iZiI6MTc3OTAyNzQ5NSwicGF0aCI6Ii83NTk1Mzg3My81ODA0NDA5OTYtNmNhYjdjN2QtOWY5OS00MzgxLTg2NzEtODMyZDM3NzI3NDdhLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA1MTclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNTE3VDE0MTgxNVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWQ2YWFlODhiZTRjYjZmZjI4ODIxMTgyMjk3ODRjNmRlMjliYTlmMzFjZjMxNDM0OWY0ODVlYWVmNDE4YzBkNDImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.4fFOl5Qri1A7WcXlX0ZMqPNVFLYi45Rkzo7Ap6clRUI" alt="">
+    </div>
+
+    <h1>Onionymous</h1>
+
+    <p class="hero-tagline">
+      <span data-en>A modern, privacy-first desktop client for the Tor network. SOCKS5 proxy and full TUN/VPN routing, all in a single portable executable.</span>
+      <span data-es>Un cliente de escritorio moderno para la red Tor, enfocado en privacidad. Proxy SOCKS5 y enrutamiento completo TUN/VPN, todo en un único ejecutable portable.</span>
+    </p>
+
+    <div class="hero-badges">
+      <img src="https://img.shields.io/badge/Rust-1.78%2B-CE422B?style=for-the-badge&logo=rust&logoColor=white" alt="Rust">
+      <img src="https://img.shields.io/badge/VERSION-1.1-8A5CFF?style=for-the-badge" alt="Version">
+      <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows">
+      <img src="https://img.shields.io/badge/Tor-Network-7D4698?style=for-the-badge&logo=torproject&logoColor=white" alt="Tor">
+      <img src="https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge" alt="License">
+      <img src="https://img.shields.io/badge/i18n-ES%20%2F%20EN-E11D2E?style=for-the-badge" alt="i18n">
+      <img src="https://img.shields.io/badge/Portable-YES-FF6200?style=for-the-badge" alt="Portable">
+    </div>
+
+    <div class="hero-cta">
+      <a href="https://github.com/R3LI4NT/Onionymous/releases/download/Onionymous-2/Onionymous.exe" class="btn btn-primary">
+        <i class="fa-solid fa-download"></i>
+        <span data-en>Download v1.1</span>
+        <span data-es>Descargar v1.1</span>
+      </a>
+      <a href="https://github.com/R3LI4NT/Onionymous" target="_blank" class="btn btn-secondary">
+        <i class="fa-brands fa-github"></i>
+        <span data-en>View on GitHub</span>
+        <span data-es>Ver en GitHub</span>
+      </a>
+      <a href="#features" class="btn btn-ghost">
+        <i class="fa-solid fa-circle-info"></i>
+        <span data-en>Learn more</span>
+        <span data-es>Saber más</span>
+      </a>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <i class="fa-solid fa-bolt"></i>
+        <div class="stat-value">100 MB</div>
+        <div class="stat-label" data-en>Portable .exe</div><div class="stat-label" data-es>.exe Portable</div>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-flag"></i>
+        <div class="stat-value">40+</div>
+        <div class="stat-label" data-en>Exit countries</div><div class="stat-label" data-es>Países de salida</div>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-language"></i>
+        <div class="stat-value">EN / ES</div>
+        <div class="stat-label" data-en>Languages</div><div class="stat-label" data-es>Idiomas</div>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-lock"></i>
+        <div class="stat-value">100%</div>
+        <div class="stat-label" data-en>Open source</div><div class="stat-label" data-es>Código abierto</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section style="padding: 0 0 40px;">
+  <div class="container">
+    <div class="screenshot-wrap">
+      <img src="https://private-user-images.githubusercontent.com/75953873/593708444-5a0661f0-eec6-4c5c-a483-024281bfa04f.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzkwMjgwOTUsIm5iZiI6MTc3OTAyNzc5NSwicGF0aCI6Ii83NTk1Mzg3My81OTM3MDg0NDQtNWEwNjYxZjAtZWVjNi00YzVjLWE0ODMtMDI0MjgxYmZhMDRmLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA1MTclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNTE3VDE0MjMxNVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWFmYzY1NTdmY2MzNTVkMDFhN2UyZDEwMjY0ZjI2OWRiYzcyNmYzZGE3Mzk0MzM1NWYyYTNkOTY3MzQ0ZDg4NGMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.jbv5cIYFRPvzAfijqhLKn1nWfxI-SLEslpK12imnwnc" alt="Onionymous Dashboard">
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag" data-en>FEATURES</span>
+      <span class="section-tag" data-es>CARACTERÍSTICAS</span>
+      <h2>
+        <span data-en>Everything you need to route through Tor</span>
+        <span data-es>Todo lo necesario para enrutarte por Tor</span>
+      </h2>
+      <p>
+        <span data-en>The official Tor binary, pluggable transports, Wintun driver and sing-box engine are all embedded in a single portable executable.</span>
+        <span data-es>El binario oficial de Tor, pluggable transports, driver Wintun y motor sing-box vienen embebidos en un único ejecutable portable.</span>
+      </p>
+    </div>
+
+    <div class="versions">
+      <button class="version-tab active" data-target="v11">v1.1 — Latest</button>
+      <button class="version-tab" data-target="v10">v1.0</button>
+    </div>
+
+    <div class="version-panel active" id="v11">
+      <div class="features">
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-network-wired"></i></div>
+          <h3>
+            <span data-en>TUN/VPN Mode</span>
+            <span data-es>Modo TUN/VPN</span>
+            <span class="new-badge">NEW</span>
+          </h3>
+          <p>
+            <span data-en>System-wide routing through Tor — not just proxy-aware apps. Any program goes through Tor when this mode is active.</span>
+            <span data-es>Routing de todo el sistema a través de Tor — no solo apps proxy-aware. Cualquier programa pasa por Tor con este modo activo.</span>
+          </p>
+          <ul>
+            <li data-en>Wintun (WireGuard's TUN driver) + sing-box engine, both embedded</li>
+            <li data-es>Wintun (driver TUN de WireGuard) + motor sing-box, embebidos</li>
+            <li data-en>Automatic admin detection with graceful fallback to Proxy</li>
+            <li data-es>Detección automática de admin con fallback a Proxy</li>
+            <li data-en>Pre-resolved DNS through Tor to prevent leaks</li>
+            <li data-es>DNS pre-resuelto vía Tor para evitar leaks</li>
+            <li data-en>Robust cleanup — adapter destroyed on disconnect</li>
+            <li data-es>Cleanup robusto — adaptador destruido al desconectar</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-earth-americas"></i></div>
+          <h3>
+            <span data-en>Smarter Exit Selector</span>
+            <span data-es>Selector de salida inteligente</span>
+            <span class="new-badge">NEW</span>
+          </h3>
+          <p>
+            <span data-en>Visual availability indicators per country, plus automatic detection when an exit country has no operational nodes.</span>
+            <span data-es>Indicadores visuales de disponibilidad por país, más detección automática cuando un país no tiene exit nodes operativos.</span>
+          </p>
+          <ul>
+            <li>★ <span data-en>High availability (DE, NL, US, FR, CH...)</span><span data-es>Alta disponibilidad (DE, NL, US, FR, CH...)</span></li>
+            <li>⚠ <span data-en>Few nodes — may fail (PT, AR, IL, MX...)</span><span data-es>Pocos nodos — puede fallar (PT, AR, IL, MX...)</span></li>
+            <li><span data-en>Auto banner when "all routers down" detected</span><span data-es>Banner automático al detectar "all routers down"</span></li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-bullseye"></i></div>
+          <h3>
+            <span data-en>Click-the-Orb UX</span>
+            <span data-es>UX click-en-el-orb</span>
+          </h3>
+          <p>
+            <span data-en>The central animated circle <strong>is</strong> the connect/disconnect button. Live bootstrap progress painted as a filled arc around it.</span>
+            <span data-es>El círculo animado central <strong>es</strong> el botón de conectar/desconectar. Progreso de bootstrap pintado como arco alrededor.</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-shield"></i></div>
+          <h3>Kill Switch</h3>
+          <p>
+            <span data-en>Blocks all non-Tor traffic at the OS level via Windows Defender Firewall. Auto-torn down on disconnect — you're never left without internet.</span>
+            <span data-es>Bloquea todo el tráfico no-Tor a nivel OS vía Windows Defender. Se desactiva al desconectar — nunca te quedás sin internet.</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-shuffle"></i></div>
+          <h3>
+            <span data-en>Bridges & Transports</span>
+            <span data-es>Puentes y transports</span>
+          </h3>
+          <p>
+            <span data-en>Built-in obfs4 with rotating bridges + custom bridge support for paste-your-own lines from bridges.torproject.org.</span>
+            <span data-es>obfs4 incorporado con bridges rotantes + soporte de puentes personalizados para pegar líneas de bridges.torproject.org.</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <h3>
+            <span data-en>Live observability</span>
+            <span data-es>Observabilidad en vivo</span>
+          </h3>
+          <p>
+            <span data-en>Real-time bandwidth sparkline, session totals, full event log filtered by source and level. Public IP in amber updated on every identity rotation.</span>
+            <span data-es>Sparkline de ancho de banda en vivo, totales de sesión, log completo filtrable. IP pública en ámbar actualizada en cada rotación de identidad.</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+          <h3>
+            <span data-en>Tor auto-updater</span>
+            <span data-es>Auto-updater de Tor</span>
+          </h3>
+          <p>
+            <span data-en>Downloads the latest Tor Expert Bundle from archive.torproject.org, verifies SHA-256 against the signed manifest, installs atomically.</span>
+            <span data-es>Descarga el Tor Expert Bundle más reciente desde archive.torproject.org, verifica SHA-256 contra el manifiesto firmado, instala atómicamente.</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+          <h3>
+            <span data-en>Polished UI</span>
+            <span data-es>UI cuidada</span>
+          </h3>
+          <p>
+            <span data-en>Custom violet theme with DWM Mica/Acrylic blur, Phosphor icons throughout, synthesized UI sounds (no audio files bundled), bilingual EN/ES at runtime.</span>
+            <span data-es>Tema violeta propio con blur DWM Mica/Acrylic, iconos Phosphor, sonidos UI sintetizados (sin archivos de audio), bilingüe EN/ES en tiempo real.</span>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-box"></i></div>
+          <h3>
+            <span data-en>True portability</span>
+            <span data-es>Portabilidad real</span>
+          </h3>
+          <p>
+            <span data-en>The .exe extracts its embedded runtime on first launch and runs from cache afterwards. Move it anywhere — it still works.</span>
+            <span data-es>El .exe extrae su runtime embebido en el primer arranque y corre desde cache. Movelo donde quieras — sigue funcionando.</span>
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="version-panel" id="v10">
+      <div class="features">
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-bullseye"></i></div>
+          <h3><span data-en>Click-the-Orb UX</span><span data-es>UX click-en-el-orb</span></h3>
+          <p><span data-en>Central animated circle as the connect/disconnect button. No extra buttons cluttering the dashboard.</span><span data-es>Círculo animado central como botón de conectar/desconectar. Sin botones extra que ensucien el dashboard.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-network-wired"></i></div>
+          <h3><span data-en>SOCKS5 Proxy</span><span data-es>Proxy SOCKS5</span></h3>
+          <p><span data-en>Local SOCKS5 listener on 127.0.0.1:9050. Tor-aware apps get routed automatically via system proxy settings.</span><span data-es>Listener SOCKS5 local en 127.0.0.1:9050. Las apps compatibles se enrutan vía proxy del sistema.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-flag"></i></div>
+          <h3><span data-en>Country picker</span><span data-es>Selector de país</span></h3>
+          <p><span data-en>Choose from 40+ exit countries, or leave it on Automatic. Excluded-countries list for permanent blacklisting.</span><span data-es>Elegí entre 40+ países de salida, o dejalo en Automático. Lista de países excluidos para vetar permanentemente.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-shield"></i></div>
+          <h3>Kill Switch</h3>
+          <p><span data-en>Windows Defender Firewall integration blocks non-Tor traffic at OS level. Auto-cleaned on disconnect.</span><span data-es>Integración con Windows Defender Firewall bloquea tráfico no-Tor a nivel OS. Auto-limpio al desconectar.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-id-card"></i></div>
+          <h3><span data-en>New Identity</span><span data-es>Nueva Identidad</span></h3>
+          <p><span data-en>Force Tor to rebuild circuits and present a fresh IP. Also a Refresh IP button for re-checking without circuit rebuild.</span><span data-es>Fuerza a Tor a reconstruir circuitos y presentar IP nueva. También botón Actualizar IP sin reconstruir circuito.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <h3><span data-en>Bandwidth sparkline</span><span data-es>Sparkline de ancho de banda</span></h3>
+          <p><span data-en>Live chart with violet download / amber upload, 60-sample rolling window. Session totals for bytes read/written.</span><span data-es>Gráfico en vivo con descarga violeta / subida ámbar, ventana rolante de 60 muestras. Totales de sesión.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-file-lines"></i></div>
+          <h3><span data-en>Full event log</span><span data-es>Registro completo</span></h3>
+          <p><span data-en>Combined Tor + app events, filterable by source and level, with auto-scroll to the tail.</span><span data-es>Eventos Tor + app combinados, filtrable por origen y nivel, con auto-scroll al pie.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-volume-low"></i></div>
+          <h3><span data-en>Synthesized sounds</span><span data-es>Sonidos sintetizados</span></h3>
+          <p><span data-en>Click, tick, connect chirp, disconnect chirp, error warble — all generated in memory by rodio. Zero audio files bundled.</span><span data-es>Click, tick, chirp de conexión, chirp de desconexión, warble de error — todos generados por rodio. Cero archivos de audio.</span></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-windows"></i></div>
+          <h3><span data-en>System integration</span><span data-es>Integración con el sistema</span></h3>
+          <p><span data-en>Start with Windows via HKCU\...\Run, optional start-minimized, optional minimize-to-tray, clean shutdown.</span><span data-es>Iniciar con Windows vía HKCU\...\Run, iniciar minimizado opcional, minimizar a bandeja opcional, cierre limpio.</span></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="whats-new" style="background: rgba(138, 92, 255, 0.04);">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag" data-en>WHAT'S NEW IN v1.1</span>
+      <span class="section-tag" data-es>NOVEDADES DE v1.1</span>
+      <h2>
+        <span data-en>System-wide Tor routing</span>
+        <span data-es>Routing de todo el sistema vía Tor</span>
+      </h2>
+      <p>
+        <span data-en>v1.1 introduces full TUN/VPN routing, powered by Wintun and sing-box, both embedded in the executable.</span>
+        <span data-es>v1.1 incorpora routing TUN/VPN completo, impulsado por Wintun y sing-box, ambos embebidos en el ejecutable.</span>
+      </p>
+    </div>
+
+    <div class="compat-grid">
+      <div class="compat-card">
+        <i class="fa-solid fa-network-wired"></i>
+        <h4>Wintun 0.14.1</h4>
+        <p data-en>WireGuard's official TUN driver, embedded</p>
+        <p data-es>Driver TUN oficial de WireGuard, embebido</p>
+      </div>
+      <div class="compat-card">
+        <i class="fa-solid fa-route"></i>
+        <h4>sing-box 1.12</h4>
+        <p data-en>TUN-to-SOCKS bridging engine</p>
+        <p data-es>Motor de bridging TUN-a-SOCKS</p>
+      </div>
+      <div class="compat-card">
+        <i class="fa-solid fa-arrows-spin"></i>
+        <h4>Tor 15.0.9</h4>
+        <p data-en>Latest Expert Bundle</p>
+        <p data-es>Expert Bundle más reciente</p>
+      </div>
+      <div class="compat-card">
+        <i class="fa-solid fa-circle-check"></i>
+        <h4>Auto-fallback</h4>
+        <p data-en>If TUN fails, falls back to Proxy</p>
+        <p data-es>Si TUN falla, hace fallback a Proxy</p>
+      </div>
+    </div>
+
+    <div class="disclaimer" style="margin-top: 40px;">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>
+        <strong><span data-en>Admin required for TUN/VPN mode.</span><span data-es>Modo TUN/VPN requiere admin.</span></strong>
+        <span data-en> Creating a virtual TUN adapter and modifying routing tables on Windows needs administrator privileges. Onionymous detects this automatically — if you're not elevated, you can still use Proxy mode without restrictions.</span>
+        <span data-es> Crear un adaptador TUN virtual y modificar tablas de ruteo en Windows requiere privilegios de administrador. Onionymous detecta esto automáticamente — si no estás elevado, podés usar modo Proxy sin restricciones.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="download" class="download-section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag" data-en>DOWNLOAD</span>
+      <span class="section-tag" data-es>DESCARGAR</span>
+      <h2>
+        <span data-en>Get Onionymous</span>
+        <span data-es>Conseguí Onionymous</span>
+      </h2>
+      <p>
+        <span data-en>Pre-built portable executable for Windows 10/11. No installer, no dependencies.</span>
+        <span data-es>Ejecutable portable precompilado para Windows 10/11. Sin instalador, sin dependencias.</span>
+      </p>
+    </div>
+
+    <div class="download-grid">
+
+      <div class="download-card">
+        <div class="download-card-head">
+          <i class="fa-solid fa-cube"></i>
+          <h3>onionymous.exe</h3>
+          <span class="ver-tag">v1.1</span>
+        </div>
+        <p>
+          <span data-en>Portable Windows executable with Tor, Wintun and sing-box embedded. Just download and run.</span>
+          <span data-es>Ejecutable Windows portable con Tor, Wintun y sing-box embebidos. Descargá y ejecutá.</span>
+        </p>
+        <div class="download-meta">
+          <span><i class="fa-solid fa-microchip"></i> x86_64</span>
+          <span><i class="fa-solid fa-weight-hanging"></i> 100 MB</span>
+          <span><i class="fa-brands fa-windows"></i> Windows 10/11</span>
+          <span><i class="fa-solid fa-shield"></i> MIT License</span>
+        </div>
+        <a href="https://github.com/R3LI4NT/Onionymous/releases/latest" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          <i class="fa-solid fa-download"></i>
+          <span data-en>Download from Releases</span>
+          <span data-es>Descargar desde Releases</span>
+        </a>
+      </div>
+
+      <div class="download-card">
+        <div class="download-card-head">
+          <i class="fa-brands fa-rust"></i>
+          <h3><span data-en>Source code</span><span data-es>Código fuente</span></h3>
+          <span class="ver-tag">main</span>
+        </div>
+        <p>
+          <span data-en>Build from source if you want to audit the code, customize features, or contribute. Requires Rust 1.78+.</span>
+          <span data-es>Compilá desde fuente para auditar código, personalizar features o contribuir. Requiere Rust 1.78+.</span>
+        </p>
+        <div class="download-meta">
+          <span><i class="fa-brands fa-rust"></i> Rust 1.78+</span>
+          <span><i class="fa-brands fa-git-alt"></i> Git clone</span>
+          <span><i class="fa-solid fa-code"></i> Open Source</span>
+          <span><i class="fa-brands fa-github"></i> R3LI4NT/Onionymous</span>
+        </div>
+        <a href="https://github.com/R3LI4NT/Onionymous" target="_blank" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+          <i class="fa-brands fa-github"></i>
+          <span data-en>View on GitHub</span>
+          <span data-es>Ver en GitHub</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="build">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag" data-en>BUILD FROM SOURCE</span>
+      <span class="section-tag" data-es>COMPILAR DESDE FUENTE</span>
+      <h2>
+        <span data-en>Three commands</span>
+        <span data-es>Tres comandos</span>
+      </h2>
+      <p>
+        <span data-en>Clone, fetch dependencies, build. The resulting .exe is fully portable.</span>
+        <span data-es>Clonar, descargar dependencias, compilar. El .exe resultante es totalmente portable.</span>
+      </p>
+    </div>
+
+    <div style="max-width: 800px; margin: 0 auto;">
+      <div class="code-block">
+<span class="comment"># 1. Clone the repo</span>
+git clone https://github.com/R3LI4NT/Onionymous.git
+cd Onionymous
+
+<span class="comment"># 2. Fetch Tor + Wintun + sing-box (one-time setup)</span>
+.\download-requeriments.bat
+
+<span class="comment"># 3. Build the portable release executable</span>
+cargo build --release
+
+<span class="comment"># Output: target\release\onionymous.exe (100 MB, portable)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>Onionymous</h4>
+        <p>
+          <span data-en>Open-source desktop client for the Tor network. Built with Rust, designed for privacy.</span>
+          <span data-es>Cliente de escritorio open-source para la red Tor. Construido con Rust, diseñado para privacidad.</span>
+        </p>
+      </div>
+      <div class="footer-col">
+        <h5><span data-en>Project</span><span data-es>Proyecto</span></h5>
+        <ul>
+          <li><a href="https://github.com/R3LI4NT/Onionymous" target="_blank">GitHub</a></li>
+          <li><a href="https://github.com/R3LI4NT/Onionymous/releases" target="_blank">Releases</a></li>
+          <li><a href="https://github.com/R3LI4NT/Onionymous/issues" target="_blank"><span data-en>Issues</span><span data-es>Issues</span></a></li>
+          <li><a href="https://github.com/R3LI4NT/Onionymous/blob/main/LICENSE" target="_blank">License (MIT)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5><span data-en>Resources</span><span data-es>Recursos</span></h5>
+        <ul>
+          <li><a href="https://www.torproject.org/" target="_blank">Tor Project</a></li>
+          <li><a href="https://www.wintun.net/" target="_blank">Wintun</a></li>
+          <li><a href="https://sing-box.sagernet.org/" target="_blank">sing-box</a></li>
+          <li><a href="https://www.rust-lang.org/" target="_blank">Rust</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>
+        <span data-en>Built by</span><span data-es>Desarrollado por</span>
+        <a href="https://github.com/R3LI4NT" target="_blank">#R3LI4NT</a>
+        <span data-en>Not affiliated with The Tor Project.</span>
+      </div>
+      <div>© 2026 Onionymous · MIT License</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const langToggle = document.getElementById('langToggle');
+const langLabel = document.getElementById('langLabel');
+let currentLang = localStorage.getItem('onionymous-lang') || 'en';
+
+function applyLang(lang) {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.style.display = (lang === 'en') ? '' : 'none';
+  });
+  document.querySelectorAll('[data-es]').forEach(el => {
+    el.style.display = (lang === 'es') ? '' : 'none';
+  });
+  langLabel.textContent = lang === 'en' ? 'ES' : 'EN';
+  currentLang = lang;
+  localStorage.setItem('onionymous-lang', lang);
+}
+applyLang(currentLang);
+
+langToggle.addEventListener('click', () => {
+  applyLang(currentLang === 'en' ? 'es' : 'en');
+});
+
+// Version tabs
+document.querySelectorAll('.version-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.version-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.version-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.target).classList.add('active');
+  });
+});
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-card, .compat-card, .download-card, .stat-card').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+  observer.observe(el);
+});
+</script>
+
+</body>
+</html>
