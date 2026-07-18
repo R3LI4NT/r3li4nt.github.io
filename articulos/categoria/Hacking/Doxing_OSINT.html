@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Doxing y OSINT · R3LI4NT</title>
+    <meta name="description" content="Cada vez es más complejo permanecer anónimo en internet, como si la única forma de serlo es desprenderse totalmente del teléfono móvil u ordenador en sí. Ya...">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/x-icon" href="../../img/favicon.ico">
+    <style>
+        .article-metadata {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--accent-primary);
+            width: 20px;
+        }
+
+        .metadata-item strong {
+            color: var(--text-primary);
+            margin-right: 0.3rem;
+        }
+
+        .tag-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .article-tag {
+            padding: 0.3rem 1rem;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .article-tag:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 59, 59, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            background: rgba(59, 123, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .tip-box {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .command-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-block pre {
+            margin: 0;
+            color: #b3ff9e;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-prompt {
+            color: var(--accent-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-copy:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .image-container {
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            background-color: rgba(0, 10, 0, 0.5);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .image-container:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 25px var(--glow-color);
+            transform: scale(1.01);
+        }
+
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+        }
+
+        .clickable-image {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clickable-image:hover {
+            filter: brightness(1.2);
+        }
+
+        .image-caption {
+            margin-top: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .zoom-hint {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            margin-left: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .image-container:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        .external-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .external-link:hover {
+            color: white;
+            border-bottom-color: white;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .pagination-article {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .pagination-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination-link.prev i {
+            margin-right: 0.5rem;
+        }
+
+        .pagination-link.next i {
+            margin-left: 0.5rem;
+        }
+
+        .related-articles {
+            margin: 3rem 0;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px var(--glow-color);
+        }
+
+        .related-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .related-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(0, 10, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--accent-primary);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(0, 255, 157, 0.05);
+            color: var(--text-primary);
+        }
+
+        .comparison-table code {
+            color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        #sidebarToc {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        #sidebarToc::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #sidebarToc::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        #sidebarToc .nav-link {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        #sidebarToc .nav-link.active {
+            border-left-color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--accent-primary);
+        }
+
+        #sidebarToc .nav-link i {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .article-metadata {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .pagination-article {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #imageModal .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 0 50px var(--glow-color);
+            animation: zoom 0.3s ease-in-out;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #imageModal .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1001;
+            text-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        #imageModal .modal-close:hover {
+            color: var(--accent-primary);
+            transform: rotate(90deg);
+        }
+
+        #imageModal .modal-caption {
+            margin: 20px auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .download-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 255, 157, 0.2));
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-primary);
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* ===== Responsive movil mejorado (Android / iPhone) ===== */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; }
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+            img { max-width: 100%; height: auto; }
+            .glitch-wrapper { font-size: 2rem !important; word-break: break-word; line-height: 1.2; }
+            .glitch { word-break: break-word; }
+            .glitch::before, .glitch::after { display: none; }
+            .hero-description { font-size: 1.05rem; }
+            .section-title { font-size: 1.3rem; }
+            .breadcrumb { flex-wrap: wrap; row-gap: 0.3rem; font-size: 0.82rem; }
+            .article-metadata { flex-wrap: wrap; gap: 0.6rem; }
+            .tag-container { flex-wrap: wrap; }
+            .content-card { padding: 1.25rem; }
+            .command-block { padding: 1rem; padding-top: 2.6rem; font-size: 0.85rem; }
+            .command-block pre { white-space: pre-wrap; word-break: break-word; }
+            .comparison-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .article-full a, .article-full code { word-break: break-word; overflow-wrap: anywhere; }
+            #imageModal .modal-content { max-width: 94%; max-height: 78%; }
+            #imageModal .modal-caption { width: 92%; font-size: 0.95rem; }
+            #imageModal .modal-close { top: 10px; right: 16px; font-size: 34px; }
+        }
+        @media (max-width: 480px) {
+            .glitch-wrapper { font-size: 1.55rem !important; }
+            .hero-description { font-size: 0.98rem; }
+            .section-title { font-size: 1.12rem; }
+            .article-full { font-size: 0.95rem; }
+            .content-card { padding: 1rem; }
+            .command-block { font-size: 0.78rem; padding: 0.85rem; padding-top: 2.6rem; }
+            .article-metadata { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header class="hero" style="min-height: 40vh;">
+            <div class="hero-content">
+                <div class="glitch-wrapper" style="font-size: 2.2rem;">
+                    <div class="glitch" data-text="Guía de Doxing y OSINT">Guía de Doxing y OSINT</div>
+                </div>
+                <p class="hero-description" style="font-size: 1.05rem;">&gt; Cada vez es más complejo permanecer anónimo en internet, como si la única forma de serlo es desprenderse totalmente del teléfono móvil u ordenador en sí. Ya... </p>
+                <div class="article-metadata">
+                    <span class="metadata-item"><i class="fas fa-user-secret"></i><strong>Autor:</strong> R3LI4NT</span>
+                    <span class="metadata-item"><i class="fas fa-tag"></i><strong>Categoría:</strong> Hacking</span>
+                    <span class="metadata-item"><i class="fas fa-shield-halved"></i><strong>Nivel:</strong> Práctico</span>
+                </div>
+                <div class="tag-container">
+                    <span class="article-tag"><i class="fas fa-folder-open"></i> Ingeniería Social</span>
+                    <span class="article-tag"><i class="fas fa-graduation-cap"></i> Educativo</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="breadcrumb" style="margin: 1rem 0;">
+            <a href="../../index.html" class="breadcrumb-link"><i class="fas fa-home"></i> Inicio</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="../../index.html#hacking" class="breadcrumb-link"><i class="fas fa-skull"></i> Hacking</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-link">Ingeniería Social</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Guía de Doxing y OSINT</span>
+        </div>
+
+        <div class="main-grid">
+            <main>
+                <article class="article-full">
+                    <section class="content-card" id="que-es-el-doxing-0">
+                        <h2 class="section-title"><span class="hash">#</span> ¿QUÉ ES EL &#x27;DOXING&#x27;?</h2>
+                        <p>Cada vez es más complejo permanecer anónimo en internet, como si la única forma de serlo es desprenderse totalmente del teléfono móvil u ordenador en sí. Ya ni siquiera es seguro navegar tranquilo en páginas webs, pues, estas recopilan toda la información del usuario con las famosas "cookies". Ahora bien, hoy en día es posible conseguir fácilmente información privada de un usuario, basta con tan solo recurrir a las redes sociales. Los individuos que hacen está recopilación de datos personales lo hacen concretamente través de Facebook o Instagram debido a su popularidad, y a esto le agrego que los usuarios no tienen control de lo que publican en su muro ni la gravedad de la misma.</p>
+<p>
+   <figure class="image-container" onclick="openImageModal('../img/Doxing_Osint.png', 'Ilustración del procedimiento')"><img src="../img/Doxing_Osint.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+
+<p>El <em><strong>Doxing</strong></em> se puede considerar una técnica o práctica en la que un usuario malintencionado realiza un labor de investigación profundo para recopilar toda la información posible sobre la persona para luego hacerla pública y que está sea hostigada. Generalmente, la información obtenida es en línea, aunque en ocasiones puede incluir información de su vida personal para que el acoso no solamente sea de en línea, sino también en la vida real de la víctima. Estas técnicas de recopilación son de todo tipo, desde búsquedas en sus perfiles de redes sociales y base de datos, hasta técnicas más avanzadas como hacking, ingeniería social, phishing y malware.</p>
+<p>Gran parte de las personas que desconocen este término se preguntan -<em>¿Y que información pueden obtener de mi?</em>-, sin darse cuenta que por el simple hecho de usar una red social ya están "regalando" sus datos como nombre, estudios, trabajos, fecha de nacimiento, ubicación, gustos e información de familiares y amigos. Solo con el nombre de la persona es suficiente para que el atacante realice búsquedas en Google y que este le arroje información de algún cargo público que ocupe la persona (en caso de que lo fuera). </p>
+<h2>Tipos de DOXING</h2>
+<p>Existen diferentes tipos de doxing en los que concurre el acosador o atacante para apropiarse de la información y divulgar aquella cual vea más conveniente, es decir, más comprometedora para la víctima. Algunas de ellas son:</p>
+<ul>
+<li>
+<p><strong>La dirección IP</strong>: En este caso, el atacante suele utilizar programas de tercero como lo es un script o IPLogger acompañada de ingeniería social para apropiarse de la IP de la víctima. La dirección IP pública revela información del usuario como su ubicación aproximada (en caso de no usar VPN/Proxy), puertos abiertos, lanzar ataques DDoS, vínculo con el ISP.</p>
+</li>
+<li>
+<p><strong>Malware</strong>: La incursión de malware es la más habitual y de las más peligrosas ya que no solo se basa en obtener información de sus datos personales, sino que el atacante también puede recopilar sus fotografías y tener el control del dispositivo infectado para ejecutar acciones en su contra sin que está sea prevista de nada.</p>
+</li>
+<li>
+<p><strong>Redes sociales:</strong> Es la técnica más utilizada debido que en las redes sociales se suele encontrar toda la información personal del individuo.</p>
+</li>
+</ul>
+<h2>Métodos usados en el DOXING</h2>
+<p>Entre los métodos más destacados por doxxers se encuentran:</p>
+<ul>
+<li>
+<p><strong>Phishing Scams</strong>: Los ataques de phishing van aumentado cada vez más, esto se debe a que no es necesario penetrar ningún sistema de seguridad ni evadir firewalls. Lo atacantes suelen camuflar una trampa (como lo es un link) para que la víctima acceda e introduzca sus credenciales. Los doxxers crean portales falsos con el código fuente de la página web y lo redireccionan a un servidor propio a escucha de capturar usuarios y contraseñas.</p>
+</li>
+<li>
+<p><strong>Búsqueda inversa de teléfono móvil</strong>: Esta técnica es muy útil para partir como base, al saber el número de la víctima podemos encontrar la fuente de sus redes sociales, nombre, dirección, nombre de la compañía, entre otros. Hay países en donde la normativa de protección de datos es bastante estricta, pero en otros no se tiene muy en cuenta y suelen parar en páginas blancas fácil de acceder con Google.</p>
+</li>
+<li>
+<p><strong>Packet Sniffing</strong>: La detección de paquetes es una técnica en la cual se detectan y observan los paquetes de datos que fluyen a través de la red. Muchos de estos datos muestran los sitios web que visita el usuario y dependiendo del protocolo (HTTP/HTTPS) se pueden leer/descifrar en texto plano las credenciales que introduce la víctima. Existen herramientas como Wireshark capaces de monitorear todo el tráfico de una red.</p>
+</li>
+<li>
+<p><strong>Data Broker Sites</strong>: Hay empresas dedicadas a recopilar información personal de varias fuentes y vender esa información a otras empresas, a esto se le conoce como "<em>Corredores de Datos</em>" y recopilan la información tanto fuera de línea como dentro. La información que obtienen puede variar, y, por lo general, incluyen el nombre, sexo, fecha de nacimiento, domicilio, planes, trabajos y más.</p>
+</li>
+</ul>
+<h3 style="color: var(--accent-primary); margin: 1.6rem 0 1rem;">Google Hacking (Dorking)</h3>
+<p>Comenzamos con una de las técnicas más utilizadas en la rama del hacking, el "<em>Google Dorking</em>" o también conocido como "<em>Google Hacking</em>". Permítame explicarle de que se trata esta técnica y porque es tan efectiva. En la actualidad el motor de búsqueda más utilizado a nivel mundial es Google, y que, por el momento no hay otro que le de pelea. Al ser de los más utilizado contiene mucha información sensible expuesta que, en manos equivocadas, puede llegar a causar un daño bastante crítico dependiendo del caso. Este tipo de información o dato se puede obtener mediante comandos/parámetros/ o palabras claves. Por ejemplo, cuando queremos tener mejores resultados de búsqueda lo que solemos hacer es escribir una palabra clave (como lo es una canción o película) para que nos arroje resultados exactos a lo que estamos buscando. Aquí es donde viene lo jugoso, hay veces que los administradores de webs no ocultan bien el contenido sensible de su página, como puede ser un panel de administración o cámara de seguridad.</p>
+<p>Uno de los ejemplos más comunes para encontrar datos de una persona es colocar su "<em>nombre y apellido</em>" entre comillas, lo mismo para "<em>su DNI</em>", "<em>teléfono</em>", "<em>dirección de casa</em>", "<em>email</em>", etc.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/72e795bd-e53f-4591-8578-d8f4b293dc3c', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/72e795bd-e53f-4591-8578-d8f4b293dc3c" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Por otro lado, si deseamos saber si nuestras credenciales o servicios online están expuestas en línea podemos usar los operadores <code>inurl</code> e <code>intext</code> tal que así: <strong>inurl: [URL de la web] AND intext: [contraseña]</strong>.</p>
+<h5 style="color: var(--text-primary); margin: 1.2rem 0 .6rem;">Función de los operadores de búsqueda avanzados:</h5>
+<ul>
+<li><strong><em>INURL</em></strong>: Encuentra aquellas páginas que tengan una determinada palabra en la URL. Para este ejemplo, se mostrarán todos los resultados que tengan la palabra "orange".</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('inurl:orange juice')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> inurl:orange juice</pre></div>
+<ul>
+<li><strong><em>INTEXT</em></strong>: Encuentra aquellas páginas que contengan una cierta palabra en algún lugar de su contenido. Por ejemplo:</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('intext:login ')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> intext:login </pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/16a05e4d-9361-4907-9502-b7cbba69d0ed', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/16a05e4d-9361-4907-9502-b7cbba69d0ed" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<ul>
+<li>
+<p><strong><em>AND</em></strong>: Busca los resultados de X e Y. Por ejemplo, si en el operador <strong>inurl</strong> tenemos lo siguiente: <code>inurl:Banco</code> y en el operador <strong>intext</strong>: <code>intext:login</code>, luego lo combinamos tal que así: <code>inurl:Banco AND intext:login</code>. Buscará dentro de la página del banco (según el nombre que le indiquemos) el panel de logueo de usuarios.</p>
+</li>
+<li>
+<p><strong><em>SITE</em></strong>: Google buscará aquellos resultados dentro de la web detrás del site. Por ejemplo:</p>
+</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('help site:facebook.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> help site:facebook.com</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/bf5e43b5-6d64-4ef2-b7d7-e39c1b820977', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/bf5e43b5-6d64-4ef2-b7d7-e39c1b820977" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Podemos utilizar las comillas ("") para obtener un resultado exacto, y más aún si le agregamos el parámetro anterior. Tal que así:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('&quot;Gerardo Miller&quot; site:facebook.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> &quot;Gerardo Miller&quot; site:facebook.com</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/729096fd-cfdc-4cc4-8fbf-bf32d4eb2a40', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/729096fd-cfdc-4cc4-8fbf-bf32d4eb2a40" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<ul>
+<li><strong><em>FILETYPE</em></strong>: Este parámetro se utiliza cuando queremos buscar resultados que contengan un tipo determinado de documento, por ejemplo, documentos PDF, Word (doc), Excel (xls), PowerPoint (ppt), etc. Es muy útil para encontrar bases de datos públicas o software.</li>
+</ul>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('&quot;software&quot; filetype:ppt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> &quot;software&quot; filetype:ppt</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/c72caa39-7f9e-461c-bc1b-4b4441a87c41', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/c72caa39-7f9e-461c-bc1b-4b4441a87c41" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Existen muchos más operadores avanzados ha utilizar, si desean ver la lista completa pueden ingresar <a href="https://ahrefs.com/blog/google-advanced-search-operators/" target="_blank" class="external-link"><strong>aquí</strong></a>. Si utilizamos el siguiente parámetro <code>intitle:index.of "parent directory"</code> podemos visualizar directorios de un servidor en especifico, es decir, de una web completa.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/84e8974a-b9a8-4d1f-940a-60b54a712762', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/84e8974a-b9a8-4d1f-940a-60b54a712762" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/97d104f3-acf4-4be2-a058-9cf1abbb08da', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/97d104f3-acf4-4be2-a058-9cf1abbb08da" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>En el ejemplo anterior podemos determinar que la configuración de los directorios no es la mejor, ya que estos deberían estar en privado en caso de contener información confidencial. Pueden utilizarlo para buscar series, películas, canciones, credenciales o libros de pago, entre otras:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('intitle:index.of &quot;parent directory&quot; breaking bad')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> intitle:index.of &quot;parent directory&quot; breaking bad</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/67d5f051-eafd-4d85-8347-7452c27b9706', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/67d5f051-eafd-4d85-8347-7452c27b9706" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/8ed4d320-b3a8-40d5-9131-2926ad8dfe86', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/8ed4d320-b3a8-40d5-9131-2926ad8dfe86" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Otros de los comandos que veremos a continuación es <code>index.of</code>, el cual permite ubicar los archivos <em><strong>logs</strong></em> dentro del servidor. Este archivo nos brinda información de la estructura del servidor, los cambios que se han hecho y otras actividades que se realicen dentro del servidor. WS_FTP es un cliente de FTP que crea automáticamente la aplicación y guarda un registro denominado WS_FTP.LOG. Este archivo contiene datos confidenciales, como el origen/destino del archivo y el nombre del archivo, fecha/hora de carga, etc. Para acceder a él se debe ingresar el siguiente dork en Google:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('index.of ws_ftp.log')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> index.of ws_ftp.log</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/945b8afd-031a-4850-b71e-729a54d41b1b', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/945b8afd-031a-4850-b71e-729a54d41b1b" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/712708bc-32e3-447a-ba79-7007e4a38485', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/712708bc-32e3-447a-ba79-7007e4a38485" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/5ff77f74-4c91-496a-9b1d-739f2d707fff', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/5ff77f74-4c91-496a-9b1d-739f2d707fff" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Como se observa en la última captura, el servidor esta ejecutando por detrás una máquina Windows (disco <code>C:</code>). Para verificar si está información es correcta podemos hacer uso de nmap: </p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/8b3ee955-3f4e-47f3-bfea-d78497c34838', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/8b3ee955-3f4e-47f3-bfea-d78497c34838" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Unos de los vectores más aprovechados por los atacantes es entrar a las carpetas de administrador que están desprotegidas. El comando <code>intitle:index.of inurl:"/ admin /*"</code> lista todas las carpetas que se encuentren dentro del caracter admin.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/1b273209-9687-4550-96e8-95433e558290', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/1b273209-9687-4550-96e8-95433e558290" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/3a02441f-1d13-4831-8b2b-c2915f493285', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/3a02441f-1d13-4831-8b2b-c2915f493285" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>La empresa de Offensive Security especializada en seguridad informática, tiene a disposición un sitio web en donde alberga una base de datos con exploits y dorks. Esta página web se va actualizando continuamente a medida que nuevas vulnerabilidades van apareciendo.</p>
+<p><strong>➤</strong> https://www.exploit-db.com/google-hacking-database</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/01537259-2904-4598-b674-dd0933875fb8', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/01537259-2904-4598-b674-dd0933875fb8" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Existen servicios gratuitos en Internet que facilitan la búsqueda de una persona en redes sociales, esto se debe generalmente porque las personas tienen un error de publicar mas de lo que se debe.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('➤ WhatsMyName Web: https://whatsmyname.app/\n➤ CheckUsernames: https://checkusernames.com/\n➤ Namechk: https://namechk.com/\n➤ UserSearch: https://usersearch.org/\n➤ InstantUsernameSearch: https://instantusername.com/#/')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> ➤ WhatsMyName Web: https://whatsmyname.app/
+➤ CheckUsernames: https://checkusernames.com/
+➤ Namechk: https://namechk.com/
+➤ UserSearch: https://usersearch.org/
+➤ InstantUsernameSearch: https://instantusername.com/#/</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/58258586-3796-4694-8725-521c5c7dcb43', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/58258586-3796-4694-8725-521c5c7dcb43" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Gracias al repositorio online de OSINT Framework es posible hacer uso de una multitud de recursos para llevar a cabo búsquedas en fuentes de información abierta como las ya mencionadas. </p>
+<p><strong>➤</strong> https://osintframework.com/</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/6ce60b8b-d571-43c5-af30-4fc08f9eff95', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/6ce60b8b-d571-43c5-af30-4fc08f9eff95" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>El reconocimiento facial se ha vuelto una de las técnicas más empleadas para llevar a cabo búsquedas por medio de una fotografía, como lo es Google. Lo único que hay que hacer es tener una fotografía de la víctima (en lo posible con buena calidad) y Google se encargará se hacer todo el trabajo.</p>
+<p><strong>➤</strong> https://images.google.com/</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/1d401ab3-4eb5-4a9d-93ef-a7ae01803bbd', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/1d401ab3-4eb5-4a9d-93ef-a7ae01803bbd" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Uno de los clásicos dorks es la de buscar cámaras web públicas que se hayan filtrado ya sea por fallos de software de las cámaras o por carencias de configuración de las mismas. Si realizamos una búsqueda en google con la frase <code>intitle:”Live View / – AXIS__</code> nos mostrará todas aquellas páginas web cuyo título tenga "<code>Live View / – Axis</code>", lo que nos llevará a muchos casos a una webcam de marca Axis.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/60ebc1cf-8fd1-4833-895d-4bd128fdaa68', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/60ebc1cf-8fd1-4833-895d-4bd128fdaa68" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/94539c1a-d351-4133-8c2d-6d6939a113c1', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/94539c1a-d351-4133-8c2d-6d6939a113c1" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><strong>➤</strong> <a href="https://github.com/rootac355/IP-cams-dork-list/blob/master/google%20dorks%20for%20ip%20cams.txt" target="_blank" class="external-link">Lista de cámaras IP (dorks)</a></p>
+                    </section>
+                    <section class="content-card" id="ip-logger-1">
+                        <h2 class="section-title"><span class="hash">#</span> IP Logger</h2>
+                        <p>Antes de explicar de que trata un IP-Logger, es preciso tener un conocimiento básico de que es una dirección IP. El nombre IP significa "<em>Protocolo de Internet</em>". Se trata de un protocolo que sirve para las comunicaciones que viajan a través de las redes (llamados paquetes/datos) y que tienen un destino cordinado. A cada dispositivo o dominio web se le asigna una IP para conectarse a Internet (IP pública), los paquetes que se generan y llegan a su destino lo hacen de diferente forma según en función del protocolo de transporte que se utilice en combinación con la IP. Los protocolos de transportes más comunes son TCP y UDP, el TCP suele ser el protocolo más fiable debido que utiliza conexión y verifica que los datos sean enviados correctamente. Mientras que el UDP no utiliza conexión y solo envía los datos aunque no confirme su recepción ni compruebe datos, el primero (TCP) es más lento que el segundo (UDP). </p>
+<p><strong>➤</strong> <a href="IPtracker.html" target="_blank" class="external-link">Cómo funciona una IP</a></p>
+<p>Ahora bien, ya al tener claro qué es una IP y como funciona, proseguimos. Un IP-Logger es una herramienta que permite capturar la dirección IP de un usuario mediante un acortador que está genera. Las páginas web que normalmente visitas para leer noticias, descargar material, etc. ¿Qué datos registra o podría recopilar de nosotros? Estas páginas mediante las cookies y estadísticas pueden saber, por ejemplo, la ubicación de nuestro dispositivo, enlaces que ha visitado, sistema operativo, navegador que usa,  entre otros datos personales. Cuando establecemos la conexión con algún servidor web, la dirección IP es uno de los datos que se comparte, lo que permite a su vez identificar las ubicación geográfica del dispositivo que estableció conexión. </p>
+<p>Existen páginas como <a href="https://grabify.link/" target="_blank" class="external-link">Grabify<a/> capaces de grabar una dirección IP mediante un link. Su uso es muy sencillo, basta con introducir una URL (en lo posible un dominio real) a la cual se va a dirigir al usuario y generar el acortador falso.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/bb68db8c-9f2d-4121-85ee-7b708b7edc76', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/bb68db8c-9f2d-4121-85ee-7b708b7edc76" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Como podemos observar, se genera un link el cual debemos de enviar a la víctima y esperar que acceda. A simple vista se ve muy sospechoso por lo que necesitamos un mejor enmascaramiento. Para ello, suelo utilizar el script <a href="https://github.com/jaykali/maskphish" target="_blank" class="external-link">MaskPhish</a>:</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('git clone https://github.com/jaykali/maskphish\ncd maskphish\nbash maskphish.sh')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> git clone https://github.com/jaykali/maskphish
+cd maskphish
+bash maskphish.sh</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/e1fd605c-57a9-43fd-b1ff-0c4cc2b5dd75', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/e1fd605c-57a9-43fd-b1ff-0c4cc2b5dd75" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/db1a210f-5001-427a-94d8-96d02a225bdb', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/db1a210f-5001-427a-94d8-96d02a225bdb" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Una vez que el usuario ingrese al enlace, de forma automática el IP-Logger capturará su IP y con ella podemos ubicar su posición geográfica por medio de un script o sitio web.</p>
+<p><strong>➤</strong> https://github.com/rajkumardusad/IP-Tracer</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/17908360-8615-4831-875e-8b770ae74693', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/17908360-8615-4831-875e-8b770ae74693" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><strong>➤</strong> https://www.iplocation.net/ip-lookup</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/a9f3d60b-efa7-48c5-8490-3c3bc1c0fe98', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/a9f3d60b-efa7-48c5-8490-3c3bc1c0fe98" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Si bien localizamos el país al que pertenece la IP, no sabemos exactamente la ubicación exacta ya que el ISP (Proveedor de servicio) establece una ubicación aproximada. Una vez que el atacante da con la IP de la víctima puede utilizarla para suplantar la identidad en sitios web y cometer delitos, vender datos personales, ser víctima de ataques de estafas y Botnet, entre otros. Recuerda siempre tener un VPN en la mano si sospechas de un enlace.</p>
+<p><strong>➤</strong> <a href="https://github.com/R3LI4NT/articulos/tree/main/Seguridad/Anonimato" target="_blank" class="external-link">Cómo funciona un VPN/Proxy y cómo usarlo</a></p>
+                    </section>
+                    <section class="content-card" id="que-es-el-osint-2">
+                        <h2 class="section-title"><span class="hash">#</span> ¿QUÉ ES EL &#x27;OSINT&#x27;?</h2>
+                        <p>El OSINT (Open Source INTelligence), traducido como <em><em>Inteligencia de Fuentes Abiertas</em></em>, son aquellas técnicas o herramientas que se utilizan a la hora de recopilar información de una persona, empresa o entidad para luego ser analizadas. En pocas palabras, automatiza el proceso del Doxing "manual" gracias a herramientas creadas para su fin. </p>
+<p>Claro está que no solo se utiliza para Doxing, sino también para etapas de reconocimiento de un pentesting (escaneo de hosts, dominios/subdominios, contraseñas, DNS, etc), prevención de ciberataques (análisis de metadatos e imágenes, motores de búsqueda, etc), entre otros. Se utiliza en una multitud de ámbitos tanto tecnológico, policial, militar como en marketing. </p>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">➤ FASES DEL PROCESO OSINT</h4>
+<p>OSINT cuenta con una serie de fases que sirven como guía para poder estructurar el trabajo y acelerar la investigación. A continuación veremos un breve resumen de estas fases:</p>
+<ul>
+<li>
+<p><strong>Requisitos</strong>: En está primera fase entendemos qué problema tenemos que resolver y que información necesitamos.</p>
+</li>
+<li>
+<p><strong>Identificación de fuentes</strong>: Las fuentes que nos pueden ser de mayor utilidad para recabar información.</p>
+</li>
+<li>
+<p><strong>Adquisición</strong>: Etapa donde obtenemos la información.</p>
+</li>
+<li>
+<p><strong>Procesamiento</strong>: En esta parte se clasifica toda la información obtenida para una mejor estructura.</p>
+</li>
+<li>
+<p><strong>Análisis</strong>: A partir de todos los datos ya obtenidos, se aplica la inteligencia para encontrar relaciones entre datos.</p>
+</li>
+<li>
+<p><strong>Presentación</strong>: En la última etapa del OSINT se aplica un formato para que la información pueda ser comprendida y utilizada fácilmente.</p>
+</li>
+</ul>
+                    </section>
+                    <section class="content-card" id="herramientas-3">
+                        <h2 class="section-title"><span class="hash">#</span> Herramientas</h2>
+                        <p>En esta sección hablaré de una serie de herramientas, las cuales nos podrán ser de gran utilidad al momento de hacer una investigación OSINT o fase de reconocimiento para el pentesting de un objetivo en concreto. Cabe mencionar que es una recopilación personal ya que he seleccionado algunas de las herramientas más interesantes, hay infinidad de herramientas y formará parte de nosotros elegir la que mejor se adapte a nuestro trabajo.</p>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">▪『Maltego』</h4>
+<p>Se trata de una potente herramienta automatizada que recopila información de un objetivo y lo muestra en forma de grafo, permitiéndonos 
+así analizar fácilmente las diferentes relaciones. Al momento de buscar una empresa, dominio o nombre, esta herramienta proporciona datos muy útiles como la dirección de correo electrónico, números teléfonicos, artículos que tenga, y más. Está información se recibe de forma cruzada, nos servirá para hacer múltiples enumeraciones en vectores para tener una investigación más amplia.</p>
+<p>Para usar Maltego es necesario instalarlo y registrarse en su página, al crear la cuenta nos va a permitir usar la aplicación junto a sus servidores públicos. </p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sudo apt-get install maltego')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sudo apt-get install maltego</pre></div>
+<p><strong>➤</strong> Registrarse: https://www.maltego.com/ce-registration/</p>
+<p>Una vez registrado, deben abrir la aplicación y seleccionar la opción gratuita de Maltego.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/da060e42-2685-41aa-8df6-b5393668df7e', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/da060e42-2685-41aa-8df6-b5393668df7e" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Luego, aceptan los términos e introducen sus credenciales en la aplicacion.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/5f9d9cc8-73e6-45fb-8b43-5f746dbde901', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/5f9d9cc8-73e6-45fb-8b43-5f746dbde901" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Dentro de la aplicación podemos encontrar varios módulos desarrollados por empresas que podemos utilizar. </p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/417a99fc-7e16-4062-be73-6a367809f09a', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/417a99fc-7e16-4062-be73-6a367809f09a" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Por ejemplo, el módulo o proyecto "<em>AbuseIPDB</em>" ayuda a que los administradores de sistemas detecten aquellas direcciones IP que son o fueron vinculadas en actividades maliciosas, ofreciendo así una lista negra.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/13a78c7e-e536-4757-8e7b-40d12d495bcc', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/13a78c7e-e536-4757-8e7b-40d12d495bcc" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Otro de los módulos interesantes es "<em>Google Social Network Transforms</em>" para rastrear la huella digital de un usuario.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/92763898-8c62-4f36-ad6b-4438b118b0ca', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/92763898-8c62-4f36-ad6b-4438b118b0ca" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Lo primero que haremos es crear un nuevo gráfico. En la parte izquierda tenemos una serie de elementos para usar en nuestras investigaciones, lo que hay que hacer es arrastrar el item hacia el centro y modificar las preferencia que se muestran debajo a la derecha. </p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/d94aaa27-f7d7-47ff-a4c0-8db9a0fc2396', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/d94aaa27-f7d7-47ff-a4c0-8db9a0fc2396" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Hecho lo anterior, si le damos clic izquierdo al ítem se nos despliega varias opciones tales como: IP Address, Number, GPS, Emails, DNS Name, etc. Toda está búsqueda se va a realizar con el nombre específicado, lo que quiere decir que podemos obtener información válida como no.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/94272de1-8648-458b-a4bc-76b7cfad53bf', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/94272de1-8648-458b-a4bc-76b7cfad53bf" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Por ejemplo, podemos obtener direcciones de emails que contengan dicho alias/nombre:</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/950d5f0a-da00-47f1-8636-1c677d492f89', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/950d5f0a-da00-47f1-8636-1c677d492f89" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Y si lo preferimos, Maltego también es capaz de vincular dicho correo con páginas u otras direcciones asociadas.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/4b5fa128-debc-4aa7-8832-d7f5cfdf22ad', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/4b5fa128-debc-4aa7-8832-d7f5cfdf22ad" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>En caso de contar con el número telefónico de la víctima, la herramienta tratará se buscar relación con algún servicio online (proveedor de servicio, correos asociados, redes sociales, gps, etc).</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/67afe446-8109-4df3-9395-fcba4f8a055c', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/67afe446-8109-4df3-9395-fcba4f8a055c" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Supongamos que el usuario cuenta con un dominio propio y queremos recopilar información personal, pero como es algo "tedioso" hacerlo manual preferimos que la herramienta lo haga por nosotros. Para ello, usamos el elemento website e ingresamos el dominio. Automáticamente Maltego empezará a buscar dentro del sitio web y desplegará redes sociales asociadas al dominio, direcciones de email, IPs, entre otros. Con doble clic vemos la información detallada del sub-elemento.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/270ab5e4-9026-4a7d-81ab-134783c32573', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/270ab5e4-9026-4a7d-81ab-134783c32573" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Como costumbre cuando queremos averiguar la ubicación aproximada de una IP recurrimos a localizadores online, Maltego tiene un elemento específico para esto. </p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/b695744b-2892-47d0-b70b-48cebadbb8a9', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/b695744b-2892-47d0-b70b-48cebadbb8a9" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><strong>Conclusión</strong>: Maltego es una herramienta que permite una búsqueda de metadatos de nivel organizado y legible para el usuario. Es útil si queremos saber que tan vulnerable son nuestros datos en la red y con que facilidad pueden hallarlos.</p>
+                    </section>
+                    <section class="content-card" id="osint-industries-4">
+                        <h2 class="section-title"><span class="hash">#</span> ▪『OSINT Industries』</h2>
+                        <p>OSINT Industries es un proyecto especializado en rastrear la huella digital de un usuario mediante el seguimiento de su correo electrónico o número de teléfono. Es necesario crearse una cuenta para hacer uso de él, recomiendo utilizar un dirección de protonmail u onionmail.</p>
+<p><strong>➤</strong> https://osint.industries/</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/47604586-c30f-4bf0-a888-dda2e36a0001', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/47604586-c30f-4bf0-a888-dda2e36a0001" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Luego de ingresar el correo, automáticamente comenzará a vincular la dirección de email en más de 200 sitios web más utilizados.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/7a727c9f-f59c-4edd-9ee3-7cbd703114bc', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/7a727c9f-f59c-4edd-9ee3-7cbd703114bc" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="tineye-5">
+                        <h2 class="section-title"><span class="hash">#</span> ▪『TinEYE』</h2>
+                        <p>Anteriormente hemos hablado de reconocimiento de imagen de Google para encontrar información de un usuario en particular, TinEye hace exactamente lo mismo pero la única diferencia es que este motor de búsqueda se basa en la tecnología de identificación imágenes y no en palabras claves, ni metadatos. </p>
+<p><strong>➤</strong> https://tineye.com/</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/e82a9217-4bb4-48e7-a9bf-179b4d3a66a8', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/e82a9217-4bb4-48e7-a9bf-179b4d3a66a8" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Hay dos formas de rastrear una imagen, la primera es subirla desde nuestro dispositivo (descargada) o pegar el link de la imagen desde una red social.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/c18f3620-8bf7-4677-8690-0e9e096f76e9', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/c18f3620-8bf7-4677-8690-0e9e096f76e9" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Al subir la imagen mostrará todos los resultados en la que aparece. Gracias a esta herramienta nos facilita la búsqueda de redes sociales y foros vinculados con la imagen de la persona, ahorrando así tiempo en búsqueda manual.</p>
+                    </section>
+                    <section class="content-card" id="blackbird-6">
+                        <h2 class="section-title"><span class="hash">#</span> ▪『Blackbird』</h2>
+                        <p>A finales de la década de 1950 se diseño un avión espía llamado "<strong>Blackbird SR-71</strong>", su uso no era para atacar, sino todo lo contrario, fue creado con la finalidad de espiar el territorio enemigo sin ser detectado o incluso derribado por su velocidad. A pesar que fue diseñado en la Guerra Fría, aún sigue siendo rápido. El creador de la herramienta se inspiró en este nombre para desarrollar su proyecto.</p>
+<p>Blackbird es una herramienta OSINT escrita en Python que permite buscar rápidamente cuentas por nombre de usuarios en 581 sitios. Cada vez realiza una búsqueda de nombre de usuario, utilizará un UserAgent aleatorio disponible en su lista para evitar el bloqueo. En pocas palabras, lo que hace el UserAgent es identificarse con otro dispositivo, compañia o versión cuando hace la petición web.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('git clone https://github.com/p1ngul1n0/blackbird\ncd blackbird\npip install -r requirements.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> git clone https://github.com/p1ngul1n0/blackbird
+cd blackbird
+pip install -r requirements.txt</pre></div>
+<p>Las opciones son las siguientes:</p>
+<ul>
+<li>
+<p><strong>-u</strong>: especificar el nombre del usuario.</p>
+</li>
+<li>
+<p><strong>--list-sites</strong>: Mostrar todos los sitios soportados.</p>
+</li>
+<li>
+<p><strong>-f</strong>: Guardar archivo de salida con los resultados.</p>
+</li>
+<li>
+<p><strong>--web</strong>: Correr la herramienta mediante el navegador web.</p>
+</li>
+<li>
+<p><strong>--proxy</strong>: Ejecutar herramienta por medio de un proxy configurado.</p>
+</li>
+<li>
+<p><strong>--show-all</strong>: Mostrar todos los resultados encontrados.</p>
+</li>
+<li>
+<p><strong>--csv</strong>: Exportar resultados en formato CSV para una mejor estructura.</p>
+</li>
+</ul>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/e6ff938c-843d-4a44-9ecd-7dbbb5d46f83', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/e6ff938c-843d-4a44-9ecd-7dbbb5d46f83" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Para el siguiente ejemplo buscaré mi alias:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 blackbird.py -u R3LI4NT -f reporte.txt --csv')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 blackbird.py -u R3LI4NT -f reporte.txt --csv</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/44345e17-3d5f-4b48-8f54-8e977319b344', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/44345e17-3d5f-4b48-8f54-8e977319b344" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Reporte en CSV (directorio <strong><em>/blackbird/results</em></strong>):</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/2564b2f1-f56e-4fff-a0bd-2a1638e528eb', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/2564b2f1-f56e-4fff-a0bd-2a1638e528eb" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Ahora haré el mismo ejemplo pero que muestre los resultados en un servidor local web. Recuerden copiar la URL que les devuelve y pegarla en el navegador (Ej. <code>http://127.0.0.1:9797/</code>)</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 blackbird.py --web')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 blackbird.py --web</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/9e61af73-d81b-4666-9ac1-a13ba2593a31', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/9e61af73-d81b-4666-9ac1-a13ba2593a31" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Nos da la posibilidad de exportar los resultados en formato PDF.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/0020a7d3-f984-4d7c-bfdf-6bf651271aa7', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/0020a7d3-f984-4d7c-bfdf-6bf651271aa7" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/e9509782-584c-4b6b-865d-9430c1878856', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/e9509782-584c-4b6b-865d-9430c1878856" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="sherlock-7">
+                        <h2 class="section-title"><span class="hash">#</span> ▪『Sherlock』</h2>
+                        <p>Sherlock es otra de las herramientas OSINT que permite buscar cuentas de redes sociales utilizando un nombre de usuario. </p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('git clone https://github.com/sherlock-project/sherlock.git\ncd sherlock\npython3 -m pip install -r requirements.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> git clone https://github.com/sherlock-project/sherlock.git
+cd sherlock
+python3 -m pip install -r requirements.txt</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/e83f856b-6627-4d8a-ab70-4f228802d0d9', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/e83f856b-6627-4d8a-ab70-4f228802d0d9" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>El siguiente comando le pide a sherlock que realice una búsqueda del alias "<em>R3LI4NT</em>" y guarde los resultados (<code>--output</code>) en un archivo de texto.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sherlock R3LI4NT --output reporte.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sherlock R3LI4NT --output reporte.txt</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/385eff7c-1ec3-4553-bc1f-bd1d8f3b029f', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/385eff7c-1ec3-4553-bc1f-bd1d8f3b029f" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>La opción (<code>--print-all</code>) imprime también los sitios donde el nombre de usuario no fue encontrado.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/b11ba455-e972-4634-b68d-98473b092242', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/b11ba455-e972-4634-b68d-98473b092242" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Por si fuera poco, le herramienta permite realizar las petición mediante la red Tor. Tenga presente que algunos sitios web pueden negarse a conectarse a través de Tor, puede llegar a tirar errores y disminuir la velocidad de búsqueda.</p>
+<p><strong><em>Descargar TOR:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sudo apt-get install tor')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sudo apt-get install tor</pre></div>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sherlock R3LI4NT --tor')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sherlock R3LI4NT --tor</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/7dbfe0d2-036f-4c04-b02b-7bdb6052c711', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/7dbfe0d2-036f-4c04-b02b-7bdb6052c711" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>En cuyo caso de querer buscar al usuario en un sitio web específico, entonces usen el parámetro (<code>--site NOMBRE</code>). Ejemplo: </p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sherlock R3LI4NT --site github')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sherlock R3LI4NT --site github</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/e2d5fe40-3c75-40f5-bb27-22015752aac7', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/e2d5fe40-3c75-40f5-bb27-22015752aac7" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>En algunas circunstancias es preciso marcar un delay de búsqueda para evitar un bloqueo. Con la opción (--timeout SEG) podemos determinar los segundos de respuesta para cada petición. Ejemplo: </p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sherlock R3LI4NT --timeout 5')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sherlock R3LI4NT --timeout 5</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/3252bb9e-f242-40f8-a1bd-c154100e49e8', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/3252bb9e-f242-40f8-a1bd-c154100e49e8" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Otros datos interesantes es que podemos exportar los resultados en formato CSV, XLSX, JSON y utilizar proxies.</p>
+                    </section>
+                    <section class="content-card" id="phoneinfoga-8">
+                        <h2 class="section-title"><span class="hash">#</span> ▪『PhoneInfoga』</h2>
+                        <p>La herramienta de PhoneInfoga es una de la más avanzadas para escanear números teléfonicos internacionales. Según el autor: </p>
+<div class="info-box"><i class="fas fa-info-circle" style="color: var(--accent-blue); margin-right: 1rem;"></i><p>"Le permite recopilar primero información estándar, como país, área, operador y tipo de línea en cualquier número de teléfono internacional, luego buscar huellas en los motores de búsqueda para intentar encontrar el proveedor de VoIP o identificar al propietario."</p></div>
+<p><strong>➤</strong> https://sundowndev.github.io/phoneinfoga/</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('bash &lt;( curl -sSL https://raw.githubusercontent.com/sundowndev/phoneinfoga/master/support/scripts/install )\nsudo mv ./phoneinfoga /usr/local/bin/phoneinfoga\nphoneinfoga --help')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> bash &lt;( curl -sSL https://raw.githubusercontent.com/sundowndev/phoneinfoga/master/support/scripts/install )
+sudo mv ./phoneinfoga /usr/local/bin/phoneinfoga
+phoneinfoga --help</pre></div>
+<p>Utilice el comando <code>scan</code> junto con <code>-n</code> para identificar el número. Por ejemplo:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('phoneinfoga scan -n &quot;+12252542523&quot;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> phoneinfoga scan -n &quot;+12252542523&quot;</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/9881f595-9c21-4b8d-a056-97e189e3d643', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/9881f595-9c21-4b8d-a056-97e189e3d643" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>El parámetro <code>scanners</code> nos despliga los motores de búsqueda de soporta para recopilar información del número.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('phoneinfoga scanners')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> phoneinfoga scanners</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/da096508-5fdd-427d-ab10-d0e6669ac68d', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/da096508-5fdd-427d-ab10-d0e6669ac68d" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Para iniciar la interfaz de usuario web desde la línea de comandos, deberá utilizar la palabra clave <code>serve</code>. De forma predeterminada, el servidor escuchará en TCP 5000; sin embargo, uso -p para especificar un puerto. En mi caso usé 8080 (http://127.0.0.1:8080/).</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('phoneinfoga serve -p 8080')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> phoneinfoga serve -p 8080</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/956d7363-2080-49fc-84c2-dd1f65bb1ca0', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/956d7363-2080-49fc-84c2-dd1f65bb1ca0" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Si pegamos algún resultado que nos arrojo de Google podemos obtener información sobre las páginas en la que se registro con el número. Asegúrense de cortar la serie de caracteres hasta las comillas dobles como se muestra en la imagen.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/4afa2066-dfad-474d-b8b1-f65ad33240fa', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/4afa2066-dfad-474d-b8b1-f65ad33240fa" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="maigret-9">
+                        <h2 class="section-title"><span class="hash">#</span> ▪『Maigret』</h2>
+                        <p>Otra de las alternativas de Sherlock es Maigret, una poderosa herramienta OSINT que busca cuentas de usuarios en un gran número de sitios web y recopila toda la información que este disponible de manera pública. Según el creador, una de sus ventajas es que no necesita claves API para utilizarla.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('git clone https://github.com/soxoj/maigret &amp;&amp; cd maigret\npip3 install -r requirements.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> git clone https://github.com/soxoj/maigret &amp;&amp; cd maigret
+pip3 install -r requirements.txt</pre></div>
+<p>El siguiente parámetro permite buscar a un usuario en todos los sitios disponibles:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 maigret.py &quot;Usuario&quot; -a -T')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 maigret.py &quot;Usuario&quot; -a -T</pre></div>
+<ul>
+<li>
+<p><strong>a</strong>: Escanear en todos los sitios.</p>
+</li>
+<li>
+<p><strong>-T</strong>: Crear archivo de reporte .TXT con los datos del usuario guardado.</p>
+</li>
+</ul>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/cd1c025b-958e-4504-81b1-d9394a01d21f', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/cd1c025b-958e-4504-81b1-d9394a01d21f" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Si quisieramos saber si el usuario existe en un sitio en particular:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 maigret.py &quot;Usuario&quot; --site SITIO_NOMBRE')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 maigret.py &quot;Usuario&quot; --site SITIO_NOMBRE</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/b4583db0-c85d-43d7-b100-7ae3e913cf92', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/b4583db0-c85d-43d7-b100-7ae3e913cf92" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="holehe-10">
+                        <h2 class="section-title"><span class="hash">#</span> ▪『Holehe』</h2>
+                        <p>Holehe es una útil herramienta que comprueba si hay un correo electrónico asociado a una cuenta en más de 120 sitios.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('git clone https://github.com/megadose/holehe.git\ncd holehe/\npython3 setup.py install')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> git clone https://github.com/megadose/holehe.git
+cd holehe/
+python3 setup.py install</pre></div>
+<p>Una vez instalado, ejecutan el nombre de la herramienta + la dirección de correo electrónico. Ejemplo:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('holehe pedrito123@gmail.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> holehe pedrito123@gmail.com</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/95585684-3c8c-40cb-bec0-ec8de06522f4', 'holehe1')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/95585684-3c8c-40cb-bec0-ec8de06522f4" alt="holehe1" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">holehe1 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/4b8cc4a3-9659-4fd4-9d7a-82562bd3919c', 'holehe2')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/4b8cc4a3-9659-4fd4-9d7a-82562bd3919c" alt="holehe2" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">holehe2 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="doxbin-11">
+                        <h2 class="section-title"><span class="hash">#</span> DOXBIN</h2>
+                        <p>Doxbin fue un foro malicioso y notorio de la darkweb creado por el usuario <code>nachash</code>. En este sitio web se publicaban datos personales de un individuo u organización como: nombres, direcciones, números de seguridad social, historiales de atención médica y otros detalles personales. En el año 2014 la cuenta oficial de Doxbin en twitter fue suspendida, lo que llevo al sitio a recopilar y publicar información de los fundadores y director ejecutivo de Twitter. La jueza Katherine Forrest quien supervisaba el caso del mercado negro Silk Road había sido objetivo de Doxbin luego de que sus datos fueron expuestos en la "The Hidden Wiki".</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/d36440ee-8eac-4f2e-a26c-6cf848b45ce8', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/d36440ee-8eac-4f2e-a26c-6cf848b45ce8" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><strong>➤</strong> Fuente: https://arstechnica.com/tech-policy/2014/10/death-threats-against-judge-in-silk-road-trial-emerge-from-darknet/</p>
+<p>En noviembre de 2014 se llevo a cabo una operación llamada "Onymous" iniciada por el FBI y Europol. Esta operación internacional tenía como objetivo atacar y cerrar mercados negros de la darknet y otros sitios ilegales que operaban en la red Tor (como Doxbin). </p>
+<p>Actualmente el sitio se encuentra disponible y se puede acceder desde el motor de Google a través de tres dominios (doxbin.com | doxbin.net | doxbin.org).</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/16372d4f-5957-4211-bd89-619bda4c2cbd', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/16372d4f-5957-4211-bd89-619bda4c2cbd" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="conclusion-general-12">
+                        <h2 class="section-title"><span class="hash">#</span> CONCLUSIÓN GENERAL</h2>
+                        <p>En este artículo hemos podido ver que tan vulnerable puede ser nuestra información en la red, lo fácil que es para cualquier atacante hacerse propietario de datos personales de un individuo con herramientas públicas. Todavía hay datos personales que tienen la misma demanda que hace una década, sobre todo las tarjetas de crédito y servicios electrónicos. </p>
+<p>Es casi imposible mantener el anonimato en Internet considerando que los rastros que vamos dejando en la red son cada vez mayores. Aunque eliminemos nuestras redes sociales seguiríamos siendo un blanco de cualquier atacante ya que posiblemente tengamos familiares u amigos con redes sociales que pueden vendernos. Aquí no te voy a enseñar tácticas anti-doxing porque el artículo va de todo lo contrario, pero pueden emplearlo consigo mismo para saber que tan expuesta esta tu información. </p>
+<p><strong><em>Y recuerda, si no quieres salir dañado, tampoco dañes a otros.</em></strong></p>
+                    </section>
+                    <section class="content-card" id="responsabilidad-final">
+                        <div class="warning-box">
+                            <i class="fas fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 1rem;"></i>
+                            <strong>Advertencia:</strong> Todo el contenido de este artículo es estrictamente educativo.
+                            No nos hacemos responsables del mal uso de esta herramienta o información. Practica únicamente
+                            en entornos controlados y con autorización.
+                        </div>
+                    </section>
+                </article>
+            </main>
+
+            <aside class="sidebar">
+                <div class="profile-card">
+                    <div class="avatar">
+                        <img src="https://avatars.githubusercontent.com/u/75953873?v=4" alt="R3LI4NT Avatar"
+                             style="width: 100%; height: 100%; border-radius: 30px; object-fit: cover;" loading="lazy">
+                    </div>
+                    <h3 class="profile-name">R3LI4NT</h3>
+                    <p class="profile-bio">Pentester · Malware Developer</p>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div><div class="stat-number">51</div><div class="stat-label">Artículos</div></div>
+                        <div><div class="stat-number">3</div><div class="stat-label">Categorías</div></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-list"></i><span>EN ESTE ARTÍCULO</span></div>
+                    <div class="category-nav" id="sidebarToc"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-folder"></i><span>CATEGORÍAS</span></div>
+                    <div class="category-nav">
+                        <a href="../../index.html#ciberseguridad" class="nav-link"><i class="fas fa-lock" style="color: #00ff9d;"></i><span>Ciberseguridad</span></a>
+                        <a href="../../index.html#hacking" class="nav-link"><i class="fas fa-skull" style="color: #ff3b3b;"></i><span>Hacking</span></a>
+                        <a href="../../index.html#seguridad" class="nav-link"><i class="fas fa-shield-halved" style="color: #3b7bff;"></i><span>Seguridad</span></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <a href="https://github.com/R3LI4NT/articulos" target="_blank" style="text-decoration: none;">
+                        <div style="background: linear-gradient(135deg, #00ff9d, #7000ff); padding: 1.5rem; border-radius: 20px; text-align: center; color: white;">
+                            <i class="fab fa-github" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: 600;">github.com/R3LI4NT/articulos</div>
+                            <div style="font-size: 0.8rem; opacity: 0.9;">Ver repositorio →</div>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">R3LI4NT_</div>
+                    <p class="footer-tagline">Conocimiento es poder, pero poder compartido es revolución.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/R3LI4NT" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link" id="toxLink"><i class="fa-brands fa-expeditedssl"></i></a>
+                        <a href="#" class="social-link" id="emailLink"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="../../index.html#ciberseguridad">Ciberseguridad</a></li>
+                        <li><a href="../../index.html#hacking">Hacking</a></li>
+                        <li><a href="../../index.html#seguridad">Seguridad</a></li>
+                        <li><a href="../../index.html">Todos los artículos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="https://github.com/R3LI4NT/articulos" target="_blank">GitHub</a></li>
+                        <li><a href="https://r3li4nt.github.io/" target="_blank">Currículum Vitae</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul><li><a href="#" id="responsabilidadLink">Responsabilidad</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 R3LI4NT · Todos los derechos reservados.</p>
+                <div class="matrix-code">{ 0x52, 0x33, 0x4c, 0x49, 0x34, 0x4e, 0x54 }</div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toxModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fa-brands fa-expeditedssl"></i></div>
+                <h2 class="modal-title">Tox ID</h2>
+                <div class="modal-info"><span class="modal-label">Tox ID:</span></div>
+                <div class="modal-complete"><code class="modal-code" style="font-size: 0.8rem; word-break: break-all;">08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426')"><i class="fas fa-copy"></i> Copiar Tox ID</button>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;"><i class="fas fa-info-circle"></i> Tox para comunicación segura</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-envelope"></i></div>
+                <h2 class="modal-title">Contacto</h2>
+                <div class="modal-info"><span class="modal-label">Email:</span><span class="modal-value">r3li4nt.contact</span></div>
+                <div class="modal-info"><span class="modal-label">Dominio:</span><span class="modal-value">keemail.me</span></div>
+                <div class="modal-complete"><code class="modal-code">r3li4nt.contact@keemail.me</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('r3li4nt.contact@keemail.me')"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="responsabilidadModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-gavel"></i></div>
+                <h2 class="modal-title">Responsabilidad</h2>
+                <div class="modal-info" style="text-align: center; margin: 2rem 0;"><span class="modal-label" style="font-size: 1.2rem;">⚠️ AVISO IMPORTANTE ⚠️</span></div>
+                <div class="modal-complete" style="margin: 1.5rem 0;"><p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; text-align: center;">Todo lo que se enseñe en estos artículos es con fines educativos</p></div>
+                <button class="modal-copy-btn" onclick="closeAllModals()"><i class="fas fa-check"></i> Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage" alt="Imagen ampliada">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        function openImageModal(src, caption) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImage').src = src;
+            document.getElementById('modalCaption').innerHTML = caption;
+            modal.style.display = "flex";
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const headings = document.querySelectorAll('article .content-card h2');
+            const sidebarToc = document.getElementById('sidebarToc');
+            if (headings.length && sidebarToc) {
+                sidebarToc.innerHTML = '';
+                headings.forEach((heading, index) => {
+                    const id = heading.textContent.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+                    heading.id = id || `section-${index}`;
+                    const link = document.createElement('a');
+                    link.href = `#${heading.id}`;
+                    link.className = 'nav-link';
+                    link.innerHTML = `<i class="fas fa-chevron-right"></i><span>${heading.textContent.replace('#', '').trim()}</span>`;
+                    sidebarToc.appendChild(link);
+                });
+                document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const t = document.querySelector(this.getAttribute('href'));
+                        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                });
+                window.addEventListener('scroll', function() {
+                    let current = '';
+                    const scrollPos = window.scrollY + 120;
+                    headings.forEach(heading => {
+                        const s = heading.closest('.content-card');
+                        if (s && scrollPos >= s.offsetTop && scrollPos < s.offsetTop + s.offsetHeight) current = heading.id;
+                    });
+                    document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+                    });
+                });
+            }
+            const bind = (id, modal) => { const el = document.getElementById(id); if (el) el.addEventListener('click', e => { e.preventDefault(); document.getElementById(modal).style.display = 'flex'; }); };
+            bind('toxLink', 'toxModal'); bind('emailLink', 'emailModal'); bind('responsabilidadLink', 'responsabilidadModal');
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', closeAllModals));
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) closeAllModals(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+        });
+        function copyCommand(cmd) { navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado al portapapeles'), () => alert('Error al copiar')); }
+        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('Copiado al portapapeles'), () => alert('Error al copiar')); }
+        function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('imageModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        window.openImageModal = openImageModal; window.closeImageModal = closeImageModal;
+    </script>
+</body>
+</html>

@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cracking WPA/WPA2 con Aircrack-ng · R3LI4NT</title>
+    <meta name="description" content="Actualmente, la mayor parte de los usuarios tiene un router / módem Wi-Fi para conectarse a Internet de forma inalámbrica desde varios dispositivos. Éstos...">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/x-icon" href="../../img/favicon.ico">
+    <style>
+        .article-metadata {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--accent-primary);
+            width: 20px;
+        }
+
+        .metadata-item strong {
+            color: var(--text-primary);
+            margin-right: 0.3rem;
+        }
+
+        .tag-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .article-tag {
+            padding: 0.3rem 1rem;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .article-tag:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 59, 59, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            background: rgba(59, 123, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .tip-box {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .command-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-block pre {
+            margin: 0;
+            color: #b3ff9e;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-prompt {
+            color: var(--accent-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-copy:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .image-container {
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            background-color: rgba(0, 10, 0, 0.5);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .image-container:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 25px var(--glow-color);
+            transform: scale(1.01);
+        }
+
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+        }
+
+        .clickable-image {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clickable-image:hover {
+            filter: brightness(1.2);
+        }
+
+        .image-caption {
+            margin-top: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .zoom-hint {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            margin-left: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .image-container:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        .external-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .external-link:hover {
+            color: white;
+            border-bottom-color: white;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .pagination-article {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .pagination-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination-link.prev i {
+            margin-right: 0.5rem;
+        }
+
+        .pagination-link.next i {
+            margin-left: 0.5rem;
+        }
+
+        .related-articles {
+            margin: 3rem 0;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px var(--glow-color);
+        }
+
+        .related-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .related-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(0, 10, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--accent-primary);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(0, 255, 157, 0.05);
+            color: var(--text-primary);
+        }
+
+        .comparison-table code {
+            color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        #sidebarToc {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        #sidebarToc::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #sidebarToc::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        #sidebarToc .nav-link {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        #sidebarToc .nav-link.active {
+            border-left-color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--accent-primary);
+        }
+
+        #sidebarToc .nav-link i {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .article-metadata {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .pagination-article {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #imageModal .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 0 50px var(--glow-color);
+            animation: zoom 0.3s ease-in-out;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #imageModal .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1001;
+            text-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        #imageModal .modal-close:hover {
+            color: var(--accent-primary);
+            transform: rotate(90deg);
+        }
+
+        #imageModal .modal-caption {
+            margin: 20px auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .download-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 255, 157, 0.2));
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-primary);
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* ===== Responsive movil mejorado (Android / iPhone) ===== */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; }
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+            img { max-width: 100%; height: auto; }
+            .glitch-wrapper { font-size: 2rem !important; word-break: break-word; line-height: 1.2; }
+            .glitch { word-break: break-word; }
+            .glitch::before, .glitch::after { display: none; }
+            .hero-description { font-size: 1.05rem; }
+            .section-title { font-size: 1.3rem; }
+            .breadcrumb { flex-wrap: wrap; row-gap: 0.3rem; font-size: 0.82rem; }
+            .article-metadata { flex-wrap: wrap; gap: 0.6rem; }
+            .tag-container { flex-wrap: wrap; }
+            .content-card { padding: 1.25rem; }
+            .command-block { padding: 1rem; padding-top: 2.6rem; font-size: 0.85rem; }
+            .command-block pre { white-space: pre-wrap; word-break: break-word; }
+            .comparison-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .article-full a, .article-full code { word-break: break-word; overflow-wrap: anywhere; }
+            #imageModal .modal-content { max-width: 94%; max-height: 78%; }
+            #imageModal .modal-caption { width: 92%; font-size: 0.95rem; }
+            #imageModal .modal-close { top: 10px; right: 16px; font-size: 34px; }
+        }
+        @media (max-width: 480px) {
+            .glitch-wrapper { font-size: 1.55rem !important; }
+            .hero-description { font-size: 0.98rem; }
+            .section-title { font-size: 1.12rem; }
+            .article-full { font-size: 0.95rem; }
+            .content-card { padding: 1rem; }
+            .command-block { font-size: 0.78rem; padding: 0.85rem; padding-top: 2.6rem; }
+            .article-metadata { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header class="hero" style="min-height: 40vh;">
+            <div class="hero-content">
+                <div class="glitch-wrapper" style="font-size: 2.2rem;">
+                    <div class="glitch" data-text="Cracking WPA/WPA2 con Aircrack-ng">Cracking WPA/WPA2 con Aircrack-ng</div>
+                </div>
+                <p class="hero-description" style="font-size: 1.05rem;">&gt; Actualmente, la mayor parte de los usuarios tiene un router / módem Wi-Fi para conectarse a Internet de forma inalámbrica desde varios dispositivos. Éstos... <span class="os-badge linux" style="margin-left:.6rem;"><i class="fab fa-linux"></i> Linux</span></p>
+                <div class="article-metadata">
+                    <span class="metadata-item"><i class="fas fa-user-secret"></i><strong>Autor:</strong> R3LI4NT</span>
+                    <span class="metadata-item"><i class="fas fa-tag"></i><strong>Categoría:</strong> Hacking</span>
+                    <span class="metadata-item"><i class="fas fa-shield-halved"></i><strong>Nivel:</strong> Práctico</span>
+                </div>
+                <div class="tag-container">
+                    <span class="article-tag"><i class="fab fa-linux"></i> Linux</span>
+                    <span class="article-tag"><i class="fas fa-folder-open"></i> Redes &amp; Wireless</span>
+                    <span class="article-tag"><i class="fas fa-graduation-cap"></i> Educativo</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="breadcrumb" style="margin: 1rem 0;">
+            <a href="../../index.html" class="breadcrumb-link"><i class="fas fa-home"></i> Inicio</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="../../index.html#hacking" class="breadcrumb-link"><i class="fas fa-skull"></i> Hacking</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-link">Redes &amp; Wireless</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Cracking WPA/WPA2 con Aircrack-ng</span>
+        </div>
+
+        <div class="main-grid">
+            <main>
+                <article class="article-full">
+                    <section class="content-card" id="cifrado-wpawpa2-0">
+                        <h2 class="section-title"><span class="hash">#</span> CIFRADO WPA/WPA2</h2>
+                        <p>Actualmente, la mayor parte de los usuarios tiene un router / módem Wi-Fi para conectarse a Internet de forma inalámbrica desde varios dispositivos. Éstos están diseñados con algoritmos de cifrados para evitar que usuarios no autorizados puedan conectarse de forma inalámbrica a nuestro router, robar conexión e incluso sniffear todo el tráfico de nuestros dispositivos en la red local. Los routers ofrecen varios tipos de cifrados y contraseñas de datos diferentes, sin embargo, no todos son iguales. </p>
+<p>El cifrado WPA fue diseñado en el año 2003, cuyo propósito es autenticar al usuario a través del protocolo 802.1x con claves precompartida. Utiliza el algoritmo RC4 para fortalecer el cifrado WEP con una clave de 128 bits y un vector de inicialización de 48 bits para cada vector transmitido, lo que le permite ser menos vulnerable que WEP. Este sistema ofrece una serie de variantes:</p>
+<ul>
+<li>
+<p><strong>WPA-Personal:</strong> Utiliza un sistema de claves PSK donde el administrador debe especificar su propia contraseña para que los usuarios puedan conectarse a la red, simplificando el acceso.</p>
+</li>
+<li>
+<p><strong>RADIUS:</strong> Utiliza un sistema de seguridad basado en un servidor en el que los usuarios deben autenticarse con un usuario y una contraseña diferente. Esta enfocado para empresas.</p>
+</li>
+</ul>
+<p>WPA tiene un método de encriptación menos seguro y requiere de una contraseña más corta, al igual que WPA2, puede ser violentado al realizar un ataque de fuerza bruta para penetrar la red.</p>
+<p>El cifrado WPA2 fue diseñado en el año 2004 y es la versión certificada del 802.11i. Tiene mayor seguridad y es más simple de configurar, utiliza el estándar de cifrado avanzado (AES) en lugar de TKIP. AES es utilizado por la NSA para proteger información gubernamental de alto secreto, lo que fue útil para proteger dispositivos que estén conectados al Wi-Fi. Este sistema ofrece una serie de variantes:</p>
+<ul>
+<li>
+<p><strong>WPA2-Personal:</strong> Otorga seguridad a través de contraseña compleja, ideal para uso doméstico o pequeñas empresas.</p>
+</li>
+<li>
+<p><strong>WPA2-Enterprise:</strong> Utiliza un servidor para autenticar a los usuarios, ideal para grandes empresas.</p>
+</li>
+</ul>
+<p>
+  <figure class="image-container" onclick="openImageModal('../img/wpa_wpa2.png', 'Ilustración del procedimiento')"><img src="../img/wpa_wpa2.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+                    </section>
+                    <section class="content-card" id="ataque-de-fuerza-bruta-1">
+                        <h2 class="section-title"><span class="hash">#</span> Ataque de Fuerza Bruta</h2>
+                        <p>En el campo de la criptografía, la fuerza bruta es descrita como un método para recuperar claves, nombres de usuarios o directorios de un servidor web probando todas las combinaciones posibles. Para llevar a cabo el ataque, el atacante hace uso de un diccionario (documento de texto con salto de línea) en donde registra las posibles contraseñas débiles para descifrarla y ganar acceso. Dependiendo la herramienta, el procesador del equipo y el diccionario a utilizar, adivinar la contraseña requiere de mucho tiempo si no se cuenta con una enumeración detallada (palabras claves, caracteres especiales, números, símbolos, etc) que pueda dar con la misma. La fuerza bruta no es solo empleada para adivinar claves Wi-Fi, sino también para acceder a cuentas personales en redes sociales o bancos. En el caso de las redes sociales no es muy eficaz, pues, la mayoría de ellas cuentan con un sistema de protección y/o autenticación que límita el acceso a usuarios malintencionados (sobre todo para evitar que entren bots), dejando el ataque inutilizable; muchas veces se utilizan <strong>user-agents</strong> para simular las peticiones HTTP desde dispositivos diferentes.</p>
+<p><ins><strong>Tipos de ataques de fuerza bruta:</strong></ins></p>
+<ul>
+<li>
+<p>Ataque por Diccionario: Su lógica es muy sencilla, consiste en probar todas las palabras del diccionario hasta averiguar con la contraseña. Este método de cracking es poco eficaz si la contraseña es muy fuerte (combinaciones de caracteres especiales y/o muy larga). En Internet hay diccionarios públicos para utilizar, la mayoría de ellos traen contraseñas débiles y más utilizadas que han sido recolectadas por usuarios (Ej: <a href="https://github.com/praetorian-inc/Hob0Rules/blob/master/wordlists/rockyou.txt.gz" target="_blank" class="external-link">rockyou</a>). Lo recomedable para llevar este ataque y tener éxito es crear un diccionario propio donde combinemos datos personales del objetivo (edad, nombres, direcciones, números teléfonicos, fechas, pasatiempos, gustos, etc). Si la víctima habla español, es una perdida de tiempo utilizar diccionarios con palabras en inglés (Ej: hello, john, iloveyou, etc) y tampoco utilizarían contraseñas fáciles de descifrar (Ej: nombre1234, fecha-de-cumpleaños, nombre-de-su-mascota123, etc). Un ataque de diccionario difícilmente tiene éxito si la contraseña es una frase larga.</p>
+</li>
+<li>
+<p>Ataque de Tabla Arcoíris: Las rainbow tables (tablas arcoíris) son las más potentes para cracking de hash. Suele utilizarse para romper contraseñas que han sido cifradas en un hash, parten desde un conjunto enorme de hashes precalculados que se combinan entre sí en todos los caracteres especiales, letras y símbolos. En una tabla arcoíris puede caber más de 100.000 palabras en una sola fila, el valor del hash de un servidor web se compara con la lista de valores hash de la tabla Rainbow, el texto se compara con la contraseña a descifrar. El hash se reduce para obtener el siguiente texto original en la cadena, se recorre toda la cadena hasta llegar a un valor hash que coincida con la contraseña. Las Rainbow Tables son específicas con los caracteres empleados en la contraseña, es decir, si una contraseña es demasiada larga o utiliza caracteres que no están en la tabla, entonces no puede ser descifrada; normalmente pueden contener miles de millones de hashes. </p>
+</li>
+<li>
+<p>Ataque Inverso (password spraying): En este caso se empieza por el final. El atacante empieza con una contraseña conocida e irá probando con una lista de miles de usuarios hasta encontrar una coincidencia. Para ello, necesitará recolectar en Internet una base de datos pública que contenga nombre de usuarios filtrados.</p>
+</li>
+</ul>
+                    </section>
+                    <section class="content-card" id="handshake-2">
+                        <h2 class="section-title"><span class="hash">#</span> Handshake</h2>
+                        <p>Cuando nos conectamos a una red inalámbrica ya sea pública o privada, en el aire están viajando miles de datos que se transmiten desde el punto de acceso (AP) hacia los dispositivos, uno de esos datos es la contraseña cifrada; que obviamente solo es posible capturarla con una herramienta específica. El protocolo de enlace de autenticación de WPA/WPA2 entre el punto de acceso (AP) y el cliente se utiliza para generar claves de cifrado, mismas que luego son utilizadas para cifrar los datos que son envíados a través de un medio inalámbrico. El handshake es capturado cuando el usuario es autenticado de forma automática a la red, por ejemplo, cuando salimos de casa el Wi-Fi del router es desconectado ya que su alcance es de algunos metros, pero al volver nuestro celular reconoce el AP y se conecta solo. Para entenderlo mejor, para capturar el handhsake (contraseña cirada) es preciso desconectar al cliente de la red y que se vuelva a conectar, para ello se realiza un <a href="desautenticacion.html" target="_blank" class="external-link">ataque de desautenticación</a> o en el caso de no haber clientes conectados, un <a href="autenticacion.html" target="_blank" class="external-link">ataque de autenticación</a>.</p>
+<ul>
+<li>
+<p><strong>Activa:</strong> Se acelera el proceso al desautenticar un cliente de la red inalámbrica.</p>
+</li>
+<li>
+<p><strong>Pasiva:</strong> Se espera que un cliente se autentifique a la red inalámbrica.</p>
+</li>
+</ul>
+<p>Es necesario contar con un adaptador de red externo para capturar los paquetes que viajan en el aire, los más vendidos son los que se observa en la imagen. También es posible llevar el ataque a través de un USB booteable pero el alcance es limitado.</p>
+<p>
+  <figure class="image-container" onclick="openImageModal('../img/adaptadores_wifi.png', 'Ilustración del procedimiento')"><img src="../img/adaptadores_wifi.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+                    </section>
+                    <section class="content-card" id="aircrack-ng-cracking-wpawpa2-3">
+                        <h2 class="section-title"><span class="hash">#</span> AIRCRACK-NG | Cracking WPA/WPA2</h2>
+                        <p>La suite de Aircrack-ng es una de las más destacada para realizar auditorías de redes inalámbricas Wi-Fi a routers y puntos de acceso. Soporta cracking de cifrado WEP, WPA y WPA2. Esta suite se divide en diferentes herramientas para una tarea en concreto:</p>
+<ul>
+<li>
+<p><strong>Airmon-ng:</strong> Coloca la tarjeta en modo monitor para capturar e inyectar paquetes de nuestro alrededor.</p>
+</li>
+<li>
+<p><strong>Airodump-ng:</strong> Escanea puntos de acceso y captura vectores de inicio.</p>
+</li>
+<li>
+<p><strong>Airplay-ng:</strong> Inyecta paquetes, genera tráfico no autorizado para utilizarlo luego (Ataque de autenticación/desautenticación).</p>
+</li>
+<li>
+<p><strong>Aircrack-ng:</strong> Descifra la clave de los vectores de inicio.</p>
+</li>
+</ul>
+<p>La suite de seguridad se divide en cuatro áreas de la ciberseguridad en redes inalámbricas:</p>
+<ul>
+<li>
+<p><strong>Monitoreo:</strong> Permite capturar todos los paquetes de una red inalámbrica, exportar los datos a archivos de texto y posteriormente analizarlos con otros programas (Ej: Wireshark).</p>
+</li>
+<li>
+<p><strong>Vectores de ataques:</strong> Es útil para realizar ataques de desautenticación, autenticación, crear puntos de acceso falsos, inyectar paquetes en la red inalámbrica, hacer ataques replay.</p>
+</li>
+<li>
+<p><strong>Testing:</strong> Comprueba si nuestra tarjeta de red Wi-Fi es compatible con el modo monitor y con los ataques anteriormente mencionados.</p>
+</li>
+<li>
+<p><strong>Cracking:</strong> Permite crackear el cifrado WEP, WPA y WPA2 basado en diccionario por fuerza bruta.</p>
+</li>
+</ul>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sudo apt-get install aircrack-ng')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sudo apt-get install aircrack-ng</pre></div>
+                    </section>
+                    <section class="content-card" id="detalles-4">
+                        <h2 class="section-title"><span class="hash">#</span> Detalles</h2>
+                        <p>En primer lugar, hay identificar nuestra interfaz de red con <code>ifconfig</code>:</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190929261-0ca89880-d238-460d-9ace-a1c60110e173.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190929261-0ca89880-d238-460d-9ace-a1c60110e173.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Con el parámetro <code>airmon-ng</code> <strong>+</strong> <code>nombre-interfaz</code> establecemos nuestro adaptador en modo monitor:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('airmon-ng start wlan0')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> airmon-ng start wlan0</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190917100-a1f0ff1c-29ed-4946-aea7-fd0657ead3db.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190917100-a1f0ff1c-29ed-4946-aea7-fd0657ead3db.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Lo siguiente será matar los procesos PID para no presentar ningún error al momento de auditar la red. Cada PID es único y se puede matar de forma manual o automática según su ID. Pero si lo preferimos, airmon lo hace automatizado por nosotros:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('airmon-ng check kill')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> airmon-ng check kill</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190917303-a59aad39-f5bb-45f3-9a85-ce5ae6eb4448.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190917303-a59aad39-f5bb-45f3-9a85-ce5ae6eb4448.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Lo más probable es que seamos desconectados del Wi-Fi. Con el parámetro <code>airodump-ng</code> <strong>+</strong> <code>nombre-interfaz</code> capturamos los paquetes de las redes de nuestro alrededor:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('airodump-ng wlan0')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> airodump-ng wlan0</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190917513-3429151f-86ae-442a-89db-3012bcecacea.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190917513-3429151f-86ae-442a-89db-3012bcecacea.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><strong>BSSID:</strong> Dirección MAC del punto de acceso.</p>
+<p><strong>PWR:</strong> Rango en el que se encuentra el AP.</p>
+<p><strong>Beacons:</strong> Número de paquetes enviados por el AP.</p>
+<p><strong>#Data:</strong> Número de paquetes capturados.</p>
+<p><strong>CH:</strong> Número de canal donde opera el AP.</p>
+<p><strong>MB:</strong> Velocidad máxima soportada por el AP. MB = 11 es 802.11b, si MB = 22 es 802.11b+ y hasta 54 son 802.11g.</p>
+<p><strong>ENC:</strong> Tipo de algoritmo de cifrado, generalmente las redes privadas utilizan WPA/WPA2 y WEP. En caso de ser una red pública, el algoritmo que utilizará es OPN = sin encriptación.</p>
+<p><strong>AUTH:</strong> Protocolo de autenticación utilizado.</p>
+<p><strong>ESSID:</strong> Nombre de la red inalámbrica.</p>
+<p>Luego de haber reconocido el BSSID y el canal, quedaría capturar los paquetes del AP objetivo:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('airodump-ng -c &lt;N-CHANNEL&gt; --bssid &lt;MAC-AP&gt; -w &lt;ARCHIVO-CAPTURA&gt; &lt;INTERFAZ&gt;\n\nEj: airodump-ng -c 7 --bssid XX:XX:XX:XX:XX:XX -w Reliant wlan0')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> airodump-ng -c &lt;N-CHANNEL&gt; --bssid &lt;MAC-AP&gt; -w &lt;ARCHIVO-CAPTURA&gt; &lt;INTERFAZ&gt;
+
+Ej: airodump-ng -c 7 --bssid XX:XX:XX:XX:XX:XX -w Reliant wlan0</pre></div>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">IMPORTANTE no cerrar esta terminal</h4>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190918202-5987590c-d12a-4c60-be28-9b577415239f.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190918202-5987590c-d12a-4c60-be28-9b577415239f.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>A modo de ejemplo, atacaré mi propia red (<strong><em>Unknown</em></strong>). La <code>STATION</code> son los clientes que están conectados la red (BSSID), en otra terminal proseguiremos a lanzar el ataque de desautenticación para desconectarlos con el parámetro <code>aireplay-ng</code>. Algo que hay que tener en cuenta es que el ataque de desautenticación puede ser llevado contra todos los clientes que estén conectados al punto de acceso o a uno en específico, personalmente recomiendo desconectar a un solo cliente para no generar sospechas:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('aireplay-ng --deauth &lt;SEGUNDOS&gt; -a &lt;MAC-AP&gt; -c &lt;MAC&gt; &lt;INTERFAZ&gt;\n\nEj: aireplay-ng --deauth 10 -a XX:XX:XX:XX:XX:XX -c XX:XX:XX:XX:XX:XX wlan0')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> aireplay-ng --deauth &lt;SEGUNDOS&gt; -a &lt;MAC-AP&gt; -c &lt;MAC&gt; &lt;INTERFAZ&gt;
+
+Ej: aireplay-ng --deauth 10 -a XX:XX:XX:XX:XX:XX -c XX:XX:XX:XX:XX:XX wlan0</pre></div>
+<p><strong>--deauth:</strong> Modo desautenticación. Al agregar el valor 0, el ataque es ílimitado provocando un DoS (Denegación de Servicio) a nivel red.</p>
+<p><strong>-a:</strong> Dirección MAC del punto de acceso (AP).</p>
+<p><strong>-c:</strong> Dirección MAC del cliente (STATION) conectado.</p>
+<p>En la esquina superior del lado derecho indica que el handshake fue capturado exitosamente, dependerá que tan lejos este el AP, esto quiere decir que se debe reintentar cuantas veces sea necesario para ser capturado.</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190919001-12c7abf5-dd94-452a-96b0-9780a6974de4.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190919001-12c7abf5-dd94-452a-96b0-9780a6974de4.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Por último, utilizamos el parámetro <code>aircrack-ng</code> para crackear la clave PSK por medio de fuerza bruta (ataque de diccionario), la longitud puede variar entre 6 y 63 caracteres. El archivo con extensión <code>.cap</code> es donde se encuentra la contraseña cifrada.</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190929527-c90ef4b7-55c1-4685-ab08-43c60b745bce.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190929527-c90ef4b7-55c1-4685-ab08-43c60b745bce.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('aircrack-ng -w &lt;DICCIONARIO&gt; &lt;ARCHIVO.cap&gt; ')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> aircrack-ng -w &lt;DICCIONARIO&gt; &lt;ARCHIVO.cap&gt; </pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/190929481-2b557995-c07d-4a92-b1a6-1218cdd507f4.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/190929481-2b557995-c07d-4a92-b1a6-1218cdd507f4.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>La herramienta probo 712 contraseñas en menos de 10 segundos, obviamente metí la contraseña real en el diccionario para acelerar el proceso. Reiternando lo que se ha dicho más arriba, este ataque requiere de mucho tiempo si el diccionario es extenso y la longitud de la contraseña también, por eso mismo se recomienda recabar información sensible del objetivo y a partir de ahí crear un diccionario con palabras claves.</p>
+                    </section>
+                    <section class="content-card" id="tips-de-seguridad-frente-a-este-ataque-5">
+                        <h2 class="section-title"><span class="hash">#</span> TIPS DE SEGURIDAD FRENTE A ESTE ATAQUE</h2>
+                        <p>No existe una medida que garantice una protección estable contra los ataques de desautenticación, el mecanismo de protección se basa en engañar al atacante desde un segundo router con salida a internet, el cual se configura con el mismo nombre (SSID) y cifrado para que cuando el ataque sea ejecutado, los clientes automáticamente se conectarán al segundo punto de acceso y sigan navegando sin problemas (se le conoce como Roaming AP). Ahora bien, si el atacante tiene dos antenas, entonces puede ejecutar doble ataque de desautenticación contra el segundo router y de nada serviría lo anterior. Algunos provedores de servicio (ISP) establecen la contraseña del router por defecto, misma que esta al alcance de todos, es por ello que se recomienda no solo cambiarla, sino también utilizar combinaciones de números y símbolos para que sea más difícil de descifrar, tal como una frase. Los filtrados de MAC puede ser una opción para expulsar clientes no autorizados del Wi-Fi, pero también es fácil de burlar la seguridad con un reconocimiento de paquetes (<strong>STATION</strong>) que permitan suplantar la dirección MAC de un usuario autorizado dentro de la lista.</p>
+<ul>
+<li>
+<p><a href="desautenticacion.html" target="_blank" class="external-link">Cómo funciona un ataque de desautenticación Wi-Fi</a> </p>
+</li>
+<li>
+<p><a href="autenticacion.html" target="_blank" class="external-link">Cómo funciona un ataque de autenticación Wi-Fi</a></p>
+</li>
+</ul>
+                    </section>
+                    <section class="content-card" id="responsabilidad-final">
+                        <div class="warning-box">
+                            <i class="fas fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 1rem;"></i>
+                            <strong>Advertencia:</strong> Todo el contenido de este artículo es estrictamente educativo.
+                            No nos hacemos responsables del mal uso de esta herramienta o información. Practica únicamente
+                            en entornos controlados y con autorización.
+                        </div>
+                    </section>
+                </article>
+            </main>
+
+            <aside class="sidebar">
+                <div class="profile-card">
+                    <div class="avatar">
+                        <img src="https://avatars.githubusercontent.com/u/75953873?v=4" alt="R3LI4NT Avatar"
+                             style="width: 100%; height: 100%; border-radius: 30px; object-fit: cover;" loading="lazy">
+                    </div>
+                    <h3 class="profile-name">R3LI4NT</h3>
+                    <p class="profile-bio">Pentester · Malware Developer</p>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div><div class="stat-number">51</div><div class="stat-label">Artículos</div></div>
+                        <div><div class="stat-number">3</div><div class="stat-label">Categorías</div></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-list"></i><span>EN ESTE ARTÍCULO</span></div>
+                    <div class="category-nav" id="sidebarToc"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-folder"></i><span>CATEGORÍAS</span></div>
+                    <div class="category-nav">
+                        <a href="../../index.html#ciberseguridad" class="nav-link"><i class="fas fa-lock" style="color: #00ff9d;"></i><span>Ciberseguridad</span></a>
+                        <a href="../../index.html#hacking" class="nav-link"><i class="fas fa-skull" style="color: #ff3b3b;"></i><span>Hacking</span></a>
+                        <a href="../../index.html#seguridad" class="nav-link"><i class="fas fa-shield-halved" style="color: #3b7bff;"></i><span>Seguridad</span></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <a href="https://github.com/R3LI4NT/articulos" target="_blank" style="text-decoration: none;">
+                        <div style="background: linear-gradient(135deg, #00ff9d, #7000ff); padding: 1.5rem; border-radius: 20px; text-align: center; color: white;">
+                            <i class="fab fa-github" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: 600;">github.com/R3LI4NT/articulos</div>
+                            <div style="font-size: 0.8rem; opacity: 0.9;">Ver repositorio →</div>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">R3LI4NT_</div>
+                    <p class="footer-tagline">Conocimiento es poder, pero poder compartido es revolución.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/R3LI4NT" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link" id="toxLink"><i class="fa-brands fa-expeditedssl"></i></a>
+                        <a href="#" class="social-link" id="emailLink"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="../../index.html#ciberseguridad">Ciberseguridad</a></li>
+                        <li><a href="../../index.html#hacking">Hacking</a></li>
+                        <li><a href="../../index.html#seguridad">Seguridad</a></li>
+                        <li><a href="../../index.html">Todos los artículos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="https://github.com/R3LI4NT/articulos" target="_blank">GitHub</a></li>
+                        <li><a href="https://r3li4nt.github.io/" target="_blank">Currículum Vitae</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul><li><a href="#" id="responsabilidadLink">Responsabilidad</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 R3LI4NT · Todos los derechos reservados.</p>
+                <div class="matrix-code">{ 0x52, 0x33, 0x4c, 0x49, 0x34, 0x4e, 0x54 }</div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toxModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fa-brands fa-expeditedssl"></i></div>
+                <h2 class="modal-title">Tox ID</h2>
+                <div class="modal-info"><span class="modal-label">Tox ID:</span></div>
+                <div class="modal-complete"><code class="modal-code" style="font-size: 0.8rem; word-break: break-all;">08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426')"><i class="fas fa-copy"></i> Copiar Tox ID</button>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;"><i class="fas fa-info-circle"></i> Tox para comunicación segura</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-envelope"></i></div>
+                <h2 class="modal-title">Contacto</h2>
+                <div class="modal-info"><span class="modal-label">Email:</span><span class="modal-value">r3li4nt.contact</span></div>
+                <div class="modal-info"><span class="modal-label">Dominio:</span><span class="modal-value">keemail.me</span></div>
+                <div class="modal-complete"><code class="modal-code">r3li4nt.contact@keemail.me</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('r3li4nt.contact@keemail.me')"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="responsabilidadModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-gavel"></i></div>
+                <h2 class="modal-title">Responsabilidad</h2>
+                <div class="modal-info" style="text-align: center; margin: 2rem 0;"><span class="modal-label" style="font-size: 1.2rem;">⚠️ AVISO IMPORTANTE ⚠️</span></div>
+                <div class="modal-complete" style="margin: 1.5rem 0;"><p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; text-align: center;">Todo lo que se enseñe en estos artículos es con fines educativos</p></div>
+                <button class="modal-copy-btn" onclick="closeAllModals()"><i class="fas fa-check"></i> Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage" alt="Imagen ampliada">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        function openImageModal(src, caption) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImage').src = src;
+            document.getElementById('modalCaption').innerHTML = caption;
+            modal.style.display = "flex";
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const headings = document.querySelectorAll('article .content-card h2');
+            const sidebarToc = document.getElementById('sidebarToc');
+            if (headings.length && sidebarToc) {
+                sidebarToc.innerHTML = '';
+                headings.forEach((heading, index) => {
+                    const id = heading.textContent.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+                    heading.id = id || `section-${index}`;
+                    const link = document.createElement('a');
+                    link.href = `#${heading.id}`;
+                    link.className = 'nav-link';
+                    link.innerHTML = `<i class="fas fa-chevron-right"></i><span>${heading.textContent.replace('#', '').trim()}</span>`;
+                    sidebarToc.appendChild(link);
+                });
+                document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const t = document.querySelector(this.getAttribute('href'));
+                        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                });
+                window.addEventListener('scroll', function() {
+                    let current = '';
+                    const scrollPos = window.scrollY + 120;
+                    headings.forEach(heading => {
+                        const s = heading.closest('.content-card');
+                        if (s && scrollPos >= s.offsetTop && scrollPos < s.offsetTop + s.offsetHeight) current = heading.id;
+                    });
+                    document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+                    });
+                });
+            }
+            const bind = (id, modal) => { const el = document.getElementById(id); if (el) el.addEventListener('click', e => { e.preventDefault(); document.getElementById(modal).style.display = 'flex'; }); };
+            bind('toxLink', 'toxModal'); bind('emailLink', 'emailModal'); bind('responsabilidadLink', 'responsabilidadModal');
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', closeAllModals));
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) closeAllModals(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+        });
+        function copyCommand(cmd) { navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado al portapapeles'), () => alert('Error al copiar')); }
+        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('Copiado al portapapeles'), () => alert('Error al copiar')); }
+        function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('imageModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        window.openImageModal = openImageModal; window.closeImageModal = closeImageModal;
+    </script>
+</body>
+</html>

