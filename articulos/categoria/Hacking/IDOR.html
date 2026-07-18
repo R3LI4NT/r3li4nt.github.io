@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerabilidad Insecure Direct Object Reference · R3LI4NT</title>
+    <meta name="description" content="Una Insecure Direct Object Reference (IDOR) es una vulnerabilidad de seguridad que ocurre cuando una aplicación permite acceder directamente a un recurso...">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/x-icon" href="../../img/favicon.ico">
+    <style>
+        .article-metadata {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--accent-primary);
+            width: 20px;
+        }
+
+        .metadata-item strong {
+            color: var(--text-primary);
+            margin-right: 0.3rem;
+        }
+
+        .tag-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .article-tag {
+            padding: 0.3rem 1rem;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .article-tag:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 59, 59, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            background: rgba(59, 123, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .tip-box {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .command-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-block pre {
+            margin: 0;
+            color: #b3ff9e;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-prompt {
+            color: var(--accent-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-copy:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .image-container {
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            background-color: rgba(0, 10, 0, 0.5);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .image-container:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 25px var(--glow-color);
+            transform: scale(1.01);
+        }
+
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+        }
+
+        .clickable-image {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clickable-image:hover {
+            filter: brightness(1.2);
+        }
+
+        .image-caption {
+            margin-top: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .zoom-hint {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            margin-left: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .image-container:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        .external-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .external-link:hover {
+            color: white;
+            border-bottom-color: white;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .pagination-article {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .pagination-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination-link.prev i {
+            margin-right: 0.5rem;
+        }
+
+        .pagination-link.next i {
+            margin-left: 0.5rem;
+        }
+
+        .related-articles {
+            margin: 3rem 0;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px var(--glow-color);
+        }
+
+        .related-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .related-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(0, 10, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--accent-primary);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(0, 255, 157, 0.05);
+            color: var(--text-primary);
+        }
+
+        .comparison-table code {
+            color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        #sidebarToc {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        #sidebarToc::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #sidebarToc::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        #sidebarToc .nav-link {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        #sidebarToc .nav-link.active {
+            border-left-color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--accent-primary);
+        }
+
+        #sidebarToc .nav-link i {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .article-metadata {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .pagination-article {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #imageModal .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 0 50px var(--glow-color);
+            animation: zoom 0.3s ease-in-out;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #imageModal .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1001;
+            text-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        #imageModal .modal-close:hover {
+            color: var(--accent-primary);
+            transform: rotate(90deg);
+        }
+
+        #imageModal .modal-caption {
+            margin: 20px auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .download-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 255, 157, 0.2));
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-primary);
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* ===== Responsive movil mejorado (Android / iPhone) ===== */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; }
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+            img { max-width: 100%; height: auto; }
+            .glitch-wrapper { font-size: 2rem !important; word-break: break-word; line-height: 1.2; }
+            .glitch { word-break: break-word; }
+            .glitch::before, .glitch::after { display: none; }
+            .hero-description { font-size: 1.05rem; }
+            .section-title { font-size: 1.3rem; }
+            .breadcrumb { flex-wrap: wrap; row-gap: 0.3rem; font-size: 0.82rem; }
+            .article-metadata { flex-wrap: wrap; gap: 0.6rem; }
+            .tag-container { flex-wrap: wrap; }
+            .content-card { padding: 1.25rem; }
+            .command-block { padding: 1rem; padding-top: 2.6rem; font-size: 0.85rem; }
+            .command-block pre { white-space: pre-wrap; word-break: break-word; }
+            .comparison-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .article-full a, .article-full code { word-break: break-word; overflow-wrap: anywhere; }
+            #imageModal .modal-content { max-width: 94%; max-height: 78%; }
+            #imageModal .modal-caption { width: 92%; font-size: 0.95rem; }
+            #imageModal .modal-close { top: 10px; right: 16px; font-size: 34px; }
+        }
+        @media (max-width: 480px) {
+            .glitch-wrapper { font-size: 1.55rem !important; }
+            .hero-description { font-size: 0.98rem; }
+            .section-title { font-size: 1.12rem; }
+            .article-full { font-size: 0.95rem; }
+            .content-card { padding: 1rem; }
+            .command-block { font-size: 0.78rem; padding: 0.85rem; padding-top: 2.6rem; }
+            .article-metadata { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header class="hero" style="min-height: 40vh;">
+            <div class="hero-content">
+                <div class="glitch-wrapper" style="font-size: 2.2rem;">
+                    <div class="glitch" data-text="Vulnerabilidad Insecure Direct Object Reference">Vulnerabilidad Insecure Direct Object Reference</div>
+                </div>
+                <p class="hero-description" style="font-size: 1.05rem;">&gt; Una Insecure Direct Object Reference (IDOR) es una vulnerabilidad de seguridad que ocurre cuando una aplicación permite acceder directamente a un recurso... </p>
+                <div class="article-metadata">
+                    <span class="metadata-item"><i class="fas fa-user-secret"></i><strong>Autor:</strong> R3LI4NT</span>
+                    <span class="metadata-item"><i class="fas fa-tag"></i><strong>Categoría:</strong> Hacking</span>
+                    <span class="metadata-item"><i class="fas fa-shield-halved"></i><strong>Nivel:</strong> Práctico</span>
+                </div>
+                <div class="tag-container">
+                    <span class="article-tag"><i class="fas fa-folder-open"></i> Web Pentesting</span>
+                    <span class="article-tag"><i class="fas fa-graduation-cap"></i> Educativo</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="breadcrumb" style="margin: 1rem 0;">
+            <a href="../../index.html" class="breadcrumb-link"><i class="fas fa-home"></i> Inicio</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="../../index.html#hacking" class="breadcrumb-link"><i class="fas fa-skull"></i> Hacking</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-link">Web Pentesting</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Vulnerabilidad Insecure Direct Object Reference</span>
+        </div>
+
+        <div class="main-grid">
+            <main>
+                <article class="article-full">
+                    <section class="content-card" id="vulnerabilidad-insecure-direct-object-reference-idor-0">
+                        <h2 class="section-title"><span class="hash">#</span> Vulnerabilidad Insecure Direct Object Reference (IDOR)</h2>
+                        <p>Una <strong>Insecure Direct Object Reference</strong> (IDOR) es una vulnerabilidad de seguridad que ocurre cuando una aplicación permite acceder directamente a un recurso (como un usuario, un archivo o un documento) utilizando un identificador, sin comprobar si el usuario que realiza la solicitud realmente tiene permiso para verlo. En otras palabras, el sistema verifica que el usuario haya iniciado sesión, pero no verifica si está autorizado a acceder al recurso solicitado.</p>
+<h2>¿Cómo funciona?</h2>
+<p>La mayoría de los sitios web/APIS utilizan identificadores para acceder a la información almacenada. Por ejemplo:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('https://ejemplo.com/perfil?id=125')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> https://ejemplo.com/perfil?id=125</pre></div>
+<p>En este caso, el número 125 representa el perfil de un usuario. Cuando un usuario inicia sesión, el servidor debería comprobar dos cosas:</p>
+<ul>
+<li>1) Que el usuario esté autenticado (es decir, que haya iniciado sesión).</li>
+<li>2) Que tenga autorización para acceder al recurso solicitado.</li>
+</ul>
+<p>Si solo se verifica el primer punto y se ignora el segundo, aparece una vulnerabilidad IDOR.</p>
+<p>
+  <figure class="image-container" onclick="openImageModal('../img/IDOR.png', 'Ilustración del procedimiento')"><img src="../img/IDOR.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+
+<h2>¿Qué información puede quedar expuesta?</h2>
+<p>Dependiendo de la aplicación afectada, un atacante podría acceder a:</p>
+<ol>
+<li>Información personal de otros usuarios.</li>
+<li>Facturas o historiales de compra.</li>
+<li>Documentos privados.</li>
+<li>Fotografías.</li>
+<li>Archivos almacenados.</li>
+<li>Mensajes internos.</li>
+<li>Datos financieros.</li>
+<li>Información confidencial de una organización.</li>
+</ol>
+<p>En algunos casos, además de leer información, también es posible modificarla o eliminarla si la aplicación no realiza las validaciones adecuadas.</p>
+<h2>Diferencia entre IDOR y BOLA</h2>
+<p>Tanto IDOR (Insecure Direct Object Reference) como BOLA (Broken Object Level Authorization) son vulnerabilidades relacionadas con fallas en el control de acceso, pero se diferencian principalmente por el contexto en el que se utilizan y su alcance.</p>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>IDOR</th>
+<th>BOLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Se refiere al acceso no autorizado a un recurso mediante la modificación de un identificador.</td>
+<td>Se refiere a la falta de autorización sobre cualquier objeto solicitado, independientemente de cómo se identifique.</td>
+</tr>
+<tr>
+<td>Es un término tradicional utilizado principalmente en aplicaciones web.</td>
+<td>Es el término utilizado por OWASP para describir este problema, especialmente en APIs.</td>
+</tr>
+<tr>
+<td>Generalmente implica cambiar un ID en una URL, parámetro o formulario.</td>
+<td>Puede ocurrir con IDs, UUID, tokens, JSON, GraphQL o cualquier referencia a un objeto.</td>
+</tr>
+<tr>
+<td>Se centra en la referencia directa al objeto.</td>
+<td>Se centra en el fallo de autorización a nivel de objeto.</td>
+</tr>
+</tbody>
+</table>
+                    </section>
+                    <section class="content-card" id="ejemplo-practico-1">
+                        <h2 class="section-title"><span class="hash">#</span> Ejemplo Práctico</h2>
+                        <p>Para ilustrar la explicación teórica, desarrollé tres aplicaciones web de ejemplo que contienen intencionalmente la vulnerabilidad IDOR. El objetivo es demostrar, de forma práctica, cómo este tipo de fallo puede ser explotado cuando una aplicación no implementa correctamente los controles de autorización. En la siguiente captura se observa un portal personal diseñado para gestionar información sensible. En este escenario, el usuario autenticado es <code>bruno</code>, quien únicamente debería poder acceder a sus propios datos.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/daa3a36e-e17e-4e11-9df8-4d6de8110be2', 'IDOR-1')"><img src="https://github.com/user-attachments/assets/daa3a36e-e17e-4e11-9df8-4d6de8110be2" alt="IDOR-1" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-1 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>La mayoría de las aplicaciones web y APIs identifican a cada usuario mediante un identificador único, como un ID o un nombre de usuario. En la siguiente captura puede observarse que el usuario autenticado <code>bruno</code> tiene asignado el ID 2, el cual se utiliza para acceder a la información de su perfil.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/ecdb4372-1d0e-48cd-86ee-6ee141e68215', 'IDOR-2')"><img src="https://github.com/user-attachments/assets/ecdb4372-1d0e-48cd-86ee-6ee141e68215" alt="IDOR-2" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-2 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>En condiciones normales, nuestro usuario únicamente debería tener permisos para acceder a su propia información. Sin embargo, al modificar manualmente el identificador en la solicitud (por ejemplo, cambiando el ID 2 por el ID 1), la aplicación devuelve los datos de otro usuario. Esto demuestra que el servidor no está validando correctamente si el usuario autenticado tiene autorización para acceder al recurso solicitado, dando lugar a una vulnerabilidad IDOR.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/a5239d6f-5611-4eff-864f-1d248e2b108a', 'IDOR-3')"><img src="https://github.com/user-attachments/assets/a5239d6f-5611-4eff-864f-1d248e2b108a" alt="IDOR-3" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-3 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Una vulnerabilidad IDOR no se limita únicamente a los perfiles de usuario. Puede afectar cualquier recurso al que la aplicación acceda mediante un identificador. Por ejemplo, un atacante podría obtener acceso no autorizado a documentos, fotografías, pólizas de seguros, facturas, historiales médicos, archivos almacenados o cualquier otro tipo de información sensible perteneciente a otros usuarios si la aplicación no valida correctamente los permisos de acceso.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/117d4379-b039-4ab8-bfba-19b8926867a7', 'IDOR-4')"><img src="https://github.com/user-attachments/assets/117d4379-b039-4ab8-bfba-19b8926867a7" alt="IDOR-4" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-4 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/eed5e28b-6f38-4d95-b64d-b3d11c569bdd', 'IDOR-5')"><img src="https://github.com/user-attachments/assets/eed5e28b-6f38-4d95-b64d-b3d11c569bdd" alt="IDOR-5" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-5 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>La segunda aplicación consiste en un sistema de gestión de proyectos. En este escenario, el usuario autenticado es <code>John Smith</code>, quien tiene acceso a dos proyectos de su propiedad. En condiciones normales, únicamente debería poder visualizar y administrar los proyectos que le pertenecen.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/678d439c-f9dd-4c36-a53e-ddd75b0b7392', 'IDOR-6')"><img src="https://github.com/user-attachments/assets/678d439c-f9dd-4c36-a53e-ddd75b0b7392" alt="IDOR-6" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-6 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/82cb39d1-628e-42b9-be5a-5c5e6e4b43be', 'IDOR-7')"><img src="https://github.com/user-attachments/assets/82cb39d1-628e-42b9-be5a-5c5e6e4b43be" alt="IDOR-7" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-7 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Observamos que el usuario <code>John Smith</code> puede acceder a los proyectos de otros usuarios registrados en la aplicación únicamente conociendo su ID.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/3df6eed9-2e37-4be1-a3c0-6fb4f2a4cd27', 'IDOR-8')"><img src="https://github.com/user-attachments/assets/3df6eed9-2e37-4be1-a3c0-6fb4f2a4cd27" alt="IDOR-8" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-8 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>La tercera aplicación corresponde a un sistema de gestión de facturas. En este escenario, el usuario autenticado es <code>Robert Johnson</code>, quien tiene asociadas tres facturas: INV001, INV002 e INV006. En condiciones normales, únicamente debería poder acceder a las facturas que le pertenecen.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/eadc8dfa-3110-4692-b332-c7e4b02ab81e', 'IDOR-9')"><img src="https://github.com/user-attachments/assets/eadc8dfa-3110-4692-b332-c7e4b02ab81e" alt="IDOR-9" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-9 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/de68bd0e-6ea8-4747-9235-11f1dd78961c', 'IDOR-10')"><img src="https://github.com/user-attachments/assets/de68bd0e-6ea8-4747-9235-11f1dd78961c" alt="IDOR-10" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-10 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>El usuario <code>Robert Johnson</code> puede acceder a facturas de otros usuarios registrado en la aplicación.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/ffd51b84-991c-4d2b-9905-983e08db45d4', 'IDOR-11')"><img src="https://github.com/user-attachments/assets/ffd51b84-991c-4d2b-9905-983e08db45d4" alt="IDOR-11" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-11 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Uno de los escenarios más críticos de una vulnerabilidad IDOR no es únicamente la lectura de información perteneciente a otros usuarios, sino la posibilidad de modificarla. Si la aplicación no valida correctamente los permisos sobre el recurso solicitado, un atacante puede alterar datos que no le pertenecen.</p>
+<p>En el siguiente ejemplo se observa cómo, mediante una solicitud HTTP con el método PUT, es posible modificar una factura de otro usuario. Para ello, se envía la cabecera <code>Content-Type: application/json</code> y, en el cuerpo de la solicitud, el siguiente contenido:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('{\n  &quot;monto&quot;: 50000\n}')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> {
+  &quot;monto&quot;: 50000
+}</pre></div>
+<p>Si el servidor procesa esta solicitud sin verificar que el usuario autenticado tenga autorización para modificar esa factura, el monto será actualizado, evidenciando una vulnerabilidad IDOR con capacidad de escritura, un escenario considerablemente más grave que la simple exposición de información.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/41fbff9a-4bca-479b-aaed-ab17c1d13cba', 'IDOR-12')"><img src="https://github.com/user-attachments/assets/41fbff9a-4bca-479b-aaed-ab17c1d13cba" alt="IDOR-12" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-12 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Personalmente, durante las pruebas de penetración autorizadas que he realizado para distintos clientes, me he encontrado con varias vulnerabilidades de tipo IDOR. Es un fallo más común de lo que muchos creen, especialmente en aplicaciones que manejan usuarios, documentos, facturas, proyectos o cualquier otro recurso identificado mediante un ID.</p>
+<p>Por eso, siempre que durante un análisis vean que un recurso tiene un identificador propio (por ejemplo, un ID), vale la pena comprobar si la aplicación está validando correctamente los permisos de acceso sobre ese recurso. En muchos casos, una simple modificación del identificador permite descubrir que el servidor no está realizando las comprobaciones de autorización necesarias. También es habitual automatizar este tipo de verificaciones enviando múltiples solicitudes con distintos identificadores y luego analizar las respuestas del servidor para detectar posibles fallos de control de acceso de forma más rápida y eficiente; para ello pueden usar el Intruder de Burp Suite.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/53d841e3-1c40-4110-9810-95c94abc056e', 'IDOR-13')"><img src="https://github.com/user-attachments/assets/53d841e3-1c40-4110-9810-95c94abc056e" alt="IDOR-13" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-13 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/user-attachments/assets/e13c5ff6-56b8-4c5d-b848-5a83573e3ca4', 'IDOR-14')"><img src="https://github.com/user-attachments/assets/e13c5ff6-56b8-4c5d-b848-5a83573e3ca4" alt="IDOR-14" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">IDOR-14 <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="buenas-practicas-de-seguridad-frente-a-vulnerabilidades-idor-2">
+                        <h2 class="section-title"><span class="hash">#</span> BUENAS PRÁCTICAS DE SEGURIDAD FRENTE A VULNERABILIDADES IDOR</h2>
+                        <p>Las vulnerabilidades IDOR pueden prevenirse implementando correctamente los controles de autorización en la aplicación. A continuación, se presentan algunas de las principales recomendaciones para reducir el riesgo.</p>
+<p><code>1. Validar siempre la autorización en el servidor:</code> La medida más importante es comprobar, en cada solicitud, que el usuario autenticado tiene permisos para acceder al recurso solicitado. No basta con verificar que el usuario haya iniciado sesión; también debe validarse que el recurso le pertenece o que tiene autorización para interactuar con él.</p>
+<p><code>2. No confiar en los datos enviados por el cliente:</code> Nunca se debe asumir que los identificadores (IDs, UUIDs, nombres de archivo, etc.) enviados por el navegador son válidos o legítimos. Todos los parámetros recibidos deben considerarse potencialmente manipulables y validarse del lado del servidor.</p>
+<p><code>3. Aplicar el principio de mínimo privilegio:</code> Cada usuario debe tener acceso únicamente a los recursos estrictamente necesarios para desempeñar sus funciones. Limitar los permisos reduce significativamente el impacto de una posible vulnerabilidad.</p>
+<p><code>4. Implementar controles de autorización centralizados:</code> En lugar de validar permisos de forma diferente en cada controlador o endpoint, es recomendable centralizar la lógica de autorización mediante middleware, filtros o políticas de acceso. Esto reduce errores y facilita el mantenimiento de la aplicación.</p>
+<p><code>5. Utilizar identificadores difíciles de predecir:</code> Siempre que sea posible, utilizar identificadores aleatorios (como UUIDs) en lugar de IDs secuenciales. Aunque esto no reemplaza los controles de autorización, dificulta que un atacante pueda adivinar recursos existentes.</p>
+<p><strong>Importante:</strong> Cambiar IDs numéricos por UUIDs no soluciona una vulnerabilidad IDOR si el servidor sigue sin verificar los permisos.</p>
+<p><code>6. Evitar exponer identificadores internos innecesariamente:</code> Si un identificador interno no necesita ser visible para el usuario, es preferible no exponerlo en URLs, formularios o respuestas de la API. Reducir la exposición de estos identificadores disminuye la superficie de ataque.</p>
+<p><code>7. Proteger todos los métodos HTTP:</code> Las validaciones de autorización deben aplicarse a todos los métodos HTTP, no solo a las solicitudes de lectura (GET). También deben protegerse operaciones de modificación (POST, PUT, PATCH) y eliminación (DELETE).</p>
+<p><code>8. Registrar y monitorear accesos sospechosos:</code> Es recomendable registrar intentos de acceso a recursos no autorizados y generar alertas cuando se detecten comportamientos anómalos, como múltiples solicitudes consecutivas con distintos identificadores.</p>
+<p><code>9. Realizar pruebas de seguridad periódicas:</code> Durante las pruebas de penetración o revisiones de seguridad, es importante comprobar que los usuarios no puedan acceder, modificar o eliminar recursos pertenecientes a otras cuentas simplemente alterando un identificador.</p>
+<p><code>10. Revisar la autorización en cada nueva funcionalidad:</code> Cada vez que se desarrolla un nuevo módulo (facturas, documentos, perfiles, proyectos, imágenes, etc.), debe verificarse que todos los recursos implementen correctamente los controles de autorización antes de poner la aplicación en producción.</p>
+                    </section>
+                    <section class="content-card" id="responsabilidad-final">
+                        <div class="warning-box">
+                            <i class="fas fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 1rem;"></i>
+                            <strong>Advertencia:</strong> Todo el contenido de este artículo es estrictamente educativo.
+                            No nos hacemos responsables del mal uso de esta herramienta o información. Practica únicamente
+                            en entornos controlados y con autorización.
+                        </div>
+                    </section>
+                </article>
+            </main>
+
+            <aside class="sidebar">
+                <div class="profile-card">
+                    <div class="avatar">
+                        <img src="https://avatars.githubusercontent.com/u/75953873?v=4" alt="R3LI4NT Avatar"
+                             style="width: 100%; height: 100%; border-radius: 30px; object-fit: cover;" loading="lazy">
+                    </div>
+                    <h3 class="profile-name">R3LI4NT</h3>
+                    <p class="profile-bio">Pentester · Malware Developer</p>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div><div class="stat-number">50</div><div class="stat-label">Artículos</div></div>
+                        <div><div class="stat-number">3</div><div class="stat-label">Categorías</div></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-list"></i><span>EN ESTE ARTÍCULO</span></div>
+                    <div class="category-nav" id="sidebarToc"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-folder"></i><span>CATEGORÍAS</span></div>
+                    <div class="category-nav">
+                        <a href="../../index.html#ciberseguridad" class="nav-link"><i class="fas fa-lock" style="color: #00ff9d;"></i><span>Ciberseguridad</span></a>
+                        <a href="../../index.html#hacking" class="nav-link"><i class="fas fa-skull" style="color: #ff3b3b;"></i><span>Hacking</span></a>
+                        <a href="../../index.html#seguridad" class="nav-link"><i class="fas fa-shield-halved" style="color: #3b7bff;"></i><span>Seguridad</span></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <a href="https://github.com/R3LI4NT/articulos" target="_blank" style="text-decoration: none;">
+                        <div style="background: linear-gradient(135deg, #00ff9d, #7000ff); padding: 1.5rem; border-radius: 20px; text-align: center; color: white;">
+                            <i class="fab fa-github" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: 600;">github.com/R3LI4NT/articulos</div>
+                            <div style="font-size: 0.8rem; opacity: 0.9;">Ver repositorio →</div>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">R3LI4NT_</div>
+                    <p class="footer-tagline">Conocimiento es poder, pero poder compartido es revolución.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/R3LI4NT" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link" id="toxLink"><i class="fa-brands fa-expeditedssl"></i></a>
+                        <a href="#" class="social-link" id="emailLink"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="../../index.html#ciberseguridad">Ciberseguridad</a></li>
+                        <li><a href="../../index.html#hacking">Hacking</a></li>
+                        <li><a href="../../index.html#seguridad">Seguridad</a></li>
+                        <li><a href="../../index.html">Todos los artículos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="https://github.com/R3LI4NT/articulos" target="_blank">GitHub</a></li>
+                        <li><a href="https://r3li4nt.github.io/" target="_blank">Currículum Vitae</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul><li><a href="#" id="responsabilidadLink">Responsabilidad</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 R3LI4NT · Todos los derechos reservados.</p>
+                <div class="matrix-code">{ 0x52, 0x33, 0x4c, 0x49, 0x34, 0x4e, 0x54 }</div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toxModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fa-brands fa-expeditedssl"></i></div>
+                <h2 class="modal-title">Tox ID</h2>
+                <div class="modal-info"><span class="modal-label">Tox ID:</span></div>
+                <div class="modal-complete"><code class="modal-code" style="font-size: 0.8rem; word-break: break-all;">08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426')"><i class="fas fa-copy"></i> Copiar Tox ID</button>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;"><i class="fas fa-info-circle"></i> Tox para comunicación segura</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-envelope"></i></div>
+                <h2 class="modal-title">Contacto</h2>
+                <div class="modal-info"><span class="modal-label">Email:</span><span class="modal-value">r3li4nt.contact</span></div>
+                <div class="modal-info"><span class="modal-label">Dominio:</span><span class="modal-value">keemail.me</span></div>
+                <div class="modal-complete"><code class="modal-code">r3li4nt.contact@keemail.me</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('r3li4nt.contact@keemail.me')"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="responsabilidadModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-gavel"></i></div>
+                <h2 class="modal-title">Responsabilidad</h2>
+                <div class="modal-info" style="text-align: center; margin: 2rem 0;"><span class="modal-label" style="font-size: 1.2rem;">⚠️ AVISO IMPORTANTE ⚠️</span></div>
+                <div class="modal-complete" style="margin: 1.5rem 0;"><p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; text-align: center;">Todo lo que se enseñe en estos artículos es con fines educativos</p></div>
+                <button class="modal-copy-btn" onclick="closeAllModals()"><i class="fas fa-check"></i> Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage" alt="Imagen ampliada">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        function openImageModal(src, caption) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImage').src = src;
+            document.getElementById('modalCaption').innerHTML = caption;
+            modal.style.display = "flex";
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const headings = document.querySelectorAll('article .content-card h2');
+            const sidebarToc = document.getElementById('sidebarToc');
+            if (headings.length && sidebarToc) {
+                sidebarToc.innerHTML = '';
+                headings.forEach((heading, index) => {
+                    const id = heading.textContent.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+                    heading.id = id || `section-${index}`;
+                    const link = document.createElement('a');
+                    link.href = `#${heading.id}`;
+                    link.className = 'nav-link';
+                    link.innerHTML = `<i class="fas fa-chevron-right"></i><span>${heading.textContent.replace('#', '').trim()}</span>`;
+                    sidebarToc.appendChild(link);
+                });
+                document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const t = document.querySelector(this.getAttribute('href'));
+                        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                });
+                window.addEventListener('scroll', function() {
+                    let current = '';
+                    const scrollPos = window.scrollY + 120;
+                    headings.forEach(heading => {
+                        const s = heading.closest('.content-card');
+                        if (s && scrollPos >= s.offsetTop && scrollPos < s.offsetTop + s.offsetHeight) current = heading.id;
+                    });
+                    document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+                    });
+                });
+            }
+            const bind = (id, modal) => { const el = document.getElementById(id); if (el) el.addEventListener('click', e => { e.preventDefault(); document.getElementById(modal).style.display = 'flex'; }); };
+            bind('toxLink', 'toxModal'); bind('emailLink', 'emailModal'); bind('responsabilidadLink', 'responsabilidadModal');
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', closeAllModals));
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) closeAllModals(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+        });
+        function copyCommand(cmd) { navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado al portapapeles'), () => alert('Error al copiar')); }
+        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('Copiado al portapapeles'), () => alert('Error al copiar')); }
+        function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('imageModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        window.openImageModal = openImageModal; window.closeImageModal = closeImageModal;
+    </script>
+</body>
+</html>

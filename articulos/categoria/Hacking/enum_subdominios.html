@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enumeración de Subdominios · R3LI4NT</title>
+    <meta name="description" content="Un subdominio es una subdivisión/subgrupo de un dominio principal lo que permite navegar en diferentes secciones del sitio web, permitiendo así mejorar la...">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/x-icon" href="../../img/favicon.ico">
+    <style>
+        .article-metadata {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metadata-item i {
+            color: var(--accent-primary);
+            width: 20px;
+        }
+
+        .metadata-item strong {
+            color: var(--text-primary);
+            margin-right: 0.3rem;
+        }
+
+        .tag-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .article-tag {
+            padding: 0.3rem 1rem;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .article-tag:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .warning-box {
+            background: rgba(255, 59, 59, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            background: rgba(59, 123, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .tip-box {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .command-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-block pre {
+            margin: 0;
+            color: #b3ff9e;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-prompt {
+            color: var(--accent-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-copy:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .image-container {
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            background-color: rgba(0, 10, 0, 0.5);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .image-container:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 25px var(--glow-color);
+            transform: scale(1.01);
+        }
+
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+        }
+
+        .clickable-image {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clickable-image:hover {
+            filter: brightness(1.2);
+        }
+
+        .image-caption {
+            margin-top: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .zoom-hint {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            margin-left: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .image-container:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        .external-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-primary);
+            transition: all 0.3s;
+        }
+
+        .external-link:hover {
+            color: white;
+            border-bottom-color: white;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .pagination-article {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .pagination-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination-link.prev i {
+            margin-right: 0.5rem;
+        }
+
+        .pagination-link.next i {
+            margin-left: 0.5rem;
+        }
+
+        .related-articles {
+            margin: 3rem 0;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px var(--glow-color);
+        }
+
+        .related-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .related-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(0, 10, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--accent-primary);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(0, 255, 157, 0.05);
+            color: var(--text-primary);
+        }
+
+        .comparison-table code {
+            color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        #sidebarToc {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        #sidebarToc::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #sidebarToc::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        #sidebarToc .nav-link {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        #sidebarToc .nav-link.active {
+            border-left-color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--accent-primary);
+        }
+
+        #sidebarToc .nav-link i {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .article-metadata {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .pagination-article {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #imageModal .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 0 50px var(--glow-color);
+            animation: zoom 0.3s ease-in-out;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #imageModal .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1001;
+            text-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        #imageModal .modal-close:hover {
+            color: var(--accent-primary);
+            transform: rotate(90deg);
+        }
+
+        #imageModal .modal-caption {
+            margin: 20px auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .download-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 255, 157, 0.2));
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-primary);
+            color: black;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* ===== Responsive movil mejorado (Android / iPhone) ===== */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; }
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+            img { max-width: 100%; height: auto; }
+            .glitch-wrapper { font-size: 2rem !important; word-break: break-word; line-height: 1.2; }
+            .glitch { word-break: break-word; }
+            .glitch::before, .glitch::after { display: none; }
+            .hero-description { font-size: 1.05rem; }
+            .section-title { font-size: 1.3rem; }
+            .breadcrumb { flex-wrap: wrap; row-gap: 0.3rem; font-size: 0.82rem; }
+            .article-metadata { flex-wrap: wrap; gap: 0.6rem; }
+            .tag-container { flex-wrap: wrap; }
+            .content-card { padding: 1.25rem; }
+            .command-block { padding: 1rem; padding-top: 2.6rem; font-size: 0.85rem; }
+            .command-block pre { white-space: pre-wrap; word-break: break-word; }
+            .comparison-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .article-full a, .article-full code { word-break: break-word; overflow-wrap: anywhere; }
+            #imageModal .modal-content { max-width: 94%; max-height: 78%; }
+            #imageModal .modal-caption { width: 92%; font-size: 0.95rem; }
+            #imageModal .modal-close { top: 10px; right: 16px; font-size: 34px; }
+        }
+        @media (max-width: 480px) {
+            .glitch-wrapper { font-size: 1.55rem !important; }
+            .hero-description { font-size: 0.98rem; }
+            .section-title { font-size: 1.12rem; }
+            .article-full { font-size: 0.95rem; }
+            .content-card { padding: 1rem; }
+            .command-block { font-size: 0.78rem; padding: 0.85rem; padding-top: 2.6rem; }
+            .article-metadata { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header class="hero" style="min-height: 40vh;">
+            <div class="hero-content">
+                <div class="glitch-wrapper" style="font-size: 2.2rem;">
+                    <div class="glitch" data-text="Enumeración de Subdominios">Enumeración de Subdominios</div>
+                </div>
+                <p class="hero-description" style="font-size: 1.05rem;">&gt; Un subdominio es una subdivisión/subgrupo de un dominio principal lo que permite navegar en diferentes secciones del sitio web, permitiendo así mejorar la... <span class="os-badge linux" style="margin-left:.6rem;"><i class="fab fa-linux"></i> Linux</span></p>
+                <div class="article-metadata">
+                    <span class="metadata-item"><i class="fas fa-user-secret"></i><strong>Autor:</strong> R3LI4NT</span>
+                    <span class="metadata-item"><i class="fas fa-tag"></i><strong>Categoría:</strong> Hacking</span>
+                    <span class="metadata-item"><i class="fas fa-shield-halved"></i><strong>Nivel:</strong> Práctico</span>
+                </div>
+                <div class="tag-container">
+                    <span class="article-tag"><i class="fab fa-linux"></i> Linux</span>
+                    <span class="article-tag"><i class="fas fa-folder-open"></i> Web Pentesting</span>
+                    <span class="article-tag"><i class="fas fa-graduation-cap"></i> Educativo</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="breadcrumb" style="margin: 1rem 0;">
+            <a href="../../index.html" class="breadcrumb-link"><i class="fas fa-home"></i> Inicio</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="../../index.html#hacking" class="breadcrumb-link"><i class="fas fa-skull"></i> Hacking</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-link">Web Pentesting</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Enumeración de Subdominios</span>
+        </div>
+
+        <div class="main-grid">
+            <main>
+                <article class="article-full">
+                    <section class="content-card" id="que-es-un-sub-dominio-0">
+                        <h2 class="section-title"><span class="hash">#</span> ¿Qué es un SUB-DOMINIO?</h2>
+                        <p>Un subdominio es una subdivisión/subgrupo de un dominio principal lo que permite navegar en diferentes secciones del sitio web, permitiendo así mejorar la navegación del sitio web, el SEO y demás necesidades. </p>
+<p>Por ejemplo, supongamos que nuestro sitio web es: https://tienda-software.com</p>
+<p>El dominio principal es <code>tienda-software.com</code> y los subdominios pueden ser: </p>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Subdominios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin.tienda-software.com</td>
+</tr>
+<tr>
+<td>clientes.tienda-software.com</td>
+</tr>
+<tr>
+<td>contacto.tienda-software.com</td>
+</tr>
+<tr>
+<td>email.tienda-software.com</td>
+</tr>
+<tr>
+<td>test.tienda-software.com</td>
+</tr>
+<tr>
+<td>articulos.tienda-software.com</td>
+</tr>
+</tbody>
+</table>
+<p>Gracias a estos subdominios es mucho más dinámico gestionar diferentes secciones del sitio web de manera más independiente.</p>
+<p>
+  <figure class="image-container" onclick="openImageModal('../img/subdominio.png', 'Ilustración del procedimiento')"><img src="../img/subdominio.png" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure>
+</p>
+
+<h3 style="color: var(--accent-primary); margin: 1.6rem 0 1rem;">Hacking Ético</h3>
+<p>La enumeración de subdominios es una actividad crucial durante la fase de reconocimiento en un pentesting o prueba de penetración. Este proceso implica identificar todos los subdominios asociados con un dominio principal.</p>
+<p><strong>Importancia de la Enumeración de Subdominios en Pentesting</strong></p>
+<ul>
+<li>
+<p><code>Detección de Superficies de Ataque:</code> Cada subdominio puede representar una entrada potencial para un atacante. Al descubrir todos los subdominios, los pentesters pueden identificar y evaluar más superficies de ataque.</p>
+</li>
+<li>
+<p><code>Descubrimiento de Servicios Ocultos:</code> Algunos subdominios pueden alojar servicios o aplicaciones menos conocidos, que podrían ser más vulnerables debido a una menor atención en su seguridad.</p>
+</li>
+<li>
+<p><code>Servicios y Aplicaciones Vulnerables:</code> Subdominios pueden estar corriendo aplicaciones o servicios desactualizados o mal configurados, lo que aumenta las posibilidades de encontrar vulnerabilidades explotables.</p>
+</li>
+<li>
+<p><code>Información Sensible:</code> Algunos subdominios pueden alojar páginas de administración, bases de datos o archivos de configuración expuestos, que contienen información sensible.</p>
+</li>
+</ul>
+<h4 style="color: var(--accent-blue); margin: 1.4rem 0 .8rem;">Ejemplo Práctico</h4>
+<p>Imagina que estás realizando un pentesting para una empresa con el dominio principal <code>empresa.com</code>. Mediante la enumeración de subdominios, descubres:</p>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Subdominios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>blog.empresa.com</td>
+</tr>
+<tr>
+<td>tienda.empresa.com</td>
+</tr>
+<tr>
+<td>admin.empresa.com</td>
+</tr>
+<tr>
+<td>dev.empresa.com</td>
+</tr>
+</tbody>
+</table>
+<p>Cada uno de estos subdominios podría estar ejecutando servicios diferentes y tener configuraciones de seguridad distintas. El subdominio <code>admin.empresa.com</code> podría exponer una interfaz de administración sin las debidas protecciones, y <code>dev.empresa.com</code> podría tener aplicaciones en desarrollo con vulnerabilidades conocidas.</p>
+                    </section>
+                    <section class="content-card" id="enumerar-subdominios-subfinder-1">
+                        <h2 class="section-title"><span class="hash">#</span> Enumerar Subdominios | SUBFINDER</h2>
+                        <p>Subfinder es una de las herramientas más efectivas y rápidas para descubrir subdominios, esta programada en lenguaje Go y utiliza fuentes pasivas en línea para su descubrimiento. </p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sudo apt-get install subfinder')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sudo apt-get install subfinder</pre></div>
+<p><strong><em>Desde Go:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest</pre></div>
+<p>Una vez instalado, es hora de jugar con él. El siguiente parámetro hará un escaneo básico en busca de subdominios:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('subfinder -d &lt;DOMINIO&gt;\nsubfinder -d mercadolibre.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> subfinder -d &lt;DOMINIO&gt;
+subfinder -d mercadolibre.com</pre></div>
+<ul>
+<li><strong>-d</strong>: Especificar dominio.</li>
+</ul>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/666d9ceb-d91d-4a4e-bae0-f74cbcc4afd1', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/666d9ceb-d91d-4a4e-bae0-f74cbcc4afd1" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Para guardar los subdominios en un documento de texto, es tan sencillo como especificarle con el parámetro <code>-o</code>:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('subfinder -d &lt;DOMINIO&gt; -o subdominios.txt\n\nsubfinder -d mercadolibre.com -o subdominios.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> subfinder -d &lt;DOMINIO&gt; -o subdominios.txt
+
+subfinder -d mercadolibre.com -o subdominios.txt</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/4286f59c-53a7-43ba-a068-c7857790e335', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/4286f59c-53a7-43ba-a068-c7857790e335" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Supongamos que queremos enumerar subdominios pero de diferentes dominios. Para ello, existe el parámetro <code>-dL</code> que permite especificarle un documento de texto que contiene varios dominios.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/5cc27754-af41-4110-b049-1de649c36688', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/5cc27754-af41-4110-b049-1de649c36688" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Y quedaría de la siguiente manera:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('subfinder -dL &lt;ARCHIVO-DOMINIOS.txt&gt;\n\nEJ: subfinder -dL dominios.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> subfinder -dL &lt;ARCHIVO-DOMINIOS.txt&gt;
+
+EJ: subfinder -dL dominios.txt</pre></div>
+<p>Comenzará a enumerar dominio por dominio.</p>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/ce6e17db-8df2-44af-b505-f37cf834b55b', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/ce6e17db-8df2-44af-b505-f37cf834b55b" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Subfinder usa varias fuentes pasivas en la enumeraicón, si deseamos excluir cierta fuente:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('subfinder -es &lt;FUENTE&gt; -d &lt;DOMINIO&gt;\n\nEJ: subfinder -es virustotal.com -d mercadolibre.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> subfinder -es &lt;FUENTE&gt; -d &lt;DOMINIO&gt;
+
+EJ: subfinder -es virustotal.com -d mercadolibre.com</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/560f5b1c-4f12-4000-a797-034818c50dcb', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/560f5b1c-4f12-4000-a797-034818c50dcb" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+                    </section>
+                    <section class="content-card" id="enumerar-subdominios-sublist3r-2">
+                        <h2 class="section-title"><span class="hash">#</span> Enumerar Subdominios | SUBLIST3R</h2>
+                        <p>Sublist3r es una herramienta basada en el lenguaje de Python, su función u objetivo principal es identificar subdominios existentes que se encuentran bajo un dominio. Enumera dominios usando motores como Google, Yahoo, Bing, Baidu and Ask.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('git clone https://github.com/aboul3la/Sublist3r.git\ncd Sublist3r\npip install -r requirements.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> git clone https://github.com/aboul3la/Sublist3r.git
+cd Sublist3r
+pip install -r requirements.txt</pre></div>
+<p>Ahora, nos queda empezar a hacer las búsquedas de dominio, tan solo agregando el siguiente comando seguido del sitio o dominio al que se analizará:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sublist3r.py -d &lt;DOMINIO&gt;\n\nEJ: python3 sublist3r.py -d mercadolibre.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sublist3r.py -d &lt;DOMINIO&gt;
+
+EJ: python3 sublist3r.py -d mercadolibre.com</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/1a1fb40b-f117-462b-bb7d-c1146b55a677', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/1a1fb40b-f117-462b-bb7d-c1146b55a677" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Enumerar subdominios utilizando motores específicos como Google:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sublist3r.py -d mercadolibre.com -e Google\n\npython3 sublist3r.py -d &lt;DOMINIO&gt; -e &lt;MOTOR&gt;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sublist3r.py -d mercadolibre.com -e Google
+
+python3 sublist3r.py -d &lt;DOMINIO&gt; -e &lt;MOTOR&gt;</pre></div>
+<p>Guardar los subdominios en un documento de texto:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sublist3r.py -d &lt;DOMINIO&gt; -o &lt;ARCHIVO.TXT&gt;\n\npython3 sublist3r.py -d mercadolibre.com -o subdominios.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sublist3r.py -d &lt;DOMINIO&gt; -o &lt;ARCHIVO.TXT&gt;
+
+python3 sublist3r.py -d mercadolibre.com -o subdominios.txt</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/495b7848-2633-4c28-bbee-c68a94e6e1cc', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/495b7848-2633-4c28-bbee-c68a94e6e1cc" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Supongamos que tenemos un diccionario específico, con Sublist3r podemos aplicarle fuerza bruta.</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 sublist3r.py -d &lt;DOMINIO&gt; -b &lt;DICCIONARIO.txt&gt;\n\npython3 sublist3r.py -d mercadolibre.com -b /usr/share/wordlists/amass/subdomains-top1mil-20000.txt')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 sublist3r.py -d &lt;DOMINIO&gt; -b &lt;DICCIONARIO.txt&gt;
+
+python3 sublist3r.py -d mercadolibre.com -b /usr/share/wordlists/amass/subdomains-top1mil-20000.txt</pre></div>
+<ul>
+<li><strong>-b</strong>: Habilitar fuerza bruta.</li>
+</ul>
+                    </section>
+                    <section class="content-card" id="enumerar-subdominios-subbrute-3">
+                        <h2 class="section-title"><span class="hash">#</span> Enumerar Subdominios | SUBBRUTE</h2>
+                        <p>SubBrute es una herramienta rápida para la enumeración de subdominios por fuerza bruta. Puede ocultar el origen del escaneo usando resolutores abiertos como proxies para evitar límites de velocidad DNS. Además, puede funcionar como un spider de DNS, rastreando registros de manera recursiva, lo que la convierte en una herramienta integral para este tipo de ataques.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('git clone https://github.com/TheRook/subbrute\ncd subbrute\npyhon3 subbrute.py')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> git clone https://github.com/TheRook/subbrute
+cd subbrute
+pyhon3 subbrute.py</pre></div>
+<p>Enumerar subdominios:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('python3 subbrute.py &lt;DOMINIO&gt;\n\nEJ: python3 subbrute.py mercadolibre.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> python3 subbrute.py &lt;DOMINIO&gt;
+
+EJ: python3 subbrute.py mercadolibre.com</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/034b9dc1-977f-4d04-8661-3aca746a57d3', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/034b9dc1-977f-4d04-8661-3aca746a57d3" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<h3 style="color: var(--accent-primary); margin: 1.6rem 0 1rem;">Enumerar Subdominios | AMASS</h3>
+<p>Amass, desarrollado por Jeff Foley, es una de las herramientas más poderosas para la enumeración de subdominios. Utiliza técnicas como scraping, fuerza bruta recursiva, barrido de DNS inverso y aprendizaje automático para recopilar y acumular grandes cantidades de datos de subdominios.</p>
+<p><strong><em>Instalar en Debian:</em></strong></p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('sudo apt-get install amass')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> sudo apt-get install amass</pre></div>
+<p>El siguiente comando enumerará los subdominios:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('amass enum -d &lt;DOMINIO&gt;\n\nEJ: amass enum -d mercadolibre.com')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> amass enum -d &lt;DOMINIO&gt;
+
+EJ: amass enum -d mercadolibre.com</pre></div>
+<p><figure class="image-container" onclick="openImageModal('https://github.com/R3LI4NT/articulos/assets/75953873/6b0cfc9c-6a31-4af4-a45a-236d2e2bfdb3', 'Ilustración del procedimiento')"><img src="https://github.com/R3LI4NT/articulos/assets/75953873/6b0cfc9c-6a31-4af4-a45a-236d2e2bfdb3" alt="Ilustración del procedimiento" class="article-image clickable-image" loading="lazy"><figcaption class="image-caption">Ilustración del procedimiento <span class="zoom-hint">🔍 click para ampliar</span></figcaption></figure></p>
+<p>Amass puede realizar enumeraciones tanto en modos pasivos como activos.</p>
+<ul>
+<li><strong>Modo Pasivo</strong>: El modo pasivo se centra en recopilar información sin interactuar directamente con el objetivo, lo que reduce la posibilidad de ser detectado. Utiliza fuentes públicas y bases de datos disponibles en línea para encontrar subdominios.</li>
+</ul>
+<p>Para realizar una enumeración pasiva, puedes usar el siguiente comando:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('amass enum -passive -d &lt;DOMINIO&gt;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> amass enum -passive -d &lt;DOMINIO&gt;</pre></div>
+<ul>
+<li><strong>Modo Activo</strong>: El modo activo implica interactuar directamente con los servidores del dominio objetivo, realizando consultas DNS, barridos de DNS inverso y otras técnicas que pueden generar tráfico detectable hacia el objetivo.</li>
+</ul>
+<p>Para realizar una enumeración activa (que es el modo por defecto), puedes usar el comando básico:</p>
+<div class="command-block"><button class="command-copy" onclick="copyCommand('amass enum -d  &lt;DOMINIO&gt;')"><i class="fas fa-copy"></i></button><pre><span class="code-prompt">$</span> amass enum -d  &lt;DOMINIO&gt;</pre></div>
+                    </section>
+                    <section class="content-card" id="responsabilidad-final">
+                        <div class="warning-box">
+                            <i class="fas fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 1rem;"></i>
+                            <strong>Advertencia:</strong> Todo el contenido de este artículo es estrictamente educativo.
+                            No nos hacemos responsables del mal uso de esta herramienta o información. Practica únicamente
+                            en entornos controlados y con autorización.
+                        </div>
+                    </section>
+                </article>
+            </main>
+
+            <aside class="sidebar">
+                <div class="profile-card">
+                    <div class="avatar">
+                        <img src="https://avatars.githubusercontent.com/u/75953873?v=4" alt="R3LI4NT Avatar"
+                             style="width: 100%; height: 100%; border-radius: 30px; object-fit: cover;" loading="lazy">
+                    </div>
+                    <h3 class="profile-name">R3LI4NT</h3>
+                    <p class="profile-bio">Pentester · Malware Developer</p>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div><div class="stat-number">50</div><div class="stat-label">Artículos</div></div>
+                        <div><div class="stat-number">3</div><div class="stat-label">Categorías</div></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-list"></i><span>EN ESTE ARTÍCULO</span></div>
+                    <div class="category-nav" id="sidebarToc"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title"><i class="fas fa-folder"></i><span>CATEGORÍAS</span></div>
+                    <div class="category-nav">
+                        <a href="../../index.html#ciberseguridad" class="nav-link"><i class="fas fa-lock" style="color: #00ff9d;"></i><span>Ciberseguridad</span></a>
+                        <a href="../../index.html#hacking" class="nav-link"><i class="fas fa-skull" style="color: #ff3b3b;"></i><span>Hacking</span></a>
+                        <a href="../../index.html#seguridad" class="nav-link"><i class="fas fa-shield-halved" style="color: #3b7bff;"></i><span>Seguridad</span></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <a href="https://github.com/R3LI4NT/articulos" target="_blank" style="text-decoration: none;">
+                        <div style="background: linear-gradient(135deg, #00ff9d, #7000ff); padding: 1.5rem; border-radius: 20px; text-align: center; color: white;">
+                            <i class="fab fa-github" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: 600;">github.com/R3LI4NT/articulos</div>
+                            <div style="font-size: 0.8rem; opacity: 0.9;">Ver repositorio →</div>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">R3LI4NT_</div>
+                    <p class="footer-tagline">Conocimiento es poder, pero poder compartido es revolución.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/R3LI4NT" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link" id="toxLink"><i class="fa-brands fa-expeditedssl"></i></a>
+                        <a href="#" class="social-link" id="emailLink"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="../../index.html#ciberseguridad">Ciberseguridad</a></li>
+                        <li><a href="../../index.html#hacking">Hacking</a></li>
+                        <li><a href="../../index.html#seguridad">Seguridad</a></li>
+                        <li><a href="../../index.html">Todos los artículos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="https://github.com/R3LI4NT/articulos" target="_blank">GitHub</a></li>
+                        <li><a href="https://r3li4nt.github.io/" target="_blank">Currículum Vitae</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul><li><a href="#" id="responsabilidadLink">Responsabilidad</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 R3LI4NT · Todos los derechos reservados.</p>
+                <div class="matrix-code">{ 0x52, 0x33, 0x4c, 0x49, 0x34, 0x4e, 0x54 }</div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toxModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fa-brands fa-expeditedssl"></i></div>
+                <h2 class="modal-title">Tox ID</h2>
+                <div class="modal-info"><span class="modal-label">Tox ID:</span></div>
+                <div class="modal-complete"><code class="modal-code" style="font-size: 0.8rem; word-break: break-all;">08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('08F21D19C314DB89700317A932C72EB26035AE002C34419E851730D751C579310AEB06CF4426')"><i class="fas fa-copy"></i> Copiar Tox ID</button>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;"><i class="fas fa-info-circle"></i> Tox para comunicación segura</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-envelope"></i></div>
+                <h2 class="modal-title">Contacto</h2>
+                <div class="modal-info"><span class="modal-label">Email:</span><span class="modal-value">r3li4nt.contact</span></div>
+                <div class="modal-info"><span class="modal-label">Dominio:</span><span class="modal-value">keemail.me</span></div>
+                <div class="modal-complete"><code class="modal-code">r3li4nt.contact@keemail.me</code></div>
+                <button class="modal-copy-btn" onclick="copyToClipboard('r3li4nt.contact@keemail.me')"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="responsabilidadModal" class="modal">
+        <div class="modal-content"><span class="modal-close">&times;</span>
+            <div class="modal-card"><div class="modal-icon"><i class="fas fa-gavel"></i></div>
+                <h2 class="modal-title">Responsabilidad</h2>
+                <div class="modal-info" style="text-align: center; margin: 2rem 0;"><span class="modal-label" style="font-size: 1.2rem;">⚠️ AVISO IMPORTANTE ⚠️</span></div>
+                <div class="modal-complete" style="margin: 1.5rem 0;"><p style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.6; text-align: center;">Todo lo que se enseñe en estos artículos es con fines educativos</p></div>
+                <button class="modal-copy-btn" onclick="closeAllModals()"><i class="fas fa-check"></i> Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage" alt="Imagen ampliada">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        function openImageModal(src, caption) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImage').src = src;
+            document.getElementById('modalCaption').innerHTML = caption;
+            modal.style.display = "flex";
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const headings = document.querySelectorAll('article .content-card h2');
+            const sidebarToc = document.getElementById('sidebarToc');
+            if (headings.length && sidebarToc) {
+                sidebarToc.innerHTML = '';
+                headings.forEach((heading, index) => {
+                    const id = heading.textContent.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+                    heading.id = id || `section-${index}`;
+                    const link = document.createElement('a');
+                    link.href = `#${heading.id}`;
+                    link.className = 'nav-link';
+                    link.innerHTML = `<i class="fas fa-chevron-right"></i><span>${heading.textContent.replace('#', '').trim()}</span>`;
+                    sidebarToc.appendChild(link);
+                });
+                document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const t = document.querySelector(this.getAttribute('href'));
+                        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                });
+                window.addEventListener('scroll', function() {
+                    let current = '';
+                    const scrollPos = window.scrollY + 120;
+                    headings.forEach(heading => {
+                        const s = heading.closest('.content-card');
+                        if (s && scrollPos >= s.offsetTop && scrollPos < s.offsetTop + s.offsetHeight) current = heading.id;
+                    });
+                    document.querySelectorAll('#sidebarToc .nav-link').forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+                    });
+                });
+            }
+            const bind = (id, modal) => { const el = document.getElementById(id); if (el) el.addEventListener('click', e => { e.preventDefault(); document.getElementById(modal).style.display = 'flex'; }); };
+            bind('toxLink', 'toxModal'); bind('emailLink', 'emailModal'); bind('responsabilidadLink', 'responsabilidadModal');
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', closeAllModals));
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) closeAllModals(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+        });
+        function copyCommand(cmd) { navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado al portapapeles'), () => alert('Error al copiar')); }
+        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('Copiado al portapapeles'), () => alert('Error al copiar')); }
+        function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('imageModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        window.openImageModal = openImageModal; window.closeImageModal = closeImageModal;
+    </script>
+</body>
+</html>
